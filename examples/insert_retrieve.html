@@ -78,7 +78,7 @@
 			 * create some objects and save them in myObjects
 			 */
 			var createObjects = function() {
-				for( var i=0;i<150;i=i+1 ) {
+				for( var i=0;i<200;i=i+1 ) {
 					myObjects.push({
 						x : randMinMax(10, 390),
 						y : randMinMax(10, 290),
@@ -173,7 +173,7 @@
 			 */
 			var loop = function() {
 				
-				var returnNodes = [];
+				var returnObjects = [];
 				
 				//clear the tree
 				myTree.clear();
@@ -200,17 +200,11 @@
 				ctx.strokeRect( myHero.x, myHero.y, myHero.width, myHero.height );
 				
 				//retrieve all objects in the bounds of the hero 
-				myTree.retrieve( returnNodes, myHero );
+				returnObjects = myTree.retrieve( myHero );
 				
-				//for each node ...
-				for( i=0;i<returnNodes.length;i=i+1 ) {
-					
-					//for each object inside the node ...
-					for( var k=0;k< returnNodes[ i ].length;k=k+1 ) {
-						
-						//set check to true, so we know our retrieved objects 
-						returnNodes[ i ][ k ].check = true;
-					}
+				//flag retrieved objects
+				for( i=0;i<returnObjects.length;i=i+1 ) {
+					returnObjects[ i ].check = true;
 				}
 				
 				
