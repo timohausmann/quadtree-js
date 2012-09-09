@@ -146,15 +146,24 @@
 	 /*
 	 * Return all objects that could collide with the given object
 	 */
-	
 	 Quadtree.prototype.retrieve = function( returnObjects, pRect ) {
 	 	
 		var 	t = this,
 			index = t.getIndex( pRect );
 			
+		//if we have subnodes ...
+		if( typeof t.nodes[0] !== 'undefined' ) {
 			
-		if( index !== -1 && typeof t.nodes[0] !== 'undefined' ) {
-			t.nodes[index].retrieve( returnObjects, pRect );
+			//if given pRect fits into a subnode ..
+			if( index !== -1 ) {
+				t.nodes[index].retrieve( returnObjects, pRect );
+				
+			//if given pRect does not fit into a single subnode, check it against all subnodes
+			} else {
+				for( var i=0; i < t.nodes.length; i=i+1 ) {
+					t.nodes[i].retrieve( returnObjects, pRect );
+				}
+			}
 		}
 	 
 		returnObjects.push( t.objects );
