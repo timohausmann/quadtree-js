@@ -1,16 +1,20 @@
 ;(function(w, M) {
  	
 	 /*
-	  * Constructor
+	  * Quadtree Constructor
+	  * @param Object bounds		bounds of the node, object with x, y, width, height
+	  * @param Integer max_objects		(optional) max objects a node can hold before splitting into 4 subnodes (default: 10)
+	  * @param Integer max_levels		(optional) total max levels inside root Quadtree (default: 4) 
+	  * @param Integer level		(optional) deepth level, required for subnodes  
 	  */
-	function Quadtree( level, bounds ) {
+	function Quadtree( bounds, max_objects, max_levels, level ) {
 		
 		var t = this;
 		
-		t.MAX_OBJECTS	= 10;
-		t.MAX_LEVELS	= 5;
+		t.max_objects	= max_objects || 10;
+		t.max_levels	= max_levels || 4;
 		
-		t.level 	= level;
+		t.level 	= level || 0;
 		t.bounds 	= bounds;
 		
 		t.objects 	= [];
@@ -19,54 +23,59 @@
 	
 	
 	
-	
 	/*
-	 * Splits the node into 4 subnodes
+	 * Split the node into 4 subnodes
 	 */
 	Quadtree.prototype.split = function() {
+		
+		//cancel if we already have subnodes
+		if( typeof this.nodes[0] !== 'undefined' ) return;
 		
 		var 	t 		= this,
 			nextLevel	= t.level+1,
 			subWidth	= M.round( t.bounds.width / 2 ),
 			subHeight 	= M.round( t.bounds.height / 2 ),
 			x 		= M.round( t.bounds.x ),
-			y 		= M.round( t.bounds.y );
-					
-		if( typeof t.nodes[0] !== 'undefined' ) {
-			return;
-		}
+			y 		= M.round( t.bounds.y );		
 	 
-		t.nodes[0] = new Quadtree( nextLevel, {
+	 	//top right node
+		t.nodes[0] = new Quadtree({
 			x	: x + subWidth, 
 			y	: y, 
 			width	: subWidth, 
 			height	: subHeight
-		});
-		t.nodes[1] = new Quadtree( nextLevel, {
+		}, t.max_objects, t.max_levels, nextLevel);
+		
+		//top left node
+		t.nodes[1] = new Quadtree({
 			x	: x, 
 			y	: y, 
 			width	: subWidth, 
 			height	: subHeight
-		});
-		t.nodes[2] = new Quadtree( nextLevel, {
+		}, t.max_objects, t.max_levels, nextLevel);
+		
+		//bottom left node
+		t.nodes[2] = new Quadtree({
 			x	: x, 
 			y	: y + subHeight, 
 			width	: subWidth, 
 			height	: subHeight
-		});
-		t.nodes[3] = new Quadtree( nextLevel, {
+		}, t.max_objects, t.max_levels, nextLevel);
+		
+		//bottom right node
+		t.nodes[3] = new Quadtree({
 			x	: x + subWidth, 
 			y	: y + subHeight, 
 			width	: subWidth, 
 			height	: subHeight
-		});
+		}, t.max_objects, t.max_levels, nextLevel);
 	};
 	
 	
 	/*
-	 * Determine which node the object belongs to. -1 means
-	 * object cannot completely fit within a child node and is part
-	 * of the parent node
+	 * Determine which node the object belongs to
+	 * @param Object pRect		bounds of the area to be checked, with x, y, width, height
+	 * @return Integer		index of the subnode (0-3), or -1 if pRect cannot completely fit within a subnode and is part of the parent node
 	 */
 	Quadtree.prototype.getIndex = function( pRect ) {
 		
@@ -75,13 +84,13 @@
 			verticalMidpoint 	= t.bounds.x + (t.bounds.width / 2),
 			horizontalMidpoint 	= t.bounds.y + (t.bounds.height / 2),
 	 
-			// Object can completely fit within the top quadrants
+			//pRect can completely fit within the top quadrants
 			topQuadrant = (pRect.y < horizontalMidpoint && pRect.y + pRect.height < horizontalMidpoint),
 			
-			// Object can completely fit within the bottom quadrants
+			//pRect can completely fit within the bottom quadrants
 			bottomQuadrant = (pRect.y > horizontalMidpoint);
 		 
-		// Object can completely fit within the left quadrants
+		//pRect can completely fit within the left quadrants
 		if( pRect.x < verticalMidpoint && pRect.x + pRect.width < verticalMidpoint ) {
 			if( topQuadrant ) {
 				index = 1;
@@ -89,7 +98,7 @@
 				index = 2;
 			}
 			
-		// Object can completely fit within the right quadrants	
+		//pRect can completely fit within the right quadrants	
 		} else if( pRect.x > verticalMidpoint ) {
 			if( topQuadrant ) {
 				index = 0;
@@ -103,9 +112,10 @@
 	
 	
 	/*
-	 * Insert the object into the quadtree. If the node
+	 * Insert the object into the node. If the node
 	 * exceeds the capacity, it will split and add all
-	 * objects to their corresponding nodes.
+	 * objects to their corresponding subnodes.
+	 * @param Object pRect		bounds of the object to be added, with x, y, width, height
 	 */
 	Quadtree.prototype.insert = function( pRect ) {
 		
@@ -113,7 +123,7 @@
 	 		i = 0,
 	 		index;
 	 	
-	 	//if we have childnodes ...
+	 	//if we have subnodes ...
 		if( typeof t.nodes[0] !== 'undefined' ) {
 			index = t.getIndex( pRect );
 	 
@@ -125,7 +135,7 @@
 	 
 	 	t.objects.push( pRect );
 		
-		if( t.objects.length > t.MAX_OBJECTS && t.level < t.MAX_LEVELS ) {
+		if( t.objects.length > t.max_objects && t.level < t.max_levels ) {
 			
 			t.split();
 			
@@ -145,6 +155,8 @@
 	 
 	 /*
 	 * Return all objects that could collide with the given object
+	 * @param Object pRect		bounds of the object to be checked, with x, y, width, height
+	 * @Return Array		array with all detected objects
 	 */
 	Quadtree.prototype.retrieve = function( pRect ) {
 	 	
@@ -155,11 +167,11 @@
 		//if we have subnodes ...
 		if( typeof t.nodes[0] !== 'undefined' ) {
 			
-			//if given pRect fits into a subnode ..
+			//if pRect fits into a subnode ..
 			if( index !== -1 ) {
 				returnObjects = returnObjects.concat( t.nodes[index].retrieve( pRect ) );
 				
-			//if given pRect does not fit into a subnode, check it against all subnodes
+			//if pRect does not fit into a subnode, check it against all subnodes
 			} else {
 				for( var i=0; i < t.nodes.length; i=i+1 ) {
 					returnObjects = returnObjects.concat( t.nodes[i].retrieve( pRect ) );
@@ -172,7 +184,7 @@
 	
 	
 	/*
-	 * Clears the quadtree
+	 * Clear the quadtree
 	 */
 	Quadtree.prototype.clear = function() {
 		
@@ -188,6 +200,7 @@
 		}
 	};
 
+	//make Quadtree available in the global namespace
 	w.Quadtree = Quadtree;	
 
 })(window, Math);
