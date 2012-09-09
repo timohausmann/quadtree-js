@@ -1,0 +1,238 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Quadtree Test</title>
+		<style type="text/css">
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			body {
+				font-family: Arial, Helvetica, sans-serif;
+				font-size: 12px;
+				padding: 40px;
+				background: #333;
+			}
+			#canvasContainer {
+				background: #111;
+			}
+			#canvasContainer canvas {
+				display: block;
+				margin: 0 auto;
+				background: #000;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="canvasContainer">
+			<canvas id="canvas" width="400" height="300"></canvas>
+		</div>
+		
+		<script src="../quadtree.js"></script>
+		
+		<script>		
+		
+		(function(w, M) {
+			
+			w.requestAnimFrame = (function () {
+				return  w.requestAnimationFrame ||
+					w.webkitRequestAnimationFrame ||
+					w.mozRequestAnimationFrame ||
+					w.oRequestAnimationFrame ||
+					w.msRequestAnimationFrame ||
+					function (callback) {
+						w.setTimeout(callback, 1000 / 60);
+					};
+			})();
+			
+			var ctx = document.getElementById('canvas').getContext('2d');
+			
+			
+			/*
+			 * the main Quadtree
+			 */
+			var myTree = new Quadtree( 0, {
+				x: 0,
+				y: 0,
+				width: 400,
+				height: 300
+			});
+			
+			/*
+			 * our objects will be stored here
+			 */
+			var myObjects = [];
+						
+			/*
+			 * our "hero"
+			 */
+			var myHero = {
+				x : 0,
+				y : 0,
+				width : 20,
+				height : 20
+			};
+			
+			
+			/*
+			 * create some objects and save them in myObjects
+			 */
+			var createObjects = function() {
+				for( var i=0;i<150;i=i+1 ) {
+					myObjects.push({
+						x : randMinMax(10, 390),
+						y : randMinMax(10, 290),
+						width : randMinMax(10, 20),
+						height : randMinMax(10, 20),
+						vx: randMinMax(-1,1),
+						vy: randMinMax(-1,1),
+						check : false
+					});
+				}
+			};
+			
+			
+			/*
+			 * draw Quadtree nodes
+			 */
+			var drawQuadtree = function( node ) {
+				var 	bounds = node.bounds;
+			
+				//no subnodes? draw the current node
+				if( node.nodes.length === 0 ) {
+					ctx.strokeStyle = 'rgba(255,0,0,0.2)';
+					ctx.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
+					
+				//has subnodes? drawQuadtree them!
+				} else {
+					for( var i=0;i<node.nodes.length;i=i+1 ) {
+						drawQuadtree( node.nodes[ i ] );
+					}
+				}
+			};
+			
+			/*
+			 * draw all objects in a given node 
+			 */
+			var drawObjects = function( node ) {
+				
+				var obj;
+				
+				//draw each object in current node
+				for( var i=0;i<node.objects.length;i=i+1 ) {
+					
+					obj = node.objects[ i ];
+					
+					if( obj.check ) {
+						ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+					} else {
+						ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+					}
+					
+					ctx.strokeRect( obj.x, obj.y, obj.width, obj.height );
+				}
+				
+				//drawObjects for every subnode, too
+				if( node.nodes.length !== 0 ) {
+					for( i=0;i<node.nodes.length;i=i+1 ) {
+						drawObjects( node.nodes[ i ] );
+					}
+				}
+			};
+			
+			/*
+			 * position hero at mouse position
+			 */
+			var handleMousemove = function(e) {
+				
+				var 	mx, my;
+				
+				if(e.offsetX) {
+					mx = e.offsetX;
+					my = e.offsetY;
+				} else if(e.layerX) {
+					mx = e.layerX;
+					my = e.layerY;
+				}
+				
+				myHero.x = mx;
+				myHero.y = my;
+			};
+			
+			/*
+			 * return a random number between min and max
+			 */
+			var randMinMax = function(min, max) {
+				return min + (M.random() * (max - min));
+			};			
+			
+			
+			
+			/*
+			 * our main loop
+			 */
+			var loop = function() {
+				
+				var returnNodes = [];
+				
+				//clear the tree
+				myTree.clear();
+				ctx.clearRect(0, 0, 400, 300);
+				
+				//update myObjects and insert them into the tree again
+				for( var i=0;i<myObjects.length;i=i+1 ) {
+					
+					myObjects[i].x += myObjects[i].vx;
+					myObjects[i].y += myObjects[i].vy;
+					myObjects[i].check = false;
+					
+					if( myObjects[i].x > 400 ) myObjects[i].x = 0;
+					if( myObjects[i].x < 0 ) myObjects[i].x = 400;
+					if( myObjects[i].y > 300 ) myObjects[i].y = 0;
+					if( myObjects[i].y < 0 ) myObjects[i].y = 300;
+					
+					
+					myTree.insert( myObjects[i] );
+				}
+				
+				//draw hero
+				ctx.strokeStyle = 'rgba(0,255,0,0.5)';
+				ctx.strokeRect( myHero.x, myHero.y, myHero.width, myHero.height );
+				
+				//retrieve all objects in the bounds of the hero 
+				myTree.retrieve( returnNodes, myHero );
+				
+				//for each node ...
+				for( i=0;i<returnNodes.length;i=i+1 ) {
+					
+					//for each object inside the node ...
+					for( var k=0;k< returnNodes[ i ].length;k=k+1 ) {
+						
+						//set check to true, so we know our retrieved objects 
+						returnNodes[ i ][ k ].check = true;
+					}
+				}
+				
+				
+				drawQuadtree( myTree );
+				drawObjects( myTree );
+				
+				requestAnimFrame( loop );
+			};
+			
+			//create objects
+			createObjects();
+			
+			//init first loop
+			loop();
+			
+			//set eventListener for mousemove
+			document.getElementById('canvas').addEventListener('mousemove', handleMousemove);
+			
+			//make myTree available in global namespace
+			w.myTree = myTree;
+			
+		})(window, Math);
+		</script>
+	</body>
+</html>
