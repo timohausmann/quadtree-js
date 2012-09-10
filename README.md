@@ -1,7 +1,7 @@
 quadtree-js
 ===========
 
-This is an Javascript Quadtree implementation of the Java Methods descriped in this tutorial:
+This is a Javascript Quadtree implementation of the Java Methods descriped in this tutorial:
 http://gamedev.tutsplus.com/tutorials/implementation/quick-tip-use-quadtrees-to-detect-likely-collisions-in-2d-space/
 
 
