@@ -28,9 +28,6 @@
 	 */
 	Quadtree.prototype.split = function() {
 		
-		//cancel if we already have subnodes
-		if( typeof this.nodes[0] !== 'undefined' ) return;
-		
 		var 	t 		= this,
 			nextLevel	= t.level+1,
 			subWidth	= M.round( t.bounds.width / 2 ),
@@ -137,8 +134,12 @@
 		
 		if( t.objects.length > t.max_objects && t.level < t.max_levels ) {
 			
-			t.split();
+			//split if we don't already have subnodes
+			if( typeof t.nodes[0] === 'undefined' ) {
+				t.split();
+			}
 			
+			//add all objects to there corresponding subnodes
 			while( i < t.objects.length ) {
 				
 				index = t.getIndex( t.objects[ i ] );
