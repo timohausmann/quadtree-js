@@ -6,7 +6,7 @@ http://gamedev.tutsplus.com/tutorials/implementation/quick-tip-use-quadtrees-to-
 
 
 Simple Demo (same as examples/insert_retrieve.html):
-http://jsfiddle.net/2dchA/2/
+http://jsfiddle.net/2dchA/29/
 
 * red squares represent Quadtree Nodes
 * white squares represent Objects in our Quadtree
