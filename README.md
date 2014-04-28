@@ -1,5 +1,4 @@
-quadtree-js
-===========
+# quadtree-js
 
 This is a Javascript Quadtree implementation of the Java Methods descriped in this tutorial:
 http://gamedev.tutsplus.com/tutorials/implementation/quick-tip-use-quadtrees-to-detect-likely-collisions-in-2d-space/
@@ -13,7 +12,7 @@ http://jsfiddle.net/2dchA/29/
 * green square represents the area we "recieve" (move mouse to change position) 
 * the highlighted white squares are returned from the recieve-function
 
-*How to use*
+## How to use
 
 Create a new Quadtree with default values for max_objects (10) and max_levels (4)
 <pre>
