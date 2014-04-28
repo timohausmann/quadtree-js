@@ -107,13 +107,13 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			horizontalMidpoint 	= this.bounds.y + (this.bounds.height / 2),
 	 
 			//pRect can completely fit within the top quadrants
-			topQuadrant = (pRecthis.y < horizontalMidpoint && pRecthis.y + pRecthis.height < horizontalMidpoint),
+			topQuadrant = (pRect.y < horizontalMidpoint && pRect.y + pRect.height < horizontalMidpoint),
 			
 			//pRect can completely fit within the bottom quadrants
-			bottomQuadrant = (pRecthis.y > horizontalMidpoint);
+			bottomQuadrant = (pRect.y > horizontalMidpoint);
 		 
 		//pRect can completely fit within the left quadrants
-		if( pRecthis.x < verticalMidpoint && pRecthis.x + pRecthis.width < verticalMidpoint ) {
+		if( pRect.x < verticalMidpoint && pRect.x + pRect.width < verticalMidpoint ) {
 			if( topQuadrant ) {
 				index = 1;
 			} else if( bottomQuadrant ) {
@@ -121,7 +121,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 			
 		//pRect can completely fit within the right quadrants	
-		} else if( pRecthis.x > verticalMidpoint ) {
+		} else if( pRect.x > verticalMidpoint ) {
 			if( topQuadrant ) {
 				index = 0;
 			} else if( bottomQuadrant ) {
