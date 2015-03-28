@@ -84,8 +84,8 @@
 						y : randMinMax(10, 290),
 						width : randMinMax(10, 20),
 						height : randMinMax(10, 20),
-						vx: randMinMax(-1,1),
-						vy: randMinMax(-1,1),
+						vx: randMinMax(-0.2,0.2),
+						vy: randMinMax(-0.2,0.2),
 						check : false
 					});
 				}
@@ -145,18 +145,13 @@
 			 */
 			var handleMousemove = function(e) {
 				
-				var 	mx, my;
+				if(!e.offsetX) {
+					e.offsetX = e.layerX - e.target.offsetLeft;
+					e.offsetY = e.layerY - e.target.offsetTop;
+				} 
 				
-				if(e.offsetX) {
-					mx = e.offsetX;
-					my = e.offsetY;
-				} else if(e.layerX) {
-					mx = e.layerX;
-					my = e.layerY;
-				}
-				
-				myHero.x = mx;
-				myHero.y = my;
+				myHero.x = e.offsetX;
+				myHero.y = e.offsetY;
 			};
 			
 			/*
