@@ -1,6 +1,6 @@
 /*
  * Javascript Quadtree 
- * @version 1.1
+ * @version 1.2.b
  * @author Timo Hausmann
  * https://github.com/timohausmann/quadtree-js/
  */
@@ -46,6 +46,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		this.bounds 		= bounds;
 		
 		this.objects 		= [];
+		this.object_refs	= [];
 		this.nodes 		= [];
 	};
 	
@@ -208,18 +209,99 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 	
 	/*
+	 * Get all objects stored in the quadtree
+	 * @return Array 		all objects in the quadtree
+	 */
+	Quadtree.prototype.getAll = function() {
+		
+		var 	objects = this.objects;
+
+		for( var i=0; i < this.nodes.length; i=i+1 ) {
+			objects = objects.concat( this.nodes[i].getAll() );
+		}
+	 
+		return objects;
+	};
+	
+	
+	/*
+	 * Identifies the node in which a certain object is stored
+	 * @param Object obj		the object that was added by Quadtree.insert
+	 * @return Object 		the subnode
+	 */
+	Quadtree.prototype.getObjectNode = function( obj ) {
+
+		var 	index;
+	 	
+	 	//if we have no subnodes ...
+	 	if( !this.nodes.length ) {
+
+	 		return this;
+
+	 	} else {
+			index = this.getIndex( obj );
+
+			if( index === -1 ) {
+
+				return this;
+
+			} else {
+				var info = this.nodes[index].getObjectNode( obj );	 
+			 	if( info ) return info;
+			}
+		}
+	};
+	
+	
+	/*
+	 * Removes a specific object from the tree 
+	 * You may want to refresh the tree after doing this
+	 * @param Object obj		the object that was added by Quadtree.insert
+	 * @return Number		-1, when the object was not found
+	 */
+	Quadtree.prototype.removeObject = function( obj ) {
+		
+		var 	node = this.getObjectNode( obj ),
+			nodeObjects = node.objects,
+			index = nodeObjects.indexOf( obj );
+
+		if( index === -1 ) return index;
+
+		nodeObjects.splice( index, 1);
+	};
+	
+	
+	/*
+	 * Clean up the quadtree without losing the objects
+	 */
+	Quadtree.prototype.cleanup = function() {
+		
+		var 	objects = this.getAll();
+
+		this.clear();
+
+		for( var i=0; i < objects.length; i++ ) {
+			this.insert( objects[i] );
+		}
+	};
+
+	
+	
+	/*
 	 * Clear the quadtree
 	 */
 	Quadtree.prototype.clear = function() {
 		
 		this.objects = [];
 	 
+		if( !this.nodes.length ) return;
+
 		for( var i=0; i < this.nodes.length; i=i+1 ) {
-			if( typeof this.nodes[i] !== 'undefined' ) {
-				this.nodes[i].clear();
-				delete this.nodes[i];
-		  	}
-		}
+
+			this.nodes[i].clear();
+	  	}
+
+	  	this.nodes = [];
 	};
 
 	//make Quadtree available in the global namespace
