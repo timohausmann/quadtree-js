@@ -1,0 +1,301 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Quadtree Test</title>
+		<style type="text/css">
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			body {
+				font-family: Arial, Helvetica, sans-serif;
+				font-size: 12px;
+				padding: 40px;
+				background: #333;
+			}
+			#canvasContainer {
+				background: #111;
+			}
+			#canvasContainer canvas {
+				display: block;
+				margin: 0 auto;
+				background: #000;
+			}
+
+			.ctrl {
+				margin: 20px auto;
+				text-align: center;
+				max-width: 640px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="canvasContainer">
+			<canvas id="canvas" width="640" height="480"></canvas>
+		</div>
+
+		<div class="ctrl">
+			<button id="btn_add">add random object</button>
+			<button id="btn_remove">remove random object</button>
+			<button id="btn_update">update random object</button>
+			<button id="btn_cleanup">clean up tree</button>
+			<button id="btn_clear">clear tree</button>
+		</div>
+		
+		<script src="../quadtree.js"></script>
+		
+		<script>		
+		
+		(function(w, M) {
+			
+			w.requestAnimFrame = (function () {
+				return  w.requestAnimationFrame ||
+					w.webkitRequestAnimationFrame ||
+					w.mozRequestAnimationFrame ||
+					w.oRequestAnimationFrame ||
+					w.msRequestAnimationFrame ||
+					function (callback) {
+						w.setTimeout(callback, 1000 / 60);
+					};
+			})();
+			
+			var ctx = document.getElementById('canvas').getContext('2d');
+			
+			
+			/*
+			 * the main Quadtree
+			 */
+			var myTree = new Quadtree({
+				x: 0,
+				y: 0,
+				width: 640,
+				height: 480
+			}, 4);
+			
+			/*
+			 * our objects will be stored here
+			 */
+			var myObjects = [];
+						
+			/*
+			 * our "hero", aka the mouse cursor.
+			 * He is not in the quadtree, we only use this object to retrieve objects from a certain area
+			 */
+			var myHero = {
+				x : 0,
+				y : 0,
+				width : 20,
+				height : 20
+			};
+			
+
+			/*
+			 * position hero at mouse position
+			 */
+			var handleMousemove = function(e) {
+				
+				if(!e.offsetX) {
+					e.offsetX = e.layerX - e.target.offsetLeft;
+					e.offsetY = e.layerY - e.target.offsetTop;
+				} 
+				
+				myHero.x = e.offsetX;
+				myHero.y = e.offsetY;
+			};
+
+			
+			/*
+			 * add a random object to our simulation
+			 */
+			var handleAdd = function() {
+				
+				var rndObj = {
+					x : randMinMax(10, 630),
+					y : randMinMax(10, 470),
+					width : randMinMax(10, 40),
+					height : randMinMax(10, 40),
+					check : false
+				};
+
+				//store object in our array
+				myObjects.push( rndObj );
+
+				//insert object in our quadtree
+				myTree.insert( rndObj );
+			}
+			
+			
+			/*
+			 * remove a random object from our simulation
+			 */
+			var handleRemove = function() {
+
+				if( !myObjects.length ) return;
+				
+				var 	rndIndex = randMinMax(0, myObjects.length-1, true),
+					rndObject = myObjects[ rndIndex ];
+
+				//remove object from our array
+				myObjects.splice( rndIndex, 1);
+
+				//remove object from our quadtree
+				myTree.removeObject( rndObject );
+			}
+			
+			
+			/*
+			 * update a random object from our simulation
+			 */
+			var handleUpdate = function() {
+
+				if( !myObjects.length ) return;
+				
+				var rndObject = myObjects[ randMinMax(0, myObjects.length-1, true) ];
+
+				//remove object from our quadtree
+				myTree.removeObject( rndObject );
+
+				//update object to our likings
+				rndObject.x = randMinMax(10, 630);
+				rndObject.y = randMinMax(10, 470);
+				rndObject.width = randMinMax(10, 40);
+				rndObject.height = randMinMax(10, 40);
+
+				//re-insert object into tree
+				myTree.insert( rndObject );
+			}
+			
+			
+			/*
+			 * update a random object from our simulation
+			 */
+			var handleCleanup = function() {
+
+				//cleanup removes "dead"/empty subnodes and updates all objects inside the tree
+				//this is useful to keep the quadtree clean, after doing removeObject-operations
+				myTree.cleanup();
+			}
+			
+			
+			/*
+			 * update a random object from our simulation
+			 */
+			var handleClear = function() {
+
+				//empty our array
+				myObjects = [];
+
+				//empty our quadtree
+				myTree.clear();
+			}
+			
+			
+			/*
+			 * draw Quadtree nodes
+			 */
+			var drawQuadtree = function( node, depth ) {
+
+				var bounds = node.bounds;
+			
+				//no subnodes? draw the current node
+				if( node.nodes.length === 0 ) {
+					ctx.strokeStyle = 'rgba(255,0,0,0.5)';
+					ctx.strokeRect(bounds.x+1, bounds.y+1, bounds.width-2, bounds.height-2);
+					
+				//has subnodes? drawQuadtree them!
+				} else {
+					for( var i=0;i<node.nodes.length;i=i+1 ) {
+						drawQuadtree( node.nodes[ i ], 2 );
+					}
+				}
+			};
+			
+			/*
+			 * draw all objects
+			 */
+			var drawObjects = function() {
+				
+				var obj;
+				
+				for( var i=0;i<myObjects.length;i=i+1 ) {
+					
+					obj = myObjects[ i ];
+					
+					if( obj.check ) {
+						ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+					} else {
+						ctx.strokeStyle = 'rgba(255,255,255,0.33)';
+					}
+					
+					ctx.strokeRect( obj.x, obj.y, obj.width, obj.height );
+				}
+			};
+
+			
+			/**
+			 * return a random number within given boundaries.
+			 *
+			 * @param {number} min		the lowest possible number
+			 * @param {number} max		the highest possible number
+			 * @param {boolean} round	if true, return integer
+			 * @return {number} 		a random number
+			 */
+			randMinMax = function(min, max, round) {
+				var val = min + (Math.random() * (max - min));
+				
+				if( round ) val = Math.round( val );
+				
+				return val;
+			};
+			
+			/*
+			 * our main loop
+			 */
+			var loop = function() {
+				
+				var returnObjects = [];
+				
+				ctx.clearRect(0, 0, 640, 480);
+				
+				//reset myObjects check flag
+				for( var i=0;i<myObjects.length;i=i+1 ) {
+					
+					myObjects[i].check = false;
+				}
+				
+				//draw hero
+				ctx.strokeStyle = 'rgba(0,255,0,0.5)';
+				ctx.strokeRect( myHero.x, myHero.y, myHero.width, myHero.height );
+				
+				//retrieve all objects in the bounds of the hero 
+				returnObjects = myTree.retrieve( myHero );
+				
+				//flag retrieved objects
+				for( i=0;i<returnObjects.length;i=i+1 ) {
+					returnObjects[ i ].check = true;
+				}
+				
+				drawQuadtree( myTree, 1);
+
+				drawObjects();
+				
+				requestAnimFrame( loop );
+			};
+						
+			//init first loop
+			loop();
+			
+			//set eventListener for mousemove
+			document.getElementById('canvas').addEventListener('mousemove', handleMousemove);
+
+			document.getElementById('btn_add').addEventListener('click', handleAdd);
+			document.getElementById('btn_remove').addEventListener('click', handleRemove);
+			document.getElementById('btn_update').addEventListener('click', handleUpdate);
+			document.getElementById('btn_cleanup').addEventListener('click', handleCleanup);
+			document.getElementById('btn_clear').addEventListener('click', handleClear);
+
+			
+		})(window, Math);
+		</script>
+	</body>
+</html>
