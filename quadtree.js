@@ -32,22 +32,22 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  	
 	 /*
 	  * Quadtree Constructor
-	  * @param Object bounds		bounds of the node, object with x, y, width, height
+	  * @param Object bounds			bounds with x, y, width, height
 	  * @param Integer max_objects		(optional) max objects a node can hold before splitting into 4 subnodes (default: 10)
 	  * @param Integer max_levels		(optional) total max levels inside root Quadtree (default: 4) 
-	  * @param Integer level		(optional) deepth level, required for subnodes  
+	  * @param Integer level			(optional) deepth level, required for subnodes  
 	  */
 	function Quadtree( bounds, max_objects, max_levels, level ) {
 		
 		this.max_objects	= max_objects || 10;
 		this.max_levels		= max_levels || 4;
 		
-		this.level 		= level || 0;
+		this.level 			= level || 0;
 		this.bounds 		= bounds;
 		
 		this.objects 		= [];
 		this.object_refs	= [];
-		this.nodes 		= [];
+		this.nodes 			= [];
 	};
 	
 	
@@ -56,11 +56,11 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	Quadtree.prototype.split = function() {
 		
-		var 	nextLevel	= this.level + 1,
+		var nextLevel	= this.level + 1,
 			subWidth	= Math.round( this.bounds.width / 2 ),
 			subHeight 	= Math.round( this.bounds.height / 2 ),
-			x 		= Math.round( this.bounds.x ),
-			y 		= Math.round( this.bounds.y );		
+			x 			= Math.round( this.bounds.x ),
+			y 			= Math.round( this.bounds.y );		
 	 
 	 	//top right node
 		this.nodes[0] = new Quadtree({
@@ -97,13 +97,13 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 	
 	/*
-	 * Determine which node the object belongs to
+	 * Determine the quadtrant for an area in this node
 	 * @param Object pRect		bounds of the area to be checked, with x, y, width, height
-	 * @return Integer		index of the subnode (0-3), or -1 if pRect cannot completely fit within a subnode and is part of the parent node
+	 * @return Integer			index of the subnode (0-3), or -1 if pRect cannot completely fit within a subnode and is part of the parent node
 	 */
 	Quadtree.prototype.getIndex = function( pRect ) {
 		
-		var 	index 			= -1,
+		var index 				= -1,
 			verticalMidpoint 	= this.bounds.x + (this.bounds.width / 2),
 			horizontalMidpoint 	= this.bounds.y + (this.bounds.height / 2),
 	 
@@ -135,27 +135,27 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 	
 	/*
-	 * Insert the object into the node. If the node
+	 * Insert an object into the node. If the node
 	 * exceeds the capacity, it will split and add all
 	 * objects to their corresponding subnodes.
-	 * @param Object pRect		bounds of the object to be added, with x, y, width, height
+	 * @param Object obj		the object to be added, with x, y, width, height
 	 */
-	Quadtree.prototype.insert = function( pRect ) {
+	Quadtree.prototype.insert = function( obj ) {
 		
-		var 	i = 0,
+		var i = 0,
 	 		index;
 	 	
 	 	//if we have subnodes ...
 		if( typeof this.nodes[0] !== 'undefined' ) {
-			index = this.getIndex( pRect );
+			index = this.getIndex( obj );
 	 
 		  	if( index !== -1 ) {
-				this.nodes[index].insert( pRect );	 
+				this.nodes[index].insert( obj );	 
 			 	return;
 			}
 		}
 	 
-	 	this.objects.push( pRect );
+	 	this.objects.push( obj );
 		
 		if( this.objects.length > this.max_objects && this.level < this.max_levels ) {
 			
@@ -180,13 +180,13 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 
 	 
 	/*
-	 * Return all objects that could collide with the given object
-	 * @param Object pRect		bounds of the object to be checked, with x, y, width, height
-	 * @Return Array		array with all detected objects
+	 * Return all objects that could collide with a given area
+	 * @param Object pRect		bounds of the area to be checked, with x, y, width, height
+	 * @Return Array			array with all detected objects
 	 */
 	Quadtree.prototype.retrieve = function( pRect ) {
 	 	
-		var 	index = this.getIndex( pRect ),
+		var index = this.getIndex( pRect ),
 			returnObjects = this.objects;
 			
 		//if we have subnodes ...
@@ -214,7 +214,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	Quadtree.prototype.getAll = function() {
 		
-		var 	objects = this.objects;
+		var objects = this.objects;
 
 		for( var i=0; i < this.nodes.length; i=i+1 ) {
 			objects = objects.concat( this.nodes[i].getAll() );
@@ -225,70 +225,58 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 	
 	/*
-	 * Identifies the node in which a certain object is stored
-	 * @param Object obj		the object that was added by Quadtree.insert
-	 * @return Object 		the subnode
+	 * Get the node in which a certain object is stored
+	 * @param Object obj		the object that was added via Quadtree.insert
+	 * @return Object 			the subnode, or false when not found
 	 */
 	Quadtree.prototype.getObjectNode = function( obj ) {
 
-		var 	index;
+		var index;
 	 	
-	 	//if we have no subnodes ...
+	 	//if there are no subnodes, object must be here
 	 	if( !this.nodes.length ) {
 
 	 		return this;
 
 	 	} else {
+
 			index = this.getIndex( obj );
 
+			//if the object does not fit into a subnode, it must be here
 			if( index === -1 ) {
 
 				return this;
 
+			//if it fits into a subnode, continue deeper search there
 			} else {
-				var info = this.nodes[index].getObjectNode( obj );	 
-			 	if( info ) return info;
+				var node = this.nodes[index].getObjectNode( obj );	 
+			 	if( node ) return node;
 			}
 		}
+
+		return false;
 	};
 	
 	
 	/*
-	 * Removes a specific object from the tree 
-	 * You may want to refresh the tree after doing this
-	 * @param Object obj		the object that was added by Quadtree.insert
-	 * @return Number		-1, when the object was not found
+	 * Removes a specific object from the quadtree 
+	 * Does not delete empty subnodes. See cleanup-function
+	 * @param Object obj		the object that was added via Quadtree.insert
+	 * @return Number			false, when the object was not found
 	 */
 	Quadtree.prototype.removeObject = function( obj ) {
 		
-		var 	node = this.getObjectNode( obj ),
-			nodeObjects = node.objects,
-			index = nodeObjects.indexOf( obj );
+		var node = this.getObjectNode( obj ),
+			index = node.objects.indexOf( obj );
 
-		if( index === -1 ) return index;
+		if( index === -1 ) return false;
 
-		nodeObjects.splice( index, 1);
+		node.objects.splice( index, 1);
 	};
 	
 	
 	/*
-	 * Clean up the quadtree without losing the objects
-	 */
-	Quadtree.prototype.cleanup = function() {
-		
-		var 	objects = this.getAll();
-
-		this.clear();
-
-		for( var i=0; i < objects.length; i++ ) {
-			this.insert( objects[i] );
-		}
-	};
-
-	
-	
-	/*
-	 * Clear the quadtree
+	 * Clear the quadtree and delte all objects
 	 */
 	Quadtree.prototype.clear = function() {
 		
@@ -303,6 +291,23 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	  	this.nodes = [];
 	};
+	
+	
+	/*
+	 * Clean up the quadtree 
+	 * Like clear, but objects won't be deleted but re-inserted
+	 */
+	Quadtree.prototype.cleanup = function() {
+		
+		var objects = this.getAll();
+
+		this.clear();
+
+		for( var i=0; i < objects.length; i++ ) {
+			this.insert( objects[i] );
+		}
+	};
+
 
 	//make Quadtree available in the global namespace
 	window.Quadtree = Quadtree;	
