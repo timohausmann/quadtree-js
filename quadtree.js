@@ -217,9 +217,10 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		for( var i=0; i < this.nodes.length; i=i+1 ) {
 			if( typeof this.nodes[i] !== 'undefined' ) {
 				this.nodes[i].clear();
-				delete this.nodes[i];
 		  	}
 		}
+
+		this.nodes = [];
 	};
 
 	//make Quadtree available in the global namespace
