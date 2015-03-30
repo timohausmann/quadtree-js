@@ -1,0 +1,50 @@
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	color: black;
+	font-size: 14px;
+	margin: 40px;
+	background: white;
+}
+.outer {
+	max-width: 640px;
+	margin: 0 auto;
+}
+a {
+	color: black;
+	text-decoration: none;
+}
+h1 {
+	text-align: center;
+}
+#canvasContainer {
+
+}
+#canvasContainer canvas {
+	display: inline-block;
+	background: #000;
+	border: 2px solid #a80000;
+}
+.ctrl {
+	margin: 1em 0 2em;
+	overflow: hidden;
+}
+.ctrl-left {
+	float: left;
+}
+.ctrl-right {
+	float: right;
+}
+button {
+	padding: 4px 8px;
+}
+p {
+	margin-bottom: 1em;
+	line-height: 1.4;
+}
+pre {
+	background: #eee;
+	border: 1px solid #ccc;
+	color: black;
+	padding: 1em 1em 0;
+	margin: 2em 0;
+}
