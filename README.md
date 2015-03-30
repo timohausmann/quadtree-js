@@ -3,6 +3,8 @@
 This is a Javascript Quadtree implementation of the Java Methods descriped in this tutorial:
 http://gamedev.tutsplus.com/tutorials/implementation/quick-tip-use-quadtrees-to-detect-likely-collisions-in-2d-space/
 
+Please read the tutorial if you want to know more about Quadtrees.
+
 
 Simple Demo (same as examples/insert_retrieve.html):
 http://jsfiddle.net/2dchA/29/
@@ -58,3 +60,6 @@ Clear the Quadtree
 <pre>
 myTree.clear();
 </pre>
+
+There is an alternative [quadtree-js hitman branch](https://github.com/timohausmann/quadtree-js/tree/hitman) available that allows you to update and remove single objects.
+This can be handy when most of the objects in your quadtree are static.
