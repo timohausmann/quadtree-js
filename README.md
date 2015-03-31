@@ -8,9 +8,8 @@ This is not a collision engine, but an algorythm to narrow down objects of possi
 Please read the tutorial if you want to know more about Quadtrees.
 
 There are two examples:
-
-http://timohausmann.de/quadtree.js/simple.html
-http://timohausmann.de/quadtree.js/dynamic.html
+* http://timohausmann.de/quadtree.js/simple.html
+* http://timohausmann.de/quadtree.js/dynamic.html
 
 * red squares represent Quadtree Nodes
 * empty white squares represent objects in our Quadtree
