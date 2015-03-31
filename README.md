@@ -5,14 +5,14 @@ http://gamedev.tutsplus.com/tutorials/implementation/quick-tip-use-quadtrees-to-
 
 Please read the tutorial if you want to know more about Quadtrees.
 
-
-Simple Demo (same as examples/insert_retrieve.html):
-http://jsfiddle.net/2dchA/29/
+There are two examples:
+http://timohausmann.de/quadtree.js/simple.html
+http://timohausmann.de/quadtree.js/dynamic.html
 
 * red squares represent Quadtree Nodes
-* white squares represent Objects in our Quadtree
-* green square represents the area we "recieve" (move mouse to change position) 
-* the highlighted white squares are returned from the recieve-function
+* empty white squares represent objects in our Quadtree
+* the cursor is the area we constantly test for
+* objects turned green are candidates for collision, returned from the recieve-function
 
 ## How to use
 
@@ -60,6 +60,9 @@ Clear the Quadtree
 <pre>
 myTree.clear();
 </pre>
+
+Check out the examples for more information.
+Feel free to open an issue if you have any problems.
 
 There is an alternative [quadtree-js hitman branch](https://github.com/timohausmann/quadtree-js/tree/hitman) available that allows you to update and remove single objects.
 This can be handy when most of the objects in your quadtree are static.
