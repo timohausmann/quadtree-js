@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<title>Quadtree-js</title>
-		<link rel="stylesheet" type="text/css" href="style.css"></link>
+		<link rel="stylesheet" type="text/css" href="style.css" />
 	</head>
 	<body>
 
@@ -67,8 +67,8 @@ myTree.insert( myObject );
 
 			<pre>
 var myCursor = {
-	x: e.offsetX,
-	y: e.offsetY,
+	x: mouseX,
+	y: mouseY,
 	width: 20,
 	height: 20
 };
@@ -80,7 +80,7 @@ var candidates = myTree.retrieve( myCursor );
 			</p>
 			
 			<p>
-				What you get is an array of your collision candidates. In this example, we will only mark them with a check-property to paint them green.
+				What you get is an array of your collision candidates. In this example, we will only mark them with a check-property to paint them green. In a real world example, you may want to check them for collisions.
 			</p>
 
 			<pre>
@@ -317,7 +317,7 @@ myTree.clear();
 					}
 				}
 
-				updateCandidates(candidates);
+				updateCandidatesInfo(candidates);
 				
 				drawQuadtree( myTree );
 
@@ -332,7 +332,7 @@ myTree.clear();
 				cnt_total.innerHTML = myObjects.length;
 			}
 
-			var updateCandidates = function(candidates) {
+			var updateCandidatesInfo = function(candidates) {
 
 				cnt_cand.innerHTML = candidates.length;
 				if( !myObjects.length ) return;

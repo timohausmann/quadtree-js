@@ -11,10 +11,13 @@ body {
 }
 a {
 	color: black;
-	text-decoration: none;
+
 }
 h1 {
 	text-align: center;
+}
+h1 a {
+	text-decoration: none;
 }
 #canvasContainer {
 
