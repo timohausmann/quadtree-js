@@ -3,9 +3,12 @@
 This is a Javascript Quadtree implementation of the Java Methods descriped in this tutorial:
 http://gamedev.tutsplus.com/tutorials/implementation/quick-tip-use-quadtrees-to-detect-likely-collisions-in-2d-space/
 
+This is not a collision engine, but an algorythm to narrow down objects of possible collision. 
+
 Please read the tutorial if you want to know more about Quadtrees.
 
 There are two examples:
+
 http://timohausmann.de/quadtree.js/simple.html
 http://timohausmann.de/quadtree.js/dynamic.html
 
