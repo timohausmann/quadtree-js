@@ -1,9 +1,9 @@
 # quadtree-js
 
-This is a Javascript Quadtree implementation of the Java Methods descriped in this tutorial:
+This is a JavaScript Quadtree implementation of the Java Methods described in this tutorial:
 http://gamedev.tutsplus.com/tutorials/implementation/quick-tip-use-quadtrees-to-detect-likely-collisions-in-2d-space/
 
-This is not a collision engine, but an algorythm to narrow down objects of possible collision. 
+This is not a collision engine, but an algorithm to narrow down objects of possible collision. 
 
 Please read the tutorial if you want to know more about Quadtrees.
 
@@ -12,7 +12,7 @@ There are two examples: [simple](http://timohausmann.de/quadtree.js/simple.html)
 * red squares represent Quadtree Nodes
 * empty white squares represent objects in our Quadtree
 * the cursor is the area we constantly test for
-* objects turned green are candidates for collision, returned from the recieve-function
+* objects turned green are candidates for collision, returned from the receive-function
 
 ## How to use
 
@@ -65,4 +65,4 @@ Check out the examples for more information.
 Feel free to open an issue if you have any problems.
 
 There is an alternative [quadtree-js hitman branch](https://github.com/timohausmann/quadtree-js/tree/hitman) available that allows you to update and remove single objects.
-This can be handy when most of the objects in your quadtree are static.
+This can be handy when most of the objects in your Quadtree are static.
