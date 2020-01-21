@@ -13,11 +13,19 @@ Please read the tutorial for a better understanding.
 
 ## Install
 
-Now you also can add this module via npm to your project and import or require it:
+[Now also available on npm](https://www.npmjs.com/package/@timohausmann/quadtree-js)! Install this module via npm and import or require it:
 
-    npm install quadtree-js --save-dev
+````
+npm i -D @timohausmann/quadtree-js
+````
 
-    import Quadtree from 'quadtree-js';
+````
+import Quadtree from '@timohausmann/quadtree-js';
+````
+
+````
+const Quadtree = require('@timohausmann/quadtree-js');
+````
 
 Alternatively, [download the source](https://github.com/timohausmann/quadtree-js/archive/master.zip) and include it the old-fashioned way:
 
@@ -32,7 +40,7 @@ var myTree = new Quadtree({
 	y: 0,
 	width: 400,
 	height: 300
-});
+}, 10, 4);
 </pre>
 
 > MAX_OBJECTS defines how many objects a node can hold before it splits and MAX_LEVELS defines the deepest level subnode.
