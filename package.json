@@ -1,25 +1,25 @@
 {
-  "name": "quadtree-js",
-  "version": "1.1.0",
+  "name": "@timohausmann/quadtree-js",
+  "version": "1.1.2",
   "description": "Another quadtree implementation for javascript",
+  "author": "Timo Hausmann",
+  "license": "MIT",
   "main": "quadtree.js",
-  "directories": {
-    "example": "examples"
-  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "grunt uglify"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/timohausmann/quadtree-js.git"
   },
+  "bugs": {
+    "url": "https://github.com/timohausmann/quadtree-js/issues"
+  },
   "keywords": [
     "quadtree"
   ],
-  "author": "Timo Hausmann",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/timohausmann/quadtree-js/issues"
+  "directories": {
+    "example": "examples"
   },
   "devDependencies": {
     "grunt": "~0.4.4",

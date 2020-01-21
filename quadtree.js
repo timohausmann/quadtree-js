@@ -1,13 +1,13 @@
 /*
  * Javascript Quadtree 
- * @version 1.1.1
+ * @version 1.1.2
  * @licence MIT
  * @author Timo Hausmann
  * https://github.com/timohausmann/quadtree-js/
  */
  
 /*
- Copyright © 2012 Timo Hausmann
+ Copyright © 2012-2020 Timo Hausmann
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -29,7 +29,7 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-;(function(window, Math) {
+;(function(Math) {
  	
 	 /*
 	  * Quadtree Constructor
@@ -224,7 +224,11 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		this.nodes = [];
 	};
 
-	//make Quadtree available in the global namespace
-	window.Quadtree = Quadtree;	
+	//export for commonJS or browser
+	if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+		module.exports = Quadtree;
+	} else {
+		window.Quadtree = Quadtree;	
+	}
 
-})(window, Math);
+})(Math);
