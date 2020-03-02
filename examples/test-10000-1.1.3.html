@@ -43,24 +43,30 @@
 
 			<pre>
 var amount = 10000;
-
 var myObjects = [];
 for(var i=0; i&lt;amount;i++) {
-  myObjects.push({
-    x: randMinMax(0, width-maxObjectSize),
-    y: randMinMax(0, height-maxObjectSize),
-    width: randMinMax(4, maxObjectSize),
-    height: randMinMax(4, maxObjectSize)
-  });
+	myObjects.push({
+	x: randMinMax(0, 800-maxObjectSize),
+	y: randMinMax(0, 600-maxObjectSize),
+	width: randMinMax(4, maxObjectSize),
+	height: randMinMax(4, maxObjectSize)
+	});
 }
 
 //time measure starts here
 var start = window.performance.now();
 
+var myTree = new Quadtree({
+	x: 0,
+	y: 0,
+	width: 800,
+	height: 600
+}, 10, 4);
+
 for(var i=0; i&lt;amount;i++) {
-  myOldTree.insert(myObjects[i]);
+  myTree.insert(myObjects[i]);
 }
-var candidates = myOldTree.retrieve(myCursor);
+var candidates = myTree.retrieve(myCursor);
 
 //time measure ends here
 var end = window.performance.now();
@@ -116,7 +122,7 @@ var time = end - start;
 			//console.time('Quadtree');
 			var start = window.performance.now();
 
-			var myOldTree = new Quadtree({
+			var myTree = new Quadtree({
 				x: 0,
 				y: 0,
 				width: width,
@@ -124,10 +130,10 @@ var time = end - start;
 			});
 
 			for(var i=0; i<amount;i++) {
-			  myOldTree.insert(myObjects[i]);
+				myTree.insert(myObjects[i]);
 			}
 
-			var candidates = myOldTree.retrieve( myCursor );
+			var candidates = myTree.retrieve( myCursor );
 
 			//console.timeEnd('Quadtree');
 			var end = window.performance.now();
@@ -195,7 +201,7 @@ var time = end - start;
 			};
 
 			drawObjects();
-			drawQuadtree(myOldTree);
+			drawQuadtree(myTree);
 
 			//draw retrieve area
 			ctx.strokeStyle = 'blue';

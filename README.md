@@ -36,6 +36,7 @@ Alternatively, [download the source](https://github.com/timohausmann/quadtree-js
 ## How to use
 
 Create a new Quadtree with default values for max_objects (10) and max_levels (4)
+
 <pre>
 var myTree = new Quadtree({
 	x: 0,
@@ -47,7 +48,7 @@ var myTree = new Quadtree({
 
 > MAX_OBJECTS defines how many objects a node can hold before it splits and MAX_LEVELS defines the deepest level subnode.
 
-If you want to specify `max_objects` and `max_levels` on your own, you can pass them as a 2nd and 3rd argument. Increasing `max_levels` may have an impact on performance depending on your objects. Using a low value for `max_levels` increases the Quadtree performance but will most likely return more candidates.
+If you want to specify `max_objects` and `max_levels` on your own, you can pass them as a 2nd and 3rd argument. I recommend using low values for `max_levels` because each level will quadruple the possible amount of nodes. Using lower values for `max_levels` increases performance but may return more candidates. Finetuning these values depends on your 2D space, the amount and size of the objects and your retrieving areas. 
 
 <pre>
 var myTree = new Quadtree({
