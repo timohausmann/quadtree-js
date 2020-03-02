@@ -1,0 +1,207 @@
+<!doctype html>
+<html>
+	<head>
+		<title>quadtree-js 1.2.0 Performance Test</title>
+		<link rel="stylesheet" type="text/css" href="style.css" />
+		<style>
+			.outer {
+				max-width: 800px;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div class="outer">
+			
+			<h1><a href="https://github.com/timohausmann/quadtree-js">quadtree-js</a> 1.2.0 <small>performance test</small></h1>
+
+
+			<div id="canvasContainer">
+				<canvas id="canvas" width="800" height="600"></canvas>
+			</div>
+
+			<div class="ctrl">
+				<div class="ctrl-left">
+					Time spend for insert of <span id="cnt_total2">0</span> objects and retrieve once:<br />
+					<strong><span id="cnt_time">0</span></strong>
+				</div>
+
+				<div class="ctrl-right">
+					Total Objects: <span id="cnt_total">0</span><br />
+					Candidates: <span id="cnt_cand">0</span> (<span id="cnt_perc">0</span>%)
+				</div>
+			</div>
+
+			<p>
+				Quadtree 1.2 now stores objects exclusively on leaf nodes. Objects, that overlap into multiple subnodes are now referenced in each matching subnode instead of their parent node. This drastically reduces the collision candidates. Prior to 1.2, overlapping objects were stored in parent nodes (<a href="test-10000-1.1.3.html">1.1.3 Demo</a>). 
+			</p>
+			<p>
+				Because objects can now be present in multiple nodes, nodes will split rather soon. Therefore it is important to have a low max_level value (default: 4), otherwise you end up with deeply nested trees that require a lot more memory and calculation. Lower max_level values perform faster but return more candidates.
+			</p>
+
+			<p style="margin: 2rem 0 -1rem">Heart of the test code (view page source for full code):</p>
+
+			<pre>
+var amount = 10000;
+
+var myObjects = [];
+for(var i=0; i&lt;amount;i++) {
+  myObjects.push({
+    x: randMinMax(0, width-maxObjectSize),
+    y: randMinMax(0, height-maxObjectSize),
+    width: randMinMax(4, maxObjectSize),
+    height: randMinMax(4, maxObjectSize)
+  });
+}
+
+//time measure starts here
+var start = window.performance.now();
+
+for(var i=0; i&lt;amount;i++) {
+  myOldTree.insert(myObjects[i]);
+}
+var candidates = myOldTree.retrieve(myCursor);
+
+//time measure ends here
+var end = window.performance.now();
+var time = end - start;
+
+			</pre>
+
+			<p>
+				<a href="https://github.com/timohausmann/quadtree-js">quadtree-js at github</a>
+			</p>
+		</div>
+
+		<script src="../quadtree.js"></script>
+
+		<script>
+
+			//---- SETUP
+
+			var amount = 10000;
+			var width = 800;
+			var height = 600;
+			var maxObjectSize = 64;
+
+			var randMinMax = function(min, max, round) {
+				var val = min + (Math.random() * (max - min));	
+				if( round ) val = Math.round( val );	
+				return val;
+			};
+
+			var myCursor = {
+				x : randMinMax(120,width-120),
+				y : randMinMax(120,height-120),
+				width : 32,
+				height : 32
+			};
+
+			var myObjects = [];
+			for(var i=0; i<amount;i++) {
+				myObjects.push({
+				  x: randMinMax(0, width-maxObjectSize),
+				  y: randMinMax(0, height-maxObjectSize),
+				  width: randMinMax(4, maxObjectSize),
+				  height: randMinMax(4, maxObjectSize)
+				});
+			}
+
+			console.log('Quadtree 1.2 with', amount, 'objects on leaf nodes only');
+
+			//---- TEST
+			//console.time('Quadtree');
+			var start = window.performance.now();
+
+			var myOldTree = new Quadtree({
+				x: 0,
+				y: 0,
+				width: width,
+			    height: height
+			}, 10, 4);
+
+			for(var i=0; i<amount;i++) {
+			  myOldTree.insert(myObjects[i]);
+			}
+
+			var candidates = myOldTree.retrieve( myCursor );
+
+			//console.timeEnd('Quadtree');
+			var end = window.performance.now();
+			var time = end - start;
+
+			console.log('Found', candidates.length, 'candidates in', time, 'ms');
+
+
+			//---- DRAW RESULT
+
+
+			var ctx = document.getElementById('canvas').getContext('2d');
+
+			//updateTotal
+			document.querySelector('#cnt_total').innerHTML = myObjects.length;
+			document.querySelector('#cnt_total2').innerHTML = myObjects.length;
+			document.querySelector('#cnt_cand').innerHTML = candidates.length;
+			document.querySelector('#cnt_perc').innerHTML = Math.round( (candidates.length/myObjects.length)*100 );
+			document.querySelector('#cnt_time').innerHTML = Math.round( time ) + 'ms';
+
+			//flag retrieved objects
+			for( i=0;i<candidates.length;i=i+1 ) {
+				candidates[ i ].check = true;
+			}
+
+			/*
+			 * draw Quadtree nodes
+			 */
+			var drawQuadtree = function( node ) {
+
+				var bounds = node.bounds;
+			
+				//no subnodes? draw the current node
+				if( node.nodes.length === 0 ) {
+					ctx.strokeStyle = 'rgba(255,0,0,0.5)';
+					ctx.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
+					
+				//has subnodes? drawQuadtree them!
+				} else {
+					for( var i=0;i<node.nodes.length;i=i+1 ) {
+						drawQuadtree( node.nodes[ i ] );
+					}
+				}
+			};
+			
+			/*
+			 * draw all objects
+			 */
+			var drawObjects = function() {
+				
+				var obj;
+				
+				for( var i=0;i<myObjects.length;i=i+1 ) {
+					
+					obj = myObjects[ i ];
+					
+					if( obj.check ) {
+						ctx.fillStyle = 'rgba(48,255,48,0.5)';
+						ctx.fillRect( obj.x, obj.y, obj.width, obj.height );
+					} else {
+						ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+						ctx.strokeRect( obj.x, obj.y, obj.width, obj.height );
+					}
+				}
+			};
+
+			drawObjects();
+			drawQuadtree(myOldTree);
+
+			//draw retrieve area
+			ctx.strokeStyle = 'blue';
+			ctx.lineWidth = 2;
+			ctx.fillStyle = 'rgba(255,255,255,0.5)';
+			ctx.fillRect(myCursor.x, myCursor.y, myCursor.width, myCursor.height);
+			ctx.strokeRect(myCursor.x, myCursor.y, myCursor.width, myCursor.height);
+
+		</script>
+
+	</body>
+</html>

@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 	<head>
-		<title>Quadtree-js</title>
+		<title>quadtree-js Simple Demo</title>
 		<link rel="stylesheet" type="text/css" href="style.css" />
 	</head>
 	<body>
@@ -16,8 +16,9 @@
 
 			<div class="ctrl">
 				<div class="ctrl-left">
-					<button id="btn_add">add random object</button>
-					<button id="btn_add_10">add 10 objects</button>
+					<button id="btn_add">add small object</button>
+					<button id="btn_add_big">add big object</button>
+					<button id="btn_add_10">add 10 small objects</button>
 					<button id="btn_clear">clear tree</button>
 				</div>
 
@@ -31,7 +32,7 @@
 				This quadtree starts off empty. Feel free to add elements to the quadtree.
 			</p>
 			<p>
-				After adding five objects to the quadtree it should split, because we initially set max_objects to 4.
+				After adding five objects to the quadtree it will split, because we initially set max_objects to 4.
 			</p>
 			<pre>
 var myTree = new Quadtree({
@@ -184,25 +185,23 @@ myTree.clear();
 			/*
 			 * add a random object to our simulation
 			 */
-			var handleAdd = function() {
+			var handleAdd = function( rect ) {
 
-				var grid = 8,
-					gridh = myTree.bounds.width/grid,
-					gridv = myTree.bounds.height/grid;
-				
-				var rndObj = {
-					x : randMinMax(0, gridh, true)*grid,
-					y : randMinMax(0, gridv, true)*grid,
-					width : randMinMax(1, 4, true)*grid,
-					height : randMinMax(1, 4, true)*grid,
-					check : false
-				};
+				if(!rect) {
+					rect = {
+						x : randMinMax(0, myTree.bounds.width-32),
+						y : randMinMax(0, myTree.bounds.height-32),
+						width : randMinMax(4, 32, true),
+						height : randMinMax(4, 32, true),
+						check : false
+					};
+				}
 
 				//store object in our array
-				myObjects.push( rndObj );
+				myObjects.push( rect );
 
 				//insert object in our quadtree
-				myTree.insert( rndObj );
+				myTree.insert( rect );
 
 				//update total counter
 				updateTotal();
@@ -307,7 +306,7 @@ myTree.clear();
 					
 					//retrieve all objects in the bounds of the hero 
 					candidates = myTree.retrieve( myCursor );
-					
+
 					//flag retrieved objects
 					for( i=0;i<candidates.length;i=i+1 ) {
 						candidates[ i ].check = true;
@@ -344,7 +343,18 @@ myTree.clear();
 			document.getElementById('canvas').addEventListener('mouseout', handleMouseout);
 
 			//set eventListener for buttons
-			document.getElementById('btn_add').addEventListener('click', handleAdd);
+			document.getElementById('btn_add').addEventListener('click', function() {
+				handleAdd();
+			});
+			document.getElementById('btn_add_big').addEventListener('click', function() {
+				handleAdd({
+					x : randMinMax(0, myTree.bounds.width/2),
+					y : randMinMax(0, myTree.bounds.height/2),
+					width : randMinMax(myTree.bounds.height/4, myTree.bounds.height/2, true),
+					height : randMinMax(myTree.bounds.height/4, myTree.bounds.height/2, true),
+					check : false
+				});
+			});
 			document.getElementById('btn_add_10').addEventListener('click', function() {
 				for(var i=0;i<10;i++) { handleAdd() };
 			});
