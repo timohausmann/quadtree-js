@@ -4,7 +4,7 @@ This is a JavaScript Quadtree implementation based on the Java Methods described
 
 > Many games require the use of collision detection algorithms to determine when two objects have collided, but these algorithms are often expensive operations and can greatly slow down a game. One way to speed things up is to reduce the number of checks that have to be made. Two objects that are at opposite ends of the screen can not possibly collide, so there is no need to check for a collision between them. This is where a quadtree comes into play.
 
-This implementation can store and retrieve rectangles in a recursive 2D Quadtree. Every Quadtree node can hold a maximum of number objects before it splits into four subnodes. Objects are only stored on leaf nodes (the lowest level). If an object overlaps into multiple leaf nodes, a reference to the object is stored in each node. 
+This implementation can store and retrieve rectangles in a recursive 2D Quadtree. Every Quadtree node can hold a maximum number of objects before it splits into four subnodes. Objects are only stored on leaf nodes (the lowest level). If an object overlaps into multiple leaf nodes, a reference to the object is stored in each node. 
 
 ## Demos
 
@@ -88,9 +88,15 @@ Check out the examples for more information.
 
 ## Browser Support
 
-This library is supported in all modern browsers beginning from IE9 and above. 
+This library is supported in all modern browsers including IE9 and above. 
 
 ## Changelog
+
+### 1.2.1
+
+Allow float boundaries for Quads
+
+Simplified getIndex function
 
 ### 1.2.0
 

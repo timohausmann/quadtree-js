@@ -1,6 +1,6 @@
 /*
  * Javascript Quadtree 
- * @version 1.2.0
+ * @version 1.2.1
  * @licence MIT
  * @author Timo Hausmann
  * https://github.com/timohausmann/quadtree-js/
@@ -33,7 +33,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  	
 	 /*
 	  * Quadtree Constructor
-	  * @param Object bounds			bounds of the node, object with x, y, width, height
+	  * @param Object bounds			bounds of the node { x, y, width, height }
 	  * @param Integer max_objects		(optional) max objects a node can hold before splitting into 4 subnodes (default: 10)
 	  * @param Integer max_levels		(optional) total max levels inside root Quadtree (default: 4) 
 	  * @param Integer level			(optional) deepth level, required for subnodes (default: 0)
@@ -57,10 +57,10 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	Quadtree.prototype.split = function() {
 		
 		var nextLevel	= this.level + 1,
-            subWidth	= Math.round( this.bounds.width / 2 ),
-            subHeight 	= Math.round( this.bounds.height / 2 ),
-            x 		= Math.round( this.bounds.x ),
-            y 		= Math.round( this.bounds.y );		
+            subWidth	= this.bounds.width/2,
+            subHeight 	= this.bounds.height/2,
+            x 		    = this.bounds.x,
+            y 		    = this.bounds.y;		
 	 
 	 	//top right node
 		this.nodes[0] = new Quadtree({
