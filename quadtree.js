@@ -29,7 +29,7 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-;(function(Math) {
+;(function() {
  	
 	 /*
 	  * Quadtree Constructor
@@ -57,10 +57,10 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	Quadtree.prototype.split = function() {
 		
 		var nextLevel	= this.level + 1,
-			subWidth	= Math.round( this.bounds.width / 2 ),
-			subHeight 	= Math.round( this.bounds.height / 2 ),
-			x 		= Math.round( this.bounds.x ),
-			y 		= Math.round( this.bounds.y );		
+            subWidth	= Math.round( this.bounds.width / 2 ),
+            subHeight 	= Math.round( this.bounds.height / 2 ),
+            x 		= Math.round( this.bounds.x ),
+            y 		= Math.round( this.bounds.y );		
 	 
 	 	//top right node
 		this.nodes[0] = new Quadtree({
@@ -99,7 +99,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	/*
 	 * Determine which node the object belongs to
 	 * @param Object pRect		bounds of the area to be checked, with x, y, width, height
-	 * @return Array			an array of indexes of the subnodes (0-3) pRect is touching
+	 * @return Array			an array of indexes of the intersecting subnodes 
+	 *                          (0-3 = top-right, top-left, bottom-left, bottom-right / ne, nw, sw, se)
 	 */
 	Quadtree.prototype.getIndex = function( pRect ) {
 		
@@ -107,33 +108,28 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			verticalMidpoint 	= this.bounds.x + (this.bounds.width / 2),
 			horizontalMidpoint 	= this.bounds.y + (this.bounds.height / 2);	
 
-		//top left quad
-		if(pRect.x < verticalMidpoint && pRect.y < horizontalMidpoint) { //top-left corner
-			indexes.push(1);
-		}		
+        var startIsNorth = pRect.y < horizontalMidpoint,
+            startIsWest  = pRect.x < verticalMidpoint,
+            endIsEast    = pRect.x + pRect.width > verticalMidpoint,
+            endIsSouth   = pRect.y + pRect.height > horizontalMidpoint;	
 
-		//top right quad
-		if(
-			(pRect.x > verticalMidpoint && pRect.y < horizontalMidpoint) || //top-left corner
-			(pRect.x + pRect.width > verticalMidpoint && pRect.y < horizontalMidpoint) //top-right corner
-			) {
+		//top-right quad
+		if(startIsNorth && endIsEast) {
 			indexes.push(0);
+        }
+        
+		//top-left quad
+		if(startIsWest && startIsNorth) {
+			indexes.push(1);
 		}
 
-		//bottom left quad
-		if(
-			pRect.x < verticalMidpoint && pRect.y > horizontalMidpoint || //top-left corner
-			(pRect.x < verticalMidpoint && pRect.y + pRect.height > horizontalMidpoint) //bottom-left corner
-			) {
+		//bottom-left quad
+		if(startIsWest && endIsSouth) {
 			indexes.push(2);
 		}
 
-		//bottom right quad
-		if(
-			(pRect.x > verticalMidpoint && pRect.y > horizontalMidpoint) || //top-left corner
-			((pRect.x + pRect.width > verticalMidpoint) && pRect.y > horizontalMidpoint) || //top-right corner
-			((pRect.x + pRect.width > verticalMidpoint) && pRect.y + pRect.height > horizontalMidpoint) //bottom right corner
-			) {
+		//bottom-right quad
+		if(endIsEast && endIsSouth) {
 			indexes.push(3);
 		}
 	 
@@ -145,7 +141,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Insert the object into the node. If the node
 	 * exceeds the capacity, it will split and add all
 	 * objects to their corresponding subnodes.
-	 * @param Object pRect		bounds of the object to be added, with x, y, width, height
+	 * @param Object pRect		bounds of the object to be added { x, y, width, height }
 	 */
 	Quadtree.prototype.insert = function( pRect ) {
 		
@@ -189,7 +185,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 
 	/*
 	 * Return all objects that could collide with the given object
-	 * @param Object pRect		bounds of the object to be checked, with x, y, width, height
+	 * @param Object pRect		bounds of the object to be checked { x, y, width, height }
 	 * @Return Array			array with all detected objects
 	 */
 	Quadtree.prototype.retrieve = function( pRect ) {
@@ -236,4 +232,4 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		window.Quadtree = Quadtree;	
 	}
 
-})(Math);
+})();
