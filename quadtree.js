@@ -7,7 +7,7 @@
  */
  
 /*
- Copyright © 2012-2020 Timo Hausmann
+Copyright © 2012-2020 Timo Hausmann
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -23,7 +23,7 @@ included in all copies or substantial portions of the Software.
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENthis. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
@@ -31,13 +31,13 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ;(function() {
      
-     /*
-      * Quadtree Constructor
-      * @param Object bounds            bounds of the node { x, y, width, height }
-      * @param Integer max_objects      (optional) max objects a node can hold before splitting into 4 subnodes (default: 10)
-      * @param Integer max_levels       (optional) total max levels inside root Quadtree (default: 4) 
-      * @param Integer level            (optional) deepth level, required for subnodes (default: 0)
-      */
+    /*
+     * Quadtree Constructor
+     * @param Object bounds            bounds of the node { x, y, width, height }
+     * @param Integer max_objects      (optional) max objects a node can hold before splitting into 4 subnodes (default: 10)
+     * @param Integer max_levels       (optional) total max levels inside root Quadtree (default: 4) 
+     * @param Integer level            (optional) deepth level, required for subnodes (default: 0)
+     */
     function Quadtree(bounds, max_objects, max_levels, level) {
         
         this.max_objects    = max_objects || 10;
