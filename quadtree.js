@@ -1,10 +1,11 @@
 /**
  * quadtree-js
- * @version 1.2.1
+ * @version 1.2.2
  * @license MIT
  * @author Timo Hausmann
- * https://github.com/timohausmann/quadtree-js.git
  */
+
+ /* https://github.com/timohausmann/quadtree-js.git v1.2.2 */
  
 /*
 Copyright © 2012-2020 Timo Hausmann

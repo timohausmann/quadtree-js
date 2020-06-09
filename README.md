@@ -6,6 +6,8 @@ This is a JavaScript Quadtree implementation based on the Java Methods described
 
 This implementation can store and retrieve rectangles in a recursive 2D Quadtree. Every Quadtree node can hold a maximum number of objects before it splits into four subnodes. Objects are only stored on leaf nodes (the lowest level). If an object overlaps into multiple leaf nodes, a reference to the object is stored in each node. 
 
+*Only 639 Bytes! (Compressed + Gzipped)*
+
 ## Demos
 
 * [Simple Demo](http://timohausmann.de/quadtree.js/simple.html) – add static objects and see the Quadtree split
@@ -90,7 +92,15 @@ Check out the examples for more information.
 
 This library is supported in all modern browsers including IE9 and above. 
 
+## Development scripts
+
+* `npm run build` to minify the source
+
 ## Changelog
+
+### 1.2.2
+
+Removed `grunt` dev dependency, now using `uglify-js` to minifiy
 
 ### 1.2.1
 
