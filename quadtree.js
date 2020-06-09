@@ -1,9 +1,9 @@
-/*
- * Javascript Quadtree 
+/**
+ * quadtree-js
  * @version 1.2.1
- * @licence MIT
+ * @license MIT
  * @author Timo Hausmann
- * https://github.com/timohausmann/quadtree-js/
+ * https://github.com/timohausmann/quadtree-js.git
  */
  
 /*
@@ -31,7 +31,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ;(function() {
      
-    /*
+    /**
      * Quadtree Constructor
      * @param Object bounds            bounds of the node { x, y, width, height }
      * @param Integer max_objects      (optional) max objects a node can hold before splitting into 4 subnodes (default: 10)
@@ -51,7 +51,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     };
     
     
-    /*
+    /**
      * Split the node into 4 subnodes
      */
     Quadtree.prototype.split = function() {
@@ -96,7 +96,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     };
     
     
-    /*
+    /**
      * Determine which node the object belongs to
      * @param Object pRect      bounds of the area to be checked, with x, y, width, height
      * @return Array            an array of indexes of the intersecting subnodes 
@@ -137,7 +137,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     };
     
     
-    /*
+    /**
      * Insert the object into the node. If the node
      * exceeds the capacity, it will split and add all
      * objects to their corresponding subnodes.
@@ -183,9 +183,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
      };
      
      
-    /*
+    /**
      * Return all objects that could collide with the given object
-     * @param Object pRect        bounds of the object to be checked { x, y, width, height }
+     * @param Object pRect      bounds of the object to be checked { x, y, width, height }
      * @Return Array            array with all detected objects
      */
     Quadtree.prototype.retrieve = function(pRect) {
@@ -209,7 +209,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     };
     
     
-    /*
+    /**
      * Clear the quadtree
      */
     Quadtree.prototype.clear = function() {
