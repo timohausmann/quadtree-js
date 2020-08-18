@@ -12,6 +12,7 @@ This implementation can store and retrieve rectangles in a recursive 2D Quadtree
 
 * [Simple Demo](http://timohausmann.de/quadtree.js/simple.html) – add static objects and see the Quadtree split
 * [Dynamic Demo](http://timohausmann.de/quadtree.js/dynamic.html) – continuously track moving objects
+* [Many to many Demo](http://timohausmann.de/quadtree.js/many.html) – check all objects against each other
 * [Benchmark v1.2](http://timohausmann.de/quadtree.js/test-10000-1.2.0.html) - Performance test with 10.000 objects
 * [Benchmark v1.1.3](http://timohausmann.de/quadtree.js/test-10000-1.1.3.html) - Performance test with 10.000 objects (old implementation)
 
@@ -19,72 +20,74 @@ This implementation can store and retrieve rectangles in a recursive 2D Quadtree
 
 [Now also available on npm](https://www.npmjs.com/package/@timohausmann/quadtree-js)! Install this module via npm and import or require it:
 
-````
+```bash
 npm i -D @timohausmann/quadtree-js
-````
+```
 
-````
+```javascript
 import Quadtree from '@timohausmann/quadtree-js';
-````
+```
 
-````
+```javascript
 const Quadtree = require('@timohausmann/quadtree-js');
-````
+```
 
 Alternatively, [download the source](https://github.com/timohausmann/quadtree-js/archive/master.zip) and include it the old-fashioned way:
 
-    <script src="quadtree.min.js"></script>
+```html
+<script src="quadtree.min.js"></script>
+```
 
 ## How to use
 
-Create a new Quadtree with default values for max_objects (10) and max_levels (4)
+Create a new Quadtree with default values for `max_objects` (10) and `max_levels` (4)
 
-<pre>
+```javascript
 var myTree = new Quadtree({
 	x: 0,
 	y: 0,
 	width: 400,
 	height: 300
 }, 10, 4);
-</pre>
+```
 
 > MAX_OBJECTS defines how many objects a node can hold before it splits and MAX_LEVELS defines the deepest level subnode.
 
 If you want to specify `max_objects` and `max_levels` on your own, you can pass them as a 2nd and 3rd argument. I recommend using low values for `max_levels` because each level will quadruple the possible amount of nodes. Using lower values for `max_levels` increases performance but may return more candidates. Finetuning these values depends on your 2D space, the amount and size of the objects and your retrieving areas. 
 
-<pre>
+```javascript
 var myTree = new Quadtree({
 	x: 0,
 	y: 0,
 	width: 800,
 	height: 600
 }, 15, 6);
-</pre> 
+``` 
 
 Insert an element in the Quadtree
-<pre>
+```javascript
 myTree.insert({
 	x: 200,
 	y: 150,
 	width: 20,
 	height: 20
 });
-</pre>
+```
 
 Retrieve elements from nodes that intersect with the given bounds
-<pre>
+```javascript
 var elements = myTree.retrieve({
 	x: 150,
 	y: 100,
 	width: 20,
 	height: 20
 });
-</pre>
+```
 
 Clear the Quadtree
-<pre>
+```javascript
 myTree.clear();
-</pre>
+```
 
 Check out the examples for more information.
 

@@ -2,13 +2,25 @@
 <html>
 	<head>
 		<title>quadtree-js Simple Demo</title>
-		<link rel="stylesheet" type="text/css" href="style.css" />
+		<link rel="stylesheet" type="text/css" href="style.css?v=2" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<!-- prism syntax highlighting (https://prismjs.com/) -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" />
 	</head>
 	<body>
 
 		<div class="outer">
 			
 			<h1><a href="https://github.com/timohausmann/quadtree-js">quadtree-js</a> <small>simple example</small></h1>
+
+			<nav>
+				<strong>Demos:</strong>
+				<span>simple</span>
+				<a href="dynamic.html">dynamic</a>
+				<a href="many.html">many to many</a>
+				<a href="test-10000-1.2.0.html">benchmark</a>
+			</nav>
 			
 			<div id="canvasContainer">
 				<canvas id="canvas" width="640" height="480"></canvas>
@@ -29,82 +41,84 @@
 			</div>
 
 			<p>
-				This quadtree starts off empty. Feel free to add elements to the quadtree.
+				This quadtree starts off empty. Click the buttons to add elements to the Quadtree.
 			</p>
 			<p>
-				After adding five objects to the quadtree it will split, because we initially set max_objects to 4.
+				After adding five objects to the Quadtree it will split, because we initially set <code>max_objects</code> to 4.
 			</p>
-			<pre>
-var myTree = new Quadtree({
+			<pre><code class="language-javascript">var myTree = new Quadtree({
 	x: 0,
 	y: 0,
 	width: 640,
 	height: 480
-}, 4);
-			</pre>
+}, 4);</code></pre>
 
 			<p>
-				Objects that you insert into the tree need to have x, y, width and height properties in order to work.
+				Objects that you insert into the tree need to have <code>x</code>, <code>y</code>, <code>width</code> and <code>height</code> properties in order to work.
 				Of course you can extend these objects with your own data.
 			</p>
-			<pre>
-var myObject = {
+			<pre><code class="language-javascript">var myObject = {
 	x: 200,
 	y: 100,
 	width: 35,
 	height: 70
 }
 
-myTree.insert( myObject );
-			</pre>
+myTree.insert(myObject);</code></pre>
 
 			
 			<p>
 				In this example, we constantly retrieve collision candidates for the white area at your mouse cursor. The candidates are highlighted in green.
 			</p>
 
-			<pre>
-var myCursor = {
+			<pre><code class="language-javascript">var myCursor = {
 	x: mouseX,
 	y: mouseY,
 	width: 20,
 	height: 20
 };
 
-var candidates = myTree.retrieve( myCursor );
-			</pre>
+var candidates = myTree.retrieve(myCursor);</code></pre>
 			<p>
 				The object passed to the retrieve function does not have to be inside the quadtree. It could be though, if that's your thing. 
 			</p>
 			
 			<p>
-				What you get is an array of your collision candidates. In this example, we will only mark them with a check-property to paint them green. In a real world example, you may want to check them for collisions.
+				What you get is an array of your collision candidates. In this example, we will only mark them with a <code>check</code>-property to paint them green. In a real world example, you may want to check them for collisions.
 			</p>
 
-			<pre>
-for( var i=0;i&lt;candidates.length;i=i+1 ) {
-	candidates[ i ].check = true;
-}
-			</pre>
+			<pre><code class="language-javascript">for(var i=0;i&lt;candidates.length;i=i+1) {
+	candidates[i].check = true;
+}</code></pre>
 				
 
 			<p>
 				Run clear() to remove all objects from the quadtree and reset it.
 			</p>
 
-			<pre>
-myTree.clear();
-			</pre>
+			<pre><code class="language-javascript">myTree.clear();</code></pre>
 
 			<p>
-				<a href="https://github.com/timohausmann/quadtree-js">quadtree-js at github</a>
+				To see the full example code please check the page source or 
+				<a href="https://github.com/timohausmann/quadtree-js" target="_blank" rel="noopener noreferrer">visit github</a>.
 			</p>
 			
 		</div>
-		
+
+		<!-- github corner (https://github.com/tholman/github-corners) -->
+		<a href="https://github.com/timohausmann/quadtree-js" class="github-corner" aria-label="View source on GitHub"
+			target="_blank" rel="noopener noreferrer">
+			<svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true">
+				<path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path>
+			</svg>
+		</a>
+
+		<!-- prism syntax highlighting -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/prism.min.js" integrity="sha512-WkVkkoB31AoI9DAk6SEEEyacH9etQXKUov4JRRuM1Y681VsTq7jYgrRw06cbP6Io7kPsKx+tLFpH/HXZSZ2YEQ==" crossorigin="anonymous"></script>
+
+		<!-- quadtree lib and script -->
 		<script src="../quadtree.js"></script>
-		
-		<script>		
+		<script>
 		
 		(function(w, M) {
 			
@@ -185,7 +199,7 @@ myTree.clear();
 			/*
 			 * add a random object to our simulation
 			 */
-			var handleAdd = function( rect ) {
+			var handleAdd = function(rect) {
 
 				if(!rect) {
 					rect = {
@@ -198,10 +212,10 @@ myTree.clear();
 				}
 
 				//store object in our array
-				myObjects.push( rect );
+				myObjects.push(rect);
 
 				//insert object in our quadtree
-				myTree.insert( rect );
+				myTree.insert(rect);
 
 				//update total counter
 				updateTotal();
@@ -226,19 +240,19 @@ myTree.clear();
 			/*
 			 * draw Quadtree nodes
 			 */
-			var drawQuadtree = function( node ) {
+			var drawQuadtree = function(node) {
 
 				var bounds = node.bounds;
 			
 				//no subnodes? draw the current node
-				if( node.nodes.length === 0 ) {
+				if(node.nodes.length === 0) {
 					ctx.strokeStyle = 'rgba(255,0,0,0.5)';
 					ctx.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
 					
 				//has subnodes? drawQuadtree them!
 				} else {
-					for( var i=0;i<node.nodes.length;i=i+1 ) {
-						drawQuadtree( node.nodes[ i ] );
+					for(var i=0;i<node.nodes.length;i=i+1) {
+						drawQuadtree(node.nodes[i]);
 					}
 				}
 			};
@@ -250,16 +264,16 @@ myTree.clear();
 				
 				var obj;
 				
-				for( var i=0;i<myObjects.length;i=i+1 ) {
+				for(var i=0;i<myObjects.length;i=i+1) {
 					
-					obj = myObjects[ i ];
+					obj = myObjects[i];
 					
-					if( obj.check ) {
+					if(obj.check) {
 						ctx.fillStyle = 'rgba(48,255,48,0.5)';
-						ctx.fillRect( obj.x, obj.y, obj.width, obj.height );
+						ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
 					} else {
 						ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-						ctx.strokeRect( obj.x, obj.y, obj.width, obj.height );
+						ctx.strokeRect(obj.x, obj.y, obj.width, obj.height);
 					}
 					
 					
@@ -278,7 +292,7 @@ myTree.clear();
 			randMinMax = function(min, max, round) {
 				var val = min + (Math.random() * (max - min));
 				
-				if( round ) val = Math.round( val );
+				if(round) val = Math.round(val);
 				
 				return val;
 			};
@@ -293,33 +307,33 @@ myTree.clear();
 				ctx.clearRect(0, 0, 640, 480);
 				
 				//reset myObjects check flag
-				for( var i=0;i<myObjects.length;i=i+1 ) {
+				for(var i=0;i<myObjects.length;i=i+1) {
 					
 					myObjects[i].check = false;
 				}
 				
 
-				if( isMouseover ) {
+				if(isMouseover) {
 
 					ctx.fillStyle = 'rgba(255,255,255,0.5)';
-					ctx.fillRect( myCursor.x, myCursor.y, myCursor.width, myCursor.height );
+					ctx.fillRect(myCursor.x, myCursor.y, myCursor.width, myCursor.height);
 					
 					//retrieve all objects in the bounds of the hero 
-					candidates = myTree.retrieve( myCursor );
+					candidates = myTree.retrieve(myCursor);
 
 					//flag retrieved objects
-					for( i=0;i<candidates.length;i=i+1 ) {
-						candidates[ i ].check = true;
+					for(i=0;i<candidates.length;i=i+1) {
+						candidates[i].check = true;
 					}
 				}
 
 				updateCandidatesInfo(candidates);
 				
-				drawQuadtree( myTree );
+				drawQuadtree(myTree);
 
 				drawObjects();
 				
-				requestAnimFrame( loop );
+				requestAnimFrame(loop);
 			};
 
 
@@ -331,8 +345,8 @@ myTree.clear();
 			var updateCandidatesInfo = function(candidates) {
 
 				cnt_cand.innerHTML = candidates.length;
-				if( !myObjects.length ) return;
-				cnt_perc.innerHTML = Math.round( (candidates.length/myObjects.length)*100 );
+				if(!myObjects.length) return;
+				cnt_perc.innerHTML = Math.round((candidates.length/myObjects.length)*100);
 			}
 						
 			//init first loop
