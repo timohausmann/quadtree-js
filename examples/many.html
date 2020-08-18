@@ -1,0 +1,359 @@
+<!doctype html>
+<html>
+	<head>
+		<title>quadtree-js Many-to-many Demo</title>
+		<link rel="stylesheet" type="text/css" href="style.css" />
+	</head>
+	<body>
+
+		<div class="outer">
+			
+			<h1><a href="https://github.com/timohausmann/quadtree-js">quadtree-js</a> <small>many-to-many example</small></h1>
+			
+			<div id="canvasContainer">
+				<canvas id="canvas" width="640" height="480"></canvas>
+			</div>
+
+			<div class="ctrl">
+				<div class="ctrl-left">
+					Total Objects: <span id="cnt_total">0</span>
+				</div>
+				<div class="ctrl-right">
+					Total candidates: <span id="cnt_cand">0</span> (avg. per object: <span id="cnt_perc">0</span>)<br />
+					FPS: <span id="cnt_fps">0</span>
+				</div>
+			</div>
+		
+
+			<p>
+				This example shows how the quadtree can be used for many-to-many checks. All objects can collide with each other. 
+				Two loops are neccessary to first insert all objects into the tree ([2]) and then check each object for collisions ([3]).
+			</p>
+
+			<pre>
+function loop() {
+
+    //[1] First, we will clear the quadtree with every game loop. 
+    //This is neccessary to keep the tree clean and accurate 
+    //(due to its recursive nature).
+    myTree.clear();
+
+    //[2] Then we will update the positions of all objects 
+    //and re-insert them into the tree.
+    for(var i=0;i&lt;myObjects.length;i++) {
+        
+        myObjects[i].x += myObjects[i].vx;
+        myObjects[i].y += myObjects[i].vy;
+        
+        myTree.insert(myObjects[i]);
+    }
+
+    //[3] Now we loop over all objects again &hellip;
+    for(var i=0;i&lt;myObjects.length;i++) {
+
+        var myObject = myObjects[i];
+
+        //[4] &hellip; and retrieve all objects from the same tree node
+        var candidates = myTree.retrieve(myObject);
+
+        //[5] Check all collision candidates
+        for(k=0;k&lt;candidates.length;k++) {
+
+            var myCandidate = candidates[k];
+
+            //[6] since all objects are inside the tree, 
+            //we will also retrieve the current object itself.
+            //That's a collision case we want to skip.
+            if(myObject === myCandidate) continue;
+
+            //[7] check each candidate for real intersection
+            var intersect = getIntersection(myObject, myCandidate);
+            
+            //[8] if they actually intersect, we can take further 
+            //actions. In this script, colliding objects will turn 
+            //green and change velocity 
+            if(intersect) {
+                // &hellip; take actions
+            }
+        }
+    }
+
+    //[9] finally, draw all objects and the quadtree
+    drawQuadtree(myTree);
+    drawObjects();
+    
+    //request next frame
+    requestAnimFrame(loop);
+}
+			</pre>
+			<p>
+				Please check the page source to see the full code. This example uses a very basic collision check and 
+				reaction that is not bullet-proof and won't fit all cases. Collision detection is beyond the scope of 
+				quadtree-js, therefore please research a collision system that will work for you. 
+			</p>
+			<p>
+				This example uses a simple collision based on 
+				<a href="https://www.metanetsoftware.com/technique/tutorialA.html" target="_blank" rel="noreferrer noopener">
+				Metanet's N Game Collision Tutorial</a>, which may be a starting point if you are new to collision detection. 
+				There are many great tutorials out there. 
+			</p>
+
+			<p>
+				<a href="https://github.com/timohausmann/quadtree-js">quadtree-js at github</a>
+			</p>
+
+		</div>
+
+		<script src="../quadtree.js"></script>
+		
+		<script>		
+		
+		(function(w) {
+			
+			w.requestAnimFrame = (function () {
+				return  w.requestAnimationFrame ||
+					w.webkitRequestAnimationFrame ||
+					w.mozRequestAnimationFrame ||
+					w.oRequestAnimationFrame ||
+					w.msRequestAnimationFrame ||
+					function (callback) {
+						w.setTimeout(callback, 1000 / 60);
+					};
+			})();
+
+
+			var ctx = document.getElementById('canvas').getContext('2d');
+
+			var cnt_total = document.querySelector('#cnt_total'),
+				cnt_cand = document.querySelector('#cnt_cand'),
+				cnt_fps = document.querySelector('#cnt_fps'),
+				cnt_perc = document.querySelector('#cnt_perc');
+				
+			
+			/*
+			 * the main Quadtree
+			 */
+			var myTree = new Quadtree({
+				x: 0,
+				y: 0,
+				width: 640,
+				height: 480
+			});
+			
+			/*
+			 * our objects will be stored here
+			 */
+			var myObjects = [];
+			
+			
+			/*
+			 * create some objects and save them in myObjects
+			 */
+			for(var i=0;i<800;i++) {
+				myObjects.push({
+					x : randMinMax(0, 640-16),
+					y : randMinMax(0, 480-16),
+					width : randMinMax(4, 16),
+					height : randMinMax(4, 16),
+					vx: randMinMax(-0.5,0.5),
+					vy: randMinMax(-0.5,0.5),
+					check : false
+				});
+			}
+			cnt_total.innerHTML = myObjects.length;
+			
+			
+			/*
+			 * draw Quadtree nodes
+			 */
+			var drawQuadtree = function(node) {
+				
+				var bounds = node.bounds;
+			
+				//no subnodes? draw the current node
+				if(node.nodes.length === 0) {
+					ctx.strokeStyle = 'rgba(255,0,0,0.25)';
+					ctx.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
+					
+				//has subnodes? drawQuadtree them!
+				} else {
+					for(var i=0;i<node.nodes.length;i++) {
+						drawQuadtree(node.nodes[i]);
+					}
+				}
+			};
+			
+			/*
+			 * draw all objects
+			 */
+			var drawObjects = function() {
+				
+				var obj;
+				
+				for(var i=0;i<myObjects.length;i++) {
+					
+					obj = myObjects[i];
+					
+					if(obj.check) {
+						ctx.strokeStyle = 'rgba(48,255,48,0.5)';
+					} else {
+						ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+					}
+					ctx.strokeRect(obj.x, obj.y, obj.width, obj.height);
+				}
+			};
+			
+			
+			/*
+			 * our main loop
+			 */
+			var lastLoop = new Date();
+			var loop = function() {
+
+				//calculate FPS
+				var thisLoop = new Date();
+				var fps = 1000 / (thisLoop - lastLoop);
+				lastLoop = thisLoop;
+				cnt_fps.innerHTML = Math.round(fps);
+				
+				//[1] clear the tree
+				myTree.clear();
+				ctx.clearRect(0, 0, 640, 480);
+				
+				//[2] update myObjects and insert them into the tree again
+				for(var i=0;i<myObjects.length;i++) {
+					
+					myObjects[i].x += myObjects[i].vx;
+					myObjects[i].y += myObjects[i].vy;
+					myObjects[i].check = false;
+					
+					//bounce objects when they reach the canvas border
+					if(myObjects[i].x > 640 - myObjects[i].width ||
+						myObjects[i].x < 0) myObjects[i].vx *= -1;
+					if(myObjects[i].y > 480 - myObjects[i].height ||
+						myObjects[i].y < 0) myObjects[i].vy *= -1;
+					
+					myTree.insert(myObjects[i]);
+				}
+
+				//[3] now that the tree is filled, we have to check each object for collisions
+				for(var i=0;i<myObjects.length;i++) {
+
+					var myObject = myObjects[i];
+
+					//[4] first, get all collision candidates
+					var candidates = myTree.retrieve(myObject);
+
+					//[5] let's check them for actual collision
+					for(k=0;k<candidates.length;k++) {
+
+						var myCandidate = candidates[k];
+
+						//[6] don't check objects against themselves
+						if(myObject === myCandidate) continue;
+
+						//[7] get intersection data
+						var intersect = getIntersection(myObject, myCandidate);
+						
+						//no intersection - continue
+						if(intersect === false) continue;
+
+						//[8]
+						myObject.check = true;
+						myCandidate.check = true;
+
+						//Perform X Push
+						if(intersect.pushX < intersect.pushY) {
+
+							if(intersect.dirX < 0) {
+								myObject.x = myCandidate.x - myObject.width;
+							} else if(intersect.dirX > 0) {
+								myObject.x = myCandidate.x + myCandidate.width;
+							}
+							
+							//reverse X trajectory (bounce)
+							myObject.vx *= -1;
+						
+						//Perform Y Push
+						} else {
+
+							if(intersect.dirY < 0) {
+								myObject.y = myCandidate.y - myObject.height;
+							} else if(intersect.dirY > 0) {
+								myObject.y = myCandidate.y + myCandidate.height;
+							}
+							
+							//reverse Y trajectory (bounce)
+							myObject.vy *= -1;
+						}
+					}
+				}
+
+				//[9] draw objects and quadtree
+				drawQuadtree(myTree);
+				drawObjects();
+
+				//update UI info
+				var candidates = myObjects.filter(function(e) { return e.check === true; })
+				updateCandidatesInfo(candidates);
+				
+				//request next frame
+				requestAnimFrame(loop);
+			};
+
+
+
+			function getIntersection(r1, r2) {
+
+				var r1w = r1.width/2,
+					r1h = r1.height/2,
+					r2w = r2.width/2,
+					r2h = r2.height/2;
+
+				var distX = (r1.x + r1w) - (r2.x + r2w);
+				var distY = (r1.y + r1h) - (r2.y + r2h);
+
+				if(Math.abs(distX) < r1w + r2w && Math.abs(distY) < r1h + r2h) {
+					return {
+						pushX : (r1w  + r2w) - Math.abs(distX),
+						pushY : (r1h  + r2h) - Math.abs(distY),
+						dirX : distX === 0 ? 0 : distX < 0 ? -1 : 1,
+						dirY : distY === 0 ? 0 : distY < 0 ? -1 : 1
+					}
+				} else {
+					return false;
+				}
+			}
+
+			var updateCandidatesInfo = function(candidates) {
+
+				var avg = myObjects.length/candidates.length;
+				cnt_cand.innerHTML =  candidates.length;
+				if(!myObjects.length) return;
+				//cnt_perc.innerHTML = Math.round((candidates.length/myObjects.length)*100);
+				cnt_perc.innerHTML = Math.round(avg);
+			}
+			
+			//init first loop
+			loop();
+			
+			/**
+			 * return a random number within given boundaries.
+			 *
+			 * @param {number} min		the lowest possible number
+			 * @param {number} max		the highest possible number
+			 * @param {boolean} round	if true, return integer
+			 * @return {number} 		a random number
+			 */
+			 function randMinMax(min, max, round) {
+				var val = min + (Math.random() * (max - min));
+				
+				if(round) val = Math.round(val);
+				
+				return val;
+			};
+			
+		})(window);
+		</script>
+	</body>
+</html>
