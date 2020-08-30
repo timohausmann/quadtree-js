@@ -37,7 +37,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
      * @param Object bounds            bounds of the node { x, y, width, height }
      * @param Integer max_objects      (optional) max objects a node can hold before splitting into 4 subnodes (default: 10)
      * @param Integer max_levels       (optional) total max levels inside root Quadtree (default: 4) 
-     * @param Integer level            (optional) deepth level, required for subnodes (default: 0)
+     * @param Integer level            (optional) depth level, required for subnodes (default: 0)
      */
     function Quadtree(bounds, max_objects, max_levels, level) {
         
