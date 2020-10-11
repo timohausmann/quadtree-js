@@ -10,11 +10,11 @@ This implementation can store and retrieve rectangles in a recursive 2D Quadtree
 
 ## Demos
 
-* [Simple Demo](https://timohausmann.github.io/quadtree.js/simple.html) – add static objects and see the Quadtree split
-* [Dynamic Demo](https://timohausmann.github.io/quadtree.js/dynamic.html) – continuously track moving objects
-* [Many to many Demo](https://timohausmann.github.io/quadtree.js/many.html) – check all objects against each other
-* [Benchmark v1.2](https://timohausmann.github.io/quadtree.js/test-10000-1.2.0.html) - Performance test with 10.000 objects
-* [Benchmark v1.1.3](https://timohausmann.github.io/quadtree.js/test-10000-1.1.3.html) - Performance test with 10.000 objects (old implementation)
+* [Simple Demo](https://timohausmann.github.io/quadtree-js/simple.html) – add static objects and see the Quadtree split
+* [Dynamic Demo](https://timohausmann.github.io/quadtree-js/dynamic.html) – continuously track moving objects
+* [Many to many Demo](https://timohausmann.github.io/quadtree-js/many.html) – check all objects against each other
+* [Benchmark v1.2](https://timohausmann.github.io/quadtree-js/test-10000-1.2.0.html) - Performance test with 10.000 objects
+* [Benchmark v1.1.3](https://timohausmann.github.io/quadtree-js/test-10000-1.1.3.html) - Performance test with 10.000 objects (old implementation)
 
 ## Install
 
