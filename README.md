@@ -10,11 +10,11 @@ This implementation can store and retrieve rectangles in a recursive 2D Quadtree
 
 ## Demos
 
-* [Simple Demo](http://timohausmann.de/quadtree.js/simple.html) – add static objects and see the Quadtree split
-* [Dynamic Demo](http://timohausmann.de/quadtree.js/dynamic.html) – continuously track moving objects
-* [Many to many Demo](http://timohausmann.de/quadtree.js/many.html) – check all objects against each other
-* [Benchmark v1.2](http://timohausmann.de/quadtree.js/test-10000-1.2.0.html) - Performance test with 10.000 objects
-* [Benchmark v1.1.3](http://timohausmann.de/quadtree.js/test-10000-1.1.3.html) - Performance test with 10.000 objects (old implementation)
+* [Simple Demo](https://timohausmann.github.io/quadtree.js/simple.html) – add static objects and see the Quadtree split
+* [Dynamic Demo](https://timohausmann.github.io/quadtree.js/dynamic.html) – continuously track moving objects
+* [Many to many Demo](https://timohausmann.github.io/quadtree.js/many.html) – check all objects against each other
+* [Benchmark v1.2](https://timohausmann.github.io/quadtree.js/test-10000-1.2.0.html) - Performance test with 10.000 objects
+* [Benchmark v1.1.3](https://timohausmann.github.io/quadtree.js/test-10000-1.1.3.html) - Performance test with 10.000 objects (old implementation)
 
 ## Install
 
@@ -38,9 +38,20 @@ Alternatively, [download the source](https://github.com/timohausmann/quadtree-js
 <script src="quadtree.min.js"></script>
 ```
 
+Or use an awesome CDN like [jsdelivr](https://www.jsdelivr.com/) or [unpkg](https://unpkg.com/)
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/@timohausmann/quadtree-js/quadtree.min.js"></script>
+```
+
+```html
+<script src="https://unpkg.com/@timohausmann/quadtree-js/quadtree.min.js"></script>
+```
+
+
 ## How to use
 
-Create a new Quadtree with default values for `max_objects` (10) and `max_levels` (4)
+Create a new Quadtree (with default values for `max_objects` (10) and `max_levels` (4)).
 
 ```javascript
 var myTree = new Quadtree({
@@ -48,7 +59,7 @@ var myTree = new Quadtree({
 	y: 0,
 	width: 400,
 	height: 300
-}, 10, 4);
+});
 ```
 
 > MAX_OBJECTS defines how many objects a node can hold before it splits and MAX_LEVELS defines the deepest level subnode.
@@ -100,6 +111,10 @@ This library is supported in all modern browsers including IE9 and above.
 * `npm run build` to minify the source
 
 ## Changelog
+
+### 1.2.3
+
+using github.io for examples (docs), CDN URLs
 
 ### 1.2.2
 

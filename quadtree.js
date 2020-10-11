@@ -1,11 +1,11 @@
 /**
  * quadtree-js
- * @version 1.2.2
+ * @version 1.2.3
  * @license MIT
  * @author Timo Hausmann
  */
 
- /* https://github.com/timohausmann/quadtree-js.git v1.2.2 */
+ /* https://github.com/timohausmann/quadtree-js.git v1.2.3 */
  
 /*
 Copyright © 2012-2020 Timo Hausmann
@@ -187,7 +187,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     /**
      * Return all objects that could collide with the given object
      * @param Object pRect      bounds of the object to be checked { x, y, width, height }
-     * @Return Array            array with all detected objects
+     * @return Array            array with all detected objects
      */
     Quadtree.prototype.retrieve = function(pRect) {
          
