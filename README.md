@@ -18,7 +18,7 @@ This implementation can store and retrieve rectangles in a recursive 2D Quadtree
 
 ## Install
 
-[Now also available on npm](https://www.npmjs.com/package/@timohausmann/quadtree-js)! Install this module via npm and import or require it:
+Install this module via [npm](https://www.npmjs.com/package/@timohausmann/quadtree-js) and import or require it:
 
 ```bash
 npm i -D @timohausmann/quadtree-js
@@ -38,7 +38,7 @@ Alternatively, [download the source](https://github.com/timohausmann/quadtree-js
 <script src="quadtree.min.js"></script>
 ```
 
-Or use an awesome CDN like [jsdelivr](https://www.jsdelivr.com/) or [unpkg](https://unpkg.com/)
+Or use an awesome CDN like [jsdelivr](https://www.jsdelivr.com/package/npm/@timohausmann/quadtree-js) or [unpkg](https://unpkg.com/browse/@timohausmann/quadtree-js@latest/):
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@timohausmann/quadtree-js/quadtree.min.js"></script>
@@ -55,10 +55,10 @@ Create a new Quadtree (with default values for `max_objects` (10) and `max_level
 
 ```javascript
 var myTree = new Quadtree({
-	x: 0,
-	y: 0,
-	width: 400,
-	height: 300
+    x: 0,
+    y: 0,
+    width: 400,
+    height: 300
 });
 ```
 
@@ -68,30 +68,30 @@ If you want to specify `max_objects` and `max_levels` on your own, you can pass 
 
 ```javascript
 var myTree = new Quadtree({
-	x: 0,
-	y: 0,
-	width: 800,
-	height: 600
+    x: 0,
+    y: 0,
+    width: 800,
+    height: 600
 }, 15, 6);
 ``` 
 
 Insert an element in the Quadtree
 ```javascript
 myTree.insert({
-	x: 200,
-	y: 150,
-	width: 20,
-	height: 20
+    x: 100,
+    y: 100,
+    width: 100,
+    height: 100
 });
 ```
 
 Retrieve elements from nodes that intersect with the given bounds
 ```javascript
 var elements = myTree.retrieve({
-	x: 150,
-	y: 100,
-	width: 20,
-	height: 20
+    x: 150,
+    y: 150,
+    width: 100,
+    height: 100
 });
 ```
 
@@ -101,6 +101,29 @@ myTree.clear();
 ```
 
 Check out the examples for more information.
+
+## Typescript
+
+Type definitions are included. Inserted objects need to conform to the `Quadtree.Rect` interface. 
+
+```javascript
+import Quadtree, { Rect } from '@timohausmann/quadtree-js';
+
+interface Player extends Rect {
+    name: string;
+    health: 100;
+}
+
+const hero:Player = {
+    name: 'Shiffmaster',
+    x: 100,
+    y: 100,
+    width: 100,
+    height: 100
+}
+
+myTree.insert(hero);
+```
 
 ## Browser Support
 
@@ -112,9 +135,15 @@ This library is supported in all modern browsers including IE9 and above.
 
 ## Changelog
 
+### 1.2.4
+
+Added definition files for Typescript support
+
+JSDoc Fixes
+
 ### 1.2.3
 
-using github.io for examples (docs), CDN URLs
+Using github.io for examples (docs), CDN URLs
 
 ### 1.2.2
 

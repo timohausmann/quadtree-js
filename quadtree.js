@@ -1,14 +1,14 @@
 /**
  * quadtree-js
- * @version 1.2.3
+ * @version 1.2.4
  * @license MIT
  * @author Timo Hausmann
  */
 
- /* https://github.com/timohausmann/quadtree-js.git v1.2.3 */
+/* https://github.com/timohausmann/quadtree-js.git v1.2.4 */
  
 /*
-Copyright © 2012-2020 Timo Hausmann
+Copyright © 2012-2021 Timo Hausmann
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -31,13 +31,24 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 ;(function() {
+
+    /**
+     * The Quadtree uses rectangle objects for all areas ("Rect").
+     * All rectangles require the properties x, y, width, height
+     * @typedef {Object} Rect
+     * @property {number} x         X-Position
+     * @property {number} y         Y-Position
+     * @property {number} width     Width
+     * @property {number} height    Height
+     */
      
     /**
      * Quadtree Constructor
-     * @param Object bounds            bounds of the node { x, y, width, height }
-     * @param Integer max_objects      (optional) max objects a node can hold before splitting into 4 subnodes (default: 10)
-     * @param Integer max_levels       (optional) total max levels inside root Quadtree (default: 4) 
-     * @param Integer level            (optional) depth level, required for subnodes (default: 0)
+     * @class Quadtree
+     * @param {Rect} bounds                 bounds of the node ({ x, y, width, height })
+     * @param {number} [max_objects=10]     (optional) max objects a node can hold before splitting into 4 subnodes (default: 10)
+     * @param {number} [max_levels=4]       (optional) total max levels inside root Quadtree (default: 4) 
+     * @param {number} [level=0]            (optional) depth level, required for subnodes (default: 0)
      */
     function Quadtree(bounds, max_objects, max_levels, level) {
         
@@ -54,6 +65,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     
     /**
      * Split the node into 4 subnodes
+     * @memberof Quadtree
      */
     Quadtree.prototype.split = function() {
         
@@ -99,9 +111,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     
     /**
      * Determine which node the object belongs to
-     * @param Object pRect      bounds of the area to be checked, with x, y, width, height
-     * @return Array            an array of indexes of the intersecting subnodes 
-     *                          (0-3 = top-right, top-left, bottom-left, bottom-right / ne, nw, sw, se)
+     * @param {Rect} pRect      bounds of the area to be checked ({ x, y, width, height })
+     * @return {number[]}       an array of indexes of the intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right / ne, nw, sw, se)
+     * @memberof Quadtree
      */
     Quadtree.prototype.getIndex = function(pRect) {
         
@@ -142,7 +154,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
      * Insert the object into the node. If the node
      * exceeds the capacity, it will split and add all
      * objects to their corresponding subnodes.
-     * @param Object pRect        bounds of the object to be added { x, y, width, height }
+     * @param {Rect} pRect      bounds of the object to be added ({ x, y, width, height })
+     * @memberof Quadtree
      */
     Quadtree.prototype.insert = function(pRect) {
         
@@ -186,8 +199,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
      
     /**
      * Return all objects that could collide with the given object
-     * @param Object pRect      bounds of the object to be checked { x, y, width, height }
-     * @return Array            array with all detected objects
+     * @param {Rect} pRect      bounds of the object to be checked ({ x, y, width, height })
+     * @return {Rect[]}         array with all detected objects
+     * @memberof Quadtree
      */
     Quadtree.prototype.retrieve = function(pRect) {
          
@@ -212,6 +226,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     
     /**
      * Clear the quadtree
+     * @memberof Quadtree
      */
     Quadtree.prototype.clear = function() {
         
