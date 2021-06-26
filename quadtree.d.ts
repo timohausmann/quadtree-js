@@ -26,7 +26,7 @@ declare class Quadtree {
     split(): void
     getIndex(pRect: Quadtree.Rect): [number]
     insert(pRect: Quadtree.Rect): void
-    retrieve(pRect: Quadtree.Rect): [Quadtree.Rect]
+    retrieve(pRect: Quadtree.Rect): {nodes: [Quadtree], objects: [Quadtree.Rect]}
     clear(): void
 }
 

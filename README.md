@@ -1,5 +1,11 @@
 # quadtree-js
 
+## Retrieve Nodes Branch
+
+see https://github.com/timohausmann/quadtree-js/issues/17
+
+----
+
 This is a JavaScript Quadtree implementation based on the Java Methods described on [gamedevelopment.tutsplus.com by Steven Lambert](https://gamedevelopment.tutsplus.com/tutorials/quick-tip-use-quadtrees-to-detect-likely-collisions-in-2d-space--gamedev-374):
 
 > Many games require the use of collision detection algorithms to determine when two objects have collided, but these algorithms are often expensive operations and can greatly slow down a game. One way to speed things up is to reduce the number of checks that have to be made. Two objects that are at opposite ends of the screen can not possibly collide, so there is no need to check for a collision between them. This is where a quadtree comes into play.

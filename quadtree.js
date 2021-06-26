@@ -1,11 +1,11 @@
 /**
  * quadtree-js
- * @version 1.2.4
+ * @version 1.2.4-retrieve-nodes
  * @license MIT
  * @author Timo Hausmann
  */
 
-/* https://github.com/timohausmann/quadtree-js.git v1.2.4 */
+/* https://github.com/timohausmann/quadtree-js.git v1.2.4-retrieve-nodes */
  
 /*
 Copyright © 2012-2021 Timo Hausmann
@@ -195,32 +195,50 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             this.objects = [];
         }
      };
-     
+
+    /**
+     * @typedef {Object} Retrieval
+     * @property {Quadtree[]} nodes - all nodes containing objects that match the retrieved area
+     * @property {Rect[]} objects - all objects that match the retrieved area
+     */
      
     /**
      * Return all objects that could collide with the given object
      * @param {Rect} pRect      bounds of the object to be checked ({ x, y, width, height })
-     * @return {Rect[]}         array with all detected objects
+     * @return {Retrieval}      matching nodes and objects
      * @memberof Quadtree
      */
-    Quadtree.prototype.retrieve = function(pRect) {
-         
+     Quadtree.prototype.retrieve = function(pRect) {
+
         var indexes = this.getIndex(pRect),
-            returnObjects = this.objects;
-            
+            objects = this.objects;
+
+        //modification: collect nodes
+        var nodes = [];
+        if (this.objects.length) nodes.push(this);
+
+
         //if we have subnodes, retrieve their objects
         if(this.nodes.length) {
             for(var i=0; i<indexes.length; i++) {
-                returnObjects = returnObjects.concat(this.nodes[indexes[i]].retrieve(pRect));
+
+                //modification: collect objects and nodes
+                var retrieved = this.nodes[indexes[i]].retrieve(pRect);
+                objects = objects.concat(retrieved.objects);
+                nodes = nodes.concat(retrieved.nodes);
             }
         }
 
-        //remove duplicates
-        returnObjects = returnObjects.filter(function(item, index) {
-            return returnObjects.indexOf(item) >= index;
+        //remove duplicate objects
+        objects = objects.filter(function (item, index) {
+            return objects.indexOf(item) >= index;
         });
-     
-        return returnObjects;
+
+        //modification: return objects and nodes
+        return {
+            objects: objects,
+            nodes: nodes
+        }
     };
     
     
