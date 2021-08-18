@@ -23,6 +23,7 @@
     "example": "examples"
   },
   "devDependencies": {
+    "typescript": "^4.3.5",
     "uglify-js": "^3.9.4"
   }
 }
