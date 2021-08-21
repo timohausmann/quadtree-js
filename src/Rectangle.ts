@@ -1,16 +1,19 @@
-import type { NodeGeometry, IndexeableGeometry } from "../quadtree";
+import type { NodeGeometry, Indexable } from "../quadtree";
 
-export interface RectGeometry extends IndexeableGeometry {
+export interface RectGeometry {
     x: number
     y: number
     width: number
     height: number
 }
 
+export interface IndexableRectGeometry extends RectGeometry, Indexable {
+}
+
 /**
  * Class representing a Rectangle
  */
-class Rectangle implements RectGeometry {
+class Rectangle implements IndexableRectGeometry {
 
     x: number;
     y: number;
@@ -29,18 +32,18 @@ class Rectangle implements RectGeometry {
      * Determine which quadrant the object belongs to.
      * (You should not call this method directly, but use Quadtree.getIndex() instead)
      * @param {NodeGeometry} node   Quadtree node bounds to be checked ({ x, y, width, height })
-     * @return {number[]}           array of indexes of the intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
+     * @return {number[]}           array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
     getIndex(node:NodeGeometry) {
         
-        const indexes:number[]   = [],
-              verticalMidpoint   = this.x + (this.width/2),
-              horizontalMidpoint = this.y + (this.height/2);    
+        const indexes:number[] = [],
+              boundsCenterX    = node.x + (node.width/2),
+              boundsCenterY    = node.y + (node.height/2);
 
-        const startIsNorth = node.y < horizontalMidpoint,
-              startIsWest  = node.x < verticalMidpoint,
-              endIsEast    = node.x + node.width > verticalMidpoint,
-              endIsSouth   = node.y + node.height > horizontalMidpoint;    
+        const startIsNorth = this.y < boundsCenterY,
+              startIsWest  = this.x < boundsCenterX,
+              endIsEast    = this.x + this.width > boundsCenterX,
+              endIsSouth   = this.y + this.height > boundsCenterY;
 
         //top-right quad
         if(startIsNorth && endIsEast) {

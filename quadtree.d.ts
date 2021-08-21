@@ -3,20 +3,9 @@
 // Definitions by: Timo Hausmann <https://timohausmann.de/>
 // Template: https://www.typescriptlang.org/docs/handbook/declaration-files/templates/module-class-d-ts.html
 
-import Rectangle, { RectGeometry } from "./src/Rectangle";
-import Circle, { CircleGeometry } from "./src/Circle";
-import Line, { LineGeometry } from "./src/Line";
-
-/*~ If this module is a UMD module that exposes a global variable 'myClassLib' when
- *~ loaded outside a module loader environment, declare that global here.
- */
-//export as namespace Quadtree;
-
-/*~ This declaration specifies that the class constructor function
- *~ is the exported object from the file
- */
-//export = Quadtree;
-
+import Rectangle, { RectangleGeometry, IndexableRectGeometry } from "./src/Rectangle";
+import Circle, { CircleGeometry, IndexableCircleGeometry } from "./src/Circle";
+import Line, { LineGeometry, IndexableLineGeometry } from "./src/Line";
 
 interface NodeGeometry {
     x: number
@@ -24,60 +13,38 @@ interface NodeGeometry {
     width: number
     height: number
 }
-interface IndexeableGeometry {
-    getIndex(rect: NodeGeometry): number[]
-}
 
-type Geometry = 
-    | RectGeometry 
-    | CircleGeometry 
-    | LineGeometry;
+interface Indexable {
+    getIndex?(node: NodeGeometry): number[]
+}
 
 type Primitive = 
     | Rectangle
-    | Circle
-    | Line;
+    | Line
+    | Circle;
 
-/*~ Write your module's methods and properties in this class */
+type Geometry = 
+    | RectangleGeometry 
+    | LineGeometry
+    | CircleGeometry;
 
-/*declare class Rectangle {
-    constructor(props: RectGeometry);
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-}*/
+type IndexeableGeometry = 
+    | IndexableRectGeometry
+    | IndexableLineGeometry
+    | IndexableCircleGeometry;
 
-/*
-declare class Quadtree {
-    constructor (bounds: Rect, max_objects?: number, max_levels?: number, level?: number);
+/*interface Quadtree {
+    constructor (bounds: NodeGeometry, max_objects?: number, max_levels?: number, level?: number);
     max_objects: number;
     max_levels: number;
     level: number;
-    bounds: Rect;
-    objects: [Rect];
+    bounds: Quadtree.Rect;
+    objects: [Quadtree.Rect];
     nodes: [Quadtree];
 
     split(): void
-    insert(pRect: Rect): void
-    retrieve(pRect: Rect): [Rect]
+    getIndex(pRect: Quadtree.Rect): [number]
+    insert(pRect: Quadtree.Rect): void
+    retrieve(pRect: Quadtree.Rect): [Quadtree.Rect]
     clear(): void
-}
-*/
-
-/*~ If you want to expose types from your module as well, you can
- *~ place them in this block.
- *~
- *~ Note that if you decide to include this namespace, the module can be
- *~ incorrectly imported as a namespace object, unless
- *~ --esModuleInterop is turned on:
- *~   import * as x from '[~THE MODULE~]'; // WRONG! DO NOT DO THIS!
- */
-/*declare namespace Quadtree {
-    export interface Rect {
-        x: number
-        y: number
-        width: number
-        height: number
-    }
 }*/

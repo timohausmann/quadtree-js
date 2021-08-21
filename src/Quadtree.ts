@@ -1,4 +1,4 @@
-import type { NodeGeometry, Geometry, Primitive } from "../quadtree";
+import type { NodeGeometry, IndexeableGeometry, Primitive } from "../quadtree";
 import Rectangle from './Rectangle';
 
 /**
@@ -40,10 +40,16 @@ class Quadtree {
         this.nodes   = [];
     }
     
-    getIndex(obj:Geometry) {
+    /**
+     * Get the subnode indexes an object belongs to
+     * @param {IndexeableGeometry} obj    geometry to be checked
+     * @return {number[]}                 array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
+     */
+    getIndex(obj:IndexeableGeometry) {
 
+        //using call here to support objects without getIndex method 
+        //(backward compability fallback to Rectangle)
         const getIndex = obj.getIndex || Rectangle.prototype.getIndex;
-
         return getIndex.call(obj, this.bounds);
     };
 
@@ -96,7 +102,7 @@ class Quadtree {
             indexes = this.getIndex(obj);
     
             for(i=0; i<indexes.length; i++) {
-                this.nodes[indexes[i]].insert(obj);     
+                this.nodes[indexes[i]].insert(obj);
             }
             return;
         }
@@ -131,7 +137,7 @@ class Quadtree {
      * @param {Geometry} geometry    geometry to be checked
      * @return {Primitive[]}         array with all detected objects
      */
-    retrieve(geometry:Geometry) {
+    retrieve(geometry:IndexeableGeometry) {
         
         var indexes = this.getIndex(geometry),
             returnObjects = this.objects;

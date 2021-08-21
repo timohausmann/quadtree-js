@@ -7,7 +7,8 @@
   "main": "quadtree.js",
   "types": "quadtree.d.ts",
   "scripts": {
-    "build": "uglifyjs quadtree.js -o quadtree.min.js --compress --mangle --comments /github/"
+    "build:dev": "webpack --mode development",
+    "build": "webpack --mode production"
   },
   "repository": {
     "type": "git",
@@ -23,7 +24,17 @@
     "example": "examples"
   },
   "devDependencies": {
+    "@babel/core": "^7.15.0",
+    "@babel/preset-typescript": "^7.15.0",
+    "@tsconfig/recommended": "^1.0.1",
+    "babel-loader": "^8.2.2",
+    "install": "^0.13.0",
+    "npm": "^7.20.6",
+    "source-map-loader": "^3.0.0",
+    "ts-loader": "^9.2.5",
     "typescript": "^4.3.5",
-    "uglify-js": "^3.9.4"
+    "uglify-js": "^3.9.4",
+    "webpack": "^5.51.1",
+    "webpack-cli": "^4.8.0"
   }
 }
