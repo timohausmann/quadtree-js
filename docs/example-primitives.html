@@ -59,56 +59,46 @@
 		<!-- prism syntax highlighting -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/prism.min.js" integrity="sha512-WkVkkoB31AoI9DAk6SEEEyacH9etQXKUov4JRRuM1Y681VsTq7jYgrRw06cbP6Io7kPsKx+tLFpH/HXZSZ2YEQ==" crossorigin="anonymous"></script>
 
-		<!-- quadtree lib and script -->
+        <!-- quadtree lib -->
 		<script src="../dist/quadtree.umd.all.js"></script>
+        
+        <!-- example helpers -->
+		<script src="./example.js"></script>
+
+		<!-- example script -->
 		<script>
-		
-		(function(w, M) {
+
+			const ctx = document.getElementById('canvas').getContext('2d'),
+            cnt_total = document.querySelector('#cnt_total'),
+			cnt_cand = document.querySelector('#cnt_cand'),
+			cnt_perc = document.querySelector('#cnt_perc');
 			
-			w.requestAnimFrame = (function () {
-				return  w.requestAnimationFrame ||
-					w.webkitRequestAnimationFrame ||
-					w.mozRequestAnimationFrame ||
-					w.oRequestAnimationFrame ||
-					w.msRequestAnimationFrame ||
-					function (callback) {
-						w.setTimeout(callback, 1000 / 60);
-					};
-			})();
-			
-			
-			/*
-			 * the main Quadtree
-			 */
-			var myTree = new Quadtree({
+			//the main Quadtree
+			const myTree = new Quadtree({
 				x: 0,
 				y: 0,
 				width: 640,
 				height: 480
 			});
 			
-			/*
-			 * our objects will be stored here
-			 */
-			var myObjects = [];
+			//our objects will be stored here
+			const myObjects = [];
 						
-			/*
-			 * our "hero"
-			 */
-			var rectCursor = new Quadtree.Rectangle({
+			//our "hero" (cursor)
+			const rectCursor = new Quadtree.Rectangle({
 				x: 0,
 				y: 0,
 				width: 40,
                 height: 40
 			});
             
-            var circleCursor = new Quadtree.Circle({
+            const circleCursor = new Quadtree.Circle({
                 x: 0, 
                 y: 0, 
                 r: 42
             });
 
-            var lineCursor = new Quadtree.Line({
+            const lineCursor = new Quadtree.Line({
                 x1: 50, 
                 y1: 50, 
                 x2: 150,
@@ -119,66 +109,17 @@
                 }
             });
 
-            var myCursor = lineCursor;
+            let myCursor = lineCursor;
+            let isMouseover = false;
 
-            document.querySelector('#btn_rect').addEventListener('click', function setRectCursor() {
-                myCursor = rectCursor;
-            });
-            document.querySelector('#btn_line').addEventListener('click', function setLineCursor() {
-                myCursor = lineCursor;
-            });
-            document.querySelector('#btn_circle').addEventListener('click', function setCircleCursor() {
-                myCursor = circleCursor;
-            });
-
-			var isMouseover = false;
-
-			var ctx = document.getElementById('canvas').getContext('2d');
-
-			var cnt_total = document.querySelector('#cnt_total'),
-				cnt_cand = document.querySelector('#cnt_cand'),
-				cnt_perc = document.querySelector('#cnt_perc');
+            //change cursor on button click
+            document.querySelector('#btn_rect').addEventListener('click', () => myCursor = rectCursor);
+            document.querySelector('#btn_line').addEventListener('click', () => myCursor = lineCursor);
+            document.querySelector('#btn_circle').addEventListener('click', () => myCursor = circleCursor);
 			
 			
-			/*
-			 * position hero at mouse
-			 */
-			var handleMousemove = function(e) {
-				
-				isMouseover = true;
-				
-				if(!e.offsetX) {
-					e.offsetX = e.layerX - e.target.offsetLeft;
-					e.offsetY = e.layerY - e.target.offsetTop;
-				} 
-				
-				if(myCursor === lineCursor) {
-                    myCursor.data.x = e.offsetX;
-                    myCursor.data.y = e.offsetY;
-
-                } else if(myCursor === circleCursor ) {
-                    myCursor.x = e.offsetX;
-				    myCursor.y = e.offsetY;
-                } else {			
-                    myCursor.x = e.offsetX - (myCursor.width/2);
-                    myCursor.y = e.offsetY - (myCursor.height/2);	
-                }
-			};
-
-
-			/*
-			 * hide hero
-			 */
-			var handleMouseout = function(e) {
-				
-				isMouseover = false;
-			};
-			
-			
-			/*
-			 * create some objects and save them in myObjects
-			 */
-			var createObjects = function() {
+			//create some objects and save them in myObjects
+			function createObjects() {
 				for(var i=0;i<200;i=i+1) {
 
                     let rand = Math.random();
@@ -192,7 +133,7 @@
                             vx: randMinMax(-0.5,0.5),
                             vy: randMinMax(-0.5,0.5),
                             check: false,
-                            getIndex: Quadtree.Rectangle.prototype.getIndex
+                            getIndex: Quadtree.Rectangle.getIndex
                         });
                     } else if(rand > 0.33) {
                         myObjects.push({
@@ -202,7 +143,7 @@
                             vx: randMinMax(-0.5,0.5),
                             vy: randMinMax(-0.5,0.5),
                             check: false,
-                            getIndex: Quadtree.Circle.prototype.getIndex
+                            getIndex: Quadtree.Circle.getIndex
                         });
                     } else {
 
@@ -211,6 +152,7 @@
                         var rad = Math.PI * Math.random();
                         var len = Math.random() * 30;
 
+                        //note: the required keys x1, y1, x2, y2 for Line are set later dynamically
                         var line = {
                             x: x,
                             y: y,
@@ -219,7 +161,7 @@
                             vx: randMinMax(-0.5,0.5),
                             vy: randMinMax(-0.5,0.5),
                             check: false,
-                            getIndex: Quadtree.Line.prototype.getIndex
+                            getIndex: Quadtree.Line.getIndex
                         };
 
                         myObjects.push(line);
@@ -230,82 +172,6 @@
 				}
 
 				updateTotal();
-			};
-			
-			
-			/*
-			 * draw Quadtree nodes
-			 */
-			var drawQuadtree = function(node) {
-				
-				var bounds = node.bounds;
-			
-				//no subnodes? draw the current node
-				if(node.nodes.length === 0) {
-					ctx.strokeStyle = 'rgba(255,0,0,0.5)';
-					ctx.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
-					
-				//has subnodes? drawQuadtree them!
-				} else {
-					for(var i=0;i<node.nodes.length;i=i+1) {
-						drawQuadtree(node.nodes[i]);
-					}
-				}
-			};
-			
-			/*
-			 * draw all objects
-			 */
-			var drawObjects = function() {
-				
-				var obj;
-				
-				for(var i=0;i<myObjects.length;i=i+1) {
-					
-					obj = myObjects[i];
-					
-					if(obj.check) {
-                        ctx.strokeStyle = 'rgba(48,255,48,0.5)';
-						ctx.fillStyle = 'rgba(48,255,48,0.5)';
-					} else {
-						ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-                        ctx.fillStyle = 'transparent';
-					}
-
-                    if(obj.getIndex === Quadtree.Rectangle.prototype.getIndex) {
-                        ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
-                        ctx.strokeRect(obj.x, obj.y, obj.width, obj.height);
-                    } else if(obj.getIndex === Quadtree.Circle.prototype.getIndex) {
-                        ctx.beginPath();
-                        ctx.arc(obj.x, obj.y, obj.r, 0, 2 * Math.PI);
-                        ctx.fill();
-                        ctx.stroke();
-                    } else {
-
-                        ctx.beginPath();
-                        ctx.moveTo(obj.x1, obj.y1);
-                        ctx.lineTo(obj.x2, obj.y2);
-                        ctx.stroke();
-
-                    }				
-				}
-			};
-
-			
-			/**
-			 * return a random number within given boundaries.
-			 *
-			 * @param {number} min		the lowest possible number
-			 * @param {number} max		the highest possible number
-			 * @param {boolean} round	if true, return integer
-			 * @return {number} 		a random number
-			 */
-			randMinMax = function(min, max, round) {
-				var val = min + (Math.random() * (max - min));
-				
-				if(round) val = Math.round(val);
-				
-				return val;
 			};
 
 
@@ -318,10 +184,8 @@
             }
 			
 			
-			/*
-			 * our main loop
-			 */
-			var loop = function() {
+			//main loop
+			function loop() {
 				
 				var candidates = [];
 				
@@ -336,7 +200,7 @@
 					myObjects[i].y += myObjects[i].vy;
 					myObjects[i].check = false;
 
-                    if(myObjects[i].getIndex === Quadtree.Line.prototype.getIndex) {
+                    if(myObjects[i].getIndex === Quadtree.Line.getIndex) {
                         updateLineXY(myObjects[i]);
                     }
 					
@@ -385,21 +249,18 @@
 
 				updateCandidatesInfo(candidates);
 				
-				
-				drawQuadtree(myTree);
+				drawQuadtree(myTree, ctx);
 
-				drawObjects();
+				drawObjects(myObjects, ctx);
 				
-				requestAnimFrame(loop);
+				window.requestAnimationFrame(loop);
 			};
 
-
-			var updateTotal = function() {
-
+            //update UI functions
+			function updateTotal() {
 				cnt_total.innerHTML = myObjects.length;
 			}
-
-			var updateCandidatesInfo = function(candidates) {
+			function updateCandidatesInfo(candidates) {
 
 				cnt_cand.innerHTML = candidates.length;
 				if(!myObjects.length) return;
@@ -413,13 +274,33 @@
 			loop();
 			
 			//set eventListener for mousemove
-			document.getElementById('canvas').addEventListener('mousemove', handleMousemove);
-			document.getElementById('canvas').addEventListener('mouseout', handleMouseout);
+			//position hero at mouse position
+			document.getElementById('canvas').addEventListener('mousemove', function(e) {
+				
+				isMouseover = true;
+				
+				if(!e.offsetX) {
+					e.offsetX = e.layerX - e.target.offsetLeft;
+					e.offsetY = e.layerY - e.target.offsetTop;
+				} 
+				
+				if(myCursor === lineCursor) {
+                    myCursor.data.x = e.offsetX;
+                    myCursor.data.y = e.offsetY;
+                } else if(myCursor === circleCursor) {
+                    myCursor.x = e.offsetX;
+				    myCursor.y = e.offsetY;
+                } else {			
+                    myCursor.x = e.offsetX - (myCursor.width/2);
+                    myCursor.y = e.offsetY - (myCursor.height/2);	
+                }
+			});
+
+			//hide hero on mouseout
+			document.getElementById('canvas').addEventListener('mouseout', function(e) {
+				isMouseover = false;
+			});
 			
-			//make myTree available in global namespace
-			w.myTree = myTree;
-			
-		})(window, Math);
 		</script>
 	</body>
 </html>

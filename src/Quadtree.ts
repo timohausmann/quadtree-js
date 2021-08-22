@@ -31,10 +31,10 @@ export class Quadtree {
      */
     constructor(bounds:NodeGeometry, max_objects=10, max_levels=4, level=0) {
         
-        this.bounds = bounds;
+        this.bounds      = bounds;
         this.max_objects = max_objects;
         this.max_levels  = max_levels;
-        this.level  = level;
+        this.level       = level;
         
         this.objects = [];
         this.nodes   = [];
@@ -47,10 +47,10 @@ export class Quadtree {
      */
     getIndex(obj:Primitive) {
 
-        //using call here to support objects without getIndex method 
-        //(backward compability fallback to Rectangle)
-        const getIndex = obj.getIndex || Rectangle.prototype.getIndex;
-        return getIndex.call(obj, this.bounds);
+        //support user set getIndex || Primitive instance static getIndex || fallback to Rectangle.getIndex
+        //@ts-ignore
+        const getIndex = obj.getIndex || obj.constructor?.getIndex || Rectangle.getIndex;
+        return getIndex(obj, this.bounds);
     };
 
     /**

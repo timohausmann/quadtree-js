@@ -1,4 +1,4 @@
-import type { NodeGeometry, Indexable } from "../quadtree";
+import type { NodeGeometry } from "../quadtree";
 
 export interface LineProps {
     x1: number
@@ -11,7 +11,7 @@ export interface LineProps {
 /**
  * Class representing a Line
  */
-export class Line implements Indexable, LineProps {
+export class Line implements LineProps {
 
     x1: number;
     y1: number;
@@ -30,11 +30,10 @@ export class Line implements Indexable, LineProps {
     
     /**
      * Determine which quadrant the object belongs to.
-     * (You should not call this method directly, but use Quadtree.getIndex() instead)
      * @param {NodeGeometry} node   Quadtree node bounds to be checked ({ x, y, width, height })
      * @return {number[]}           array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
-    getIndex(node:NodeGeometry) {
+    static getIndex(obj:Line, node:NodeGeometry) {
 
         const indexes:number[] = [],
               w2 = node.width/2,
@@ -52,7 +51,7 @@ export class Line implements Indexable, LineProps {
 
         //test all nodes for line intersections
         for(let i=0; i<nodes.length; i++) {
-            if(Line.containsSegment(this.x1, this.y1, this.x2, this.y2, nodes[i][0], nodes[i][1], nodes[i][0] + w2, nodes[i][1] + h2)) {
+            if(Line.containsSegment(obj.x1, obj.y1, obj.x2, obj.y2, nodes[i][0], nodes[i][1], nodes[i][0] + w2, nodes[i][1] + h2)) {
                 indexes.push(i);
             }
         }

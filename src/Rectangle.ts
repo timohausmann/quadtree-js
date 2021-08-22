@@ -1,4 +1,4 @@
-import type { NodeGeometry, Indexable } from "../quadtree";
+import type { NodeGeometry } from "../quadtree";
 
 export interface RectProps {
     x: number
@@ -11,7 +11,7 @@ export interface RectProps {
 /**
  * Class representing a Rectangle
  */
- export class Rectangle implements Indexable, RectProps {
+ export class Rectangle implements RectProps {
 
     x: number;
     y: number;
@@ -20,7 +20,7 @@ export interface RectProps {
     data: any;
 
     constructor(props:RectProps) {
-    
+        
         this.x = props.x;
         this.y = props.y;
         this.width = props.width;
@@ -30,20 +30,19 @@ export interface RectProps {
     
     /**
      * Determine which quadrant the object belongs to.
-     * (You should not call this method directly, but use Quadtree.getIndex() instead)
      * @param {NodeGeometry} node   Quadtree node bounds to be checked ({ x, y, width, height })
      * @return {number[]}           array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
-    getIndex(node:NodeGeometry) {
+    static getIndex(obj:Rectangle, node:NodeGeometry) {
         
         const indexes:number[] = [],
               boundsCenterX    = node.x + (node.width/2),
               boundsCenterY    = node.y + (node.height/2);
 
-        const startIsNorth = this.y < boundsCenterY,
-              startIsWest  = this.x < boundsCenterX,
-              endIsEast    = this.x + this.width > boundsCenterX,
-              endIsSouth   = this.y + this.height > boundsCenterY;
+        const startIsNorth = obj.y < boundsCenterY,
+              startIsWest  = obj.x < boundsCenterX,
+              endIsEast    = obj.x + obj.width > boundsCenterX,
+              endIsSouth   = obj.y + obj.height > boundsCenterY;
 
         //top-right quad
         if(startIsNorth && endIsEast) {
