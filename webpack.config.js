@@ -3,11 +3,12 @@ module.exports = (env, argv) => {
     const devMode = argv.mode !== 'production';
 
     return {
-        entry: "./src/index.ts",
+        entry: "./src/index.js",
         output: {
             filename: "quadtree.min.js",
             library: {
                 name: 'Quadtree',
+                export: 'default',
                 type: 'umd',
             },
             globalObject: 'this',

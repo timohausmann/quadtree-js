@@ -4,7 +4,8 @@
   "description": "Another quadtree implementation for javascript",
   "author": "Timo Hausmann",
   "license": "MIT",
-  "main": "quadtree.js",
+  "main": "dist/quadtree.min.js",
+  "module": "src/index.mjs",
   "types": "quadtree.d.ts",
   "scripts": {
     "build:dev": "webpack --mode development",
@@ -21,7 +22,7 @@
     "quadtree"
   ],
   "directories": {
-    "example": "examples"
+    "example": "docs"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",

@@ -1,10 +1,10 @@
-import type { NodeGeometry, IndexeableGeometry, Primitive } from "../quadtree";
+import type { NodeGeometry, Primitive } from "../quadtree";
 import Rectangle from './Rectangle';
 
 /**
  * Class representing a Quadtree node
  */
-class Quadtree {
+export default class Quadtree {
 
     /**
      * @var {number} max_objects how many objects a node can hold before it splits
@@ -42,10 +42,10 @@ class Quadtree {
     
     /**
      * Get the subnode indexes an object belongs to
-     * @param {IndexeableGeometry} obj    geometry to be checked
-     * @return {number[]}                 array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
+     * @param {Primitive} obj    object to be checked
+     * @return {number[]}        array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
-    getIndex(obj:IndexeableGeometry) {
+    getIndex(obj:Primitive) {
 
         //using call here to support objects without getIndex method 
         //(backward compability fallback to Rectangle)
@@ -134,18 +134,18 @@ class Quadtree {
     
     /**
      * Return all objects that could collide with the given object
-     * @param {Geometry} geometry    geometry to be checked
-     * @return {Primitive[]}         array with all detected objects
+     * @param {Primitive} obj    object to be checked
+     * @return {Primitive[]}     array with all detected objects
      */
-    retrieve(geometry:IndexeableGeometry) {
+    retrieve(obj:Primitive) {
         
-        var indexes = this.getIndex(geometry),
+        var indexes = this.getIndex(obj),
             returnObjects = this.objects;
             
         //if we have subnodes, retrieve their objects
         if(this.nodes.length) {
             for(var i=0; i<indexes.length; i++) {
-                returnObjects = returnObjects.concat(this.nodes[indexes[i]].retrieve(geometry));
+                returnObjects = returnObjects.concat(this.nodes[indexes[i]].retrieve(obj));
             }
         }
 
@@ -175,5 +175,3 @@ class Quadtree {
         this.nodes = [];
     };
 }
-
-export default Quadtree;

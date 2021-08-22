@@ -1,32 +1,32 @@
 import type { NodeGeometry, Indexable } from "../quadtree";
 
-export interface RectGeometry {
+export interface RectProps {
     x: number
     y: number
     width: number
     height: number
-}
-
-export interface IndexableRectGeometry extends RectGeometry, Indexable {
+    data?: any
 }
 
 /**
  * Class representing a Rectangle
  */
-class Rectangle implements IndexableRectGeometry {
+ export default class Rectangle implements Indexable, RectProps {
 
     x: number;
     y: number;
     width: number;
     height: number;
+    data: any;
 
-    constructor(props:RectGeometry) {
+    constructor(props:RectProps) {
+    
         this.x = props.x;
         this.y = props.y;
         this.width = props.width;
         this.height = props.height;
+        this.data = props.data || {};
     }
-
     
     /**
      * Determine which quadrant the object belongs to.
@@ -68,5 +68,3 @@ class Rectangle implements IndexableRectGeometry {
         return indexes;
     };
 }
-
-export default Rectangle;

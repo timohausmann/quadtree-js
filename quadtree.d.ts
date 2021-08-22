@@ -23,7 +23,7 @@ type Primitive =
     | Line
     | Circle;
 
-type Geometry = 
+/*type Geometry = 
     | RectangleGeometry 
     | LineGeometry
     | CircleGeometry;
@@ -32,7 +32,7 @@ type IndexeableGeometry =
     | IndexableRectGeometry
     | IndexableLineGeometry
     | IndexableCircleGeometry;
-
+*/
 /*interface Quadtree {
     constructor (bounds: NodeGeometry, max_objects?: number, max_levels?: number, level?: number);
     max_objects: number;
