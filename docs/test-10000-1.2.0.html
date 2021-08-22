@@ -25,6 +25,7 @@
 				<a href="dynamic.html">dynamic</a>
 				<a href="many.html">many to many</a>
 				<span>benchmark</span>
+                <a href="primitives.html">primitives</a>
 			</nav>
 
 
@@ -100,8 +101,13 @@ var time = end - start;</code></pre>
 		<!-- prism syntax highlighting -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/prism.min.js" integrity="sha512-WkVkkoB31AoI9DAk6SEEEyacH9etQXKUov4JRRuM1Y681VsTq7jYgrRw06cbP6Io7kPsKx+tLFpH/HXZSZ2YEQ==" crossorigin="anonymous"></script>
 
-		<!-- quadtree lib and script -->
-		<script src="https://cdn.jsdelivr.net/npm/@timohausmann/quadtree-js/quadtree.min.js"></script>
+        <!-- quadtree lib -->
+		<script src="../dist/quadtree.umd.all.js"></script>
+        
+        <!-- example helpers -->
+		<script src="./example.js"></script>
+
+		<!-- example script -->
 		<script>
 
 			//---- SETUP
@@ -111,12 +117,6 @@ var time = end - start;</code></pre>
 			var width = 800;
 			var height = 600;
 			var maxObjectSize = 64;
-
-			var randMinMax = function(min, max, round) {
-				var val = min + (Math.random() * (max - min));	
-				if(round) val = Math.round(val);	
-				return val;
-			};
 
 			var myCursor = {
 				x : randMinMax(120,width-120),
@@ -175,50 +175,9 @@ var time = end - start;</code></pre>
 				candidates[ i ].check = true;
 			}
 
-			/*
-			 * draw Quadtree nodes
-			 */
-			var drawQuadtree = function(node) {
-
-				var bounds = node.bounds;
-			
-				//no subnodes? draw the current node
-				if(node.nodes.length === 0) {
-					ctx.strokeStyle = 'rgba(255,0,0,0.5)';
-					ctx.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
-					
-				//has subnodes? drawQuadtree them!
-				} else {
-					for(var i=0;i<node.nodes.length;i=i+1) {
-						drawQuadtree(node.nodes[ i ]);
-					}
-				}
-			};
-			
-			/*
-			 * draw all objects
-			 */
-			var drawObjects = function() {
-				
-				var obj;
-				
-				for(var i=0;i<myObjects.length;i=i+1) {
-					
-					obj = myObjects[ i ];
-					
-					if(obj.check) {
-						ctx.fillStyle = 'rgba(48,255,48,0.5)';
-						ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
-					} else {
-						ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-						ctx.strokeRect(obj.x, obj.y, obj.width, obj.height);
-					}
-				}
-			};
-
-			drawObjects();
-			drawQuadtree(myTree);
-
+            drawQuadtree(myTree, ctx);
+			drawObjects(myObjects, ctx);
+            
 			//draw retrieve area
 			ctx.strokeStyle = 'blue';
 			ctx.lineWidth = 2;

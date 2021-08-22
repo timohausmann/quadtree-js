@@ -20,6 +20,7 @@
 				<a href="dynamic.html">dynamic</a>
 				<span>many to many</span>
 				<a href="test-10000-1.2.0.html">benchmark</a>
+                <a href="primitives.html">primitives</a>
 			</nav>
 			
 			<div id="canvasContainer">
@@ -134,52 +135,35 @@ function loop() {
 		<!-- prism syntax highlighting -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/prism.min.js" integrity="sha512-WkVkkoB31AoI9DAk6SEEEyacH9etQXKUov4JRRuM1Y681VsTq7jYgrRw06cbP6Io7kPsKx+tLFpH/HXZSZ2YEQ==" crossorigin="anonymous"></script>
 
-		<!-- quadtree lib and script -->
-		<script src="https://cdn.jsdelivr.net/npm/@timohausmann/quadtree-js/quadtree.min.js"></script>
-		<script>		
-		
-		(function(w) {
+        <!-- quadtree lib -->
+		<script src="../dist/quadtree.umd.all.js"></script>
+        
+        <!-- example helpers -->
+		<script src="./example.js"></script>
+
+		<!-- example script -->
+		<script>
+
+			const ctx = document.getElementById('canvas').getContext('2d'),
+			cnt_total = document.querySelector('#cnt_total'),
+            cnt_cand = document.querySelector('#cnt_cand'),
+            cnt_fps = document.querySelector('#cnt_fps'),
+            cnt_perc = document.querySelector('#cnt_perc');
 			
-			w.requestAnimFrame = (function () {
-				return  w.requestAnimationFrame ||
-					w.webkitRequestAnimationFrame ||
-					w.mozRequestAnimationFrame ||
-					w.oRequestAnimationFrame ||
-					w.msRequestAnimationFrame ||
-					function (callback) {
-						w.setTimeout(callback, 1000 / 60);
-					};
-			})();
-
-
-			var ctx = document.getElementById('canvas').getContext('2d');
-
-			var cnt_total = document.querySelector('#cnt_total'),
-				cnt_cand = document.querySelector('#cnt_cand'),
-				cnt_fps = document.querySelector('#cnt_fps'),
-				cnt_perc = document.querySelector('#cnt_perc');
-				
-			
-			/*
-			 * the main Quadtree
-			 */
-			var myTree = new Quadtree({
+			//the main Quadtree
+			const myTree = new Quadtree({
 				x: 0,
 				y: 0,
 				width: 640,
 				height: 480
 			});
 			
-			/*
-			 * our objects will be stored here
-			 */
-			var myObjects = [];
+			//our objects will be stored here
+			const myObjects = [];
 			
 			
-			/*
-			 * create some objects and save them in myObjects
-			 */
-			for(var i=0;i<800;i++) {
+			//create some objects and save them in myObjects
+			for(let i=0;i<800;i++) {
 				myObjects.push({
 					x : randMinMax(0, 640-16),
 					y : randMinMax(0, 480-16),
@@ -193,56 +177,13 @@ function loop() {
 			cnt_total.innerHTML = myObjects.length;
 			
 			
-			/*
-			 * draw Quadtree nodes
-			 */
-			var drawQuadtree = function(node) {
-				
-				var bounds = node.bounds;
-			
-				//no subnodes? draw the current node
-				if(node.nodes.length === 0) {
-					ctx.strokeStyle = 'rgba(255,0,0,0.25)';
-					ctx.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
-					
-				//has subnodes? drawQuadtree them!
-				} else {
-					for(var i=0;i<node.nodes.length;i++) {
-						drawQuadtree(node.nodes[i]);
-					}
-				}
-			};
-			
-			/*
-			 * draw all objects
-			 */
-			var drawObjects = function() {
-				
-				var obj;
-				
-				for(var i=0;i<myObjects.length;i++) {
-					
-					obj = myObjects[i];
-					
-					if(obj.check) {
-						ctx.strokeStyle = 'rgba(48,255,48,0.5)';
-					} else {
-						ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-					}
-					ctx.strokeRect(obj.x, obj.y, obj.width, obj.height);
-				}
-			};
-			
-			
-			/*
-			 * our main loop
-			 */
-			var lastLoop = new Date();
-			var loop = function() {
+			//our main loop
+			let lastLoop = new Date();
+			function loop() {
 
 				//calculate FPS
-				var thisLoop = new Date();
-				var fps = 1000 / (thisLoop - lastLoop);
+				const thisLoop = new Date();
+				const fps = 1000 / (thisLoop - lastLoop);
 				lastLoop = thisLoop;
 				cnt_fps.innerHTML = Math.round(fps);
 				
@@ -251,7 +192,7 @@ function loop() {
 				ctx.clearRect(0, 0, 640, 480);
 				
 				//[2] update myObjects and insert them into the tree again
-				for(var i=0;i<myObjects.length;i++) {
+				for(let i=0;i<myObjects.length;i++) {
 					
 					myObjects[i].x += myObjects[i].vx;
 					myObjects[i].y += myObjects[i].vy;
@@ -267,23 +208,23 @@ function loop() {
 				}
 
 				//[3] now that the tree is filled, we have to check each object for collisions
-				for(var i=0;i<myObjects.length;i++) {
+				for(let i=0;i<myObjects.length;i++) {
 
-					var myObject = myObjects[i];
+					const myObject = myObjects[i];
 
 					//[4] first, get all collision candidates
-					var candidates = myTree.retrieve(myObject);
+					const candidates = myTree.retrieve(myObject);
 
 					//[5] let's check them for actual collision
-					for(k=0;k<candidates.length;k++) {
+					for(let k=0;k<candidates.length;k++) {
 
-						var myCandidate = candidates[k];
+						const myCandidate = candidates[k];
 
 						//[6] don't check objects against themselves
 						if(myObject === myCandidate) continue;
 
 						//[7] get intersection data
-						var intersect = getIntersection(myObject, myCandidate);
+						const intersect = getIntersection(myObject, myCandidate);
 						
 						//no intersection - continue
 						if(intersect === false) continue;
@@ -320,28 +261,26 @@ function loop() {
 				}
 
 				//[9] draw objects and quadtree
-				drawQuadtree(myTree);
-				drawObjects();
+				drawQuadtree(myTree, ctx);
+				drawObjects(myObjects, ctx, true);
 
 				//update UI info
-				var candidates = myObjects.filter(function(e) { return e.check === true; })
+				const candidates = myObjects.filter(function(e) { return e.check === true; })
 				updateCandidatesInfo(candidates);
 				
 				//request next frame
-				requestAnimFrame(loop);
+				window.requestAnimationFrame(loop);
 			};
-
-
 
 			function getIntersection(r1, r2) {
 
-				var r1w = r1.width/2,
-					r1h = r1.height/2,
-					r2w = r2.width/2,
-					r2h = r2.height/2;
+				const r1w = r1.width/2,
+					  r1h = r1.height/2,
+					  r2w = r2.width/2,
+					  r2h = r2.height/2;
 
-				var distX = (r1.x + r1w) - (r2.x + r2w);
-				var distY = (r1.y + r1h) - (r2.y + r2h);
+                const distX = (r1.x + r1w) - (r2.x + r2w);
+                const distY = (r1.y + r1h) - (r2.y + r2h);
 
 				if(Math.abs(distX) < r1w + r2w && Math.abs(distY) < r1h + r2h) {
 					return {
@@ -355,9 +294,9 @@ function loop() {
 				}
 			}
 
-			var updateCandidatesInfo = function(candidates) {
+			function updateCandidatesInfo(candidates) {
 
-				var avg = myObjects.length/candidates.length;
+				const avg = myObjects.length/candidates.length;
 				cnt_cand.innerHTML =  candidates.length;
 				if(!myObjects.length) return;
 				cnt_perc.innerHTML = Math.round(avg);
@@ -365,24 +304,7 @@ function loop() {
 			
 			//init first loop
 			loop();
-			
-			/**
-			 * return a random number within given boundaries.
-			 *
-			 * @param {number} min		the lowest possible number
-			 * @param {number} max		the highest possible number
-			 * @param {boolean} round	if true, return integer
-			 * @return {number} 		a random number
-			 */
-			 function randMinMax(min, max, round) {
-				var val = min + (Math.random() * (max - min));
-				
-				if(round) val = Math.round(val);
-				
-				return val;
-			};
-			
-		})(window);
+
 		</script>
 	</body>
 </html>

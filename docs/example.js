@@ -21,7 +21,7 @@ function drawQuadtree(node, ctx) {
 /*
  * draw all objects
  */
-function drawObjects(objects, ctx) {
+function drawObjects(objects, ctx, outlineOnly) {
     
     for(let i=0;i<objects.length;i=i+1) {
         
@@ -34,6 +34,8 @@ function drawObjects(objects, ctx) {
             ctx.strokeStyle = 'rgba(255,255,255,0.5)';
             ctx.fillStyle = 'transparent';
         }
+
+        if(outlineOnly) ctx.fillStyle = 'transparent';
 
         if(obj instanceof Quadtree.Line || obj.getIndex === Quadtree.Line.getIndex) {
             ctx.beginPath();
