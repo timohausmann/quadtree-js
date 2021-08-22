@@ -1,10 +1,10 @@
 import type { NodeGeometry, Primitive } from "../quadtree";
-import Rectangle from './Rectangle';
+import { Rectangle } from './Rectangle';
 
 /**
  * Class representing a Quadtree node
  */
-export default class Quadtree {
+export class Quadtree {
 
     /**
      * @var {number} max_objects how many objects a node can hold before it splits

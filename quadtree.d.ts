@@ -3,9 +3,9 @@
 // Definitions by: Timo Hausmann <https://timohausmann.de/>
 // Template: https://www.typescriptlang.org/docs/handbook/declaration-files/templates/module-class-d-ts.html
 
-import Rectangle, { RectangleGeometry, IndexableRectGeometry } from "./src/Rectangle";
-import Circle, { CircleGeometry, IndexableCircleGeometry } from "./src/Circle";
-import Line, { LineGeometry, IndexableLineGeometry } from "./src/Line";
+import { Rectangle } from "./src/Rectangle";
+import { Circle } from "./src/Circle";
+import { Line } from "./src/Line";
 
 interface NodeGeometry {
     x: number

@@ -11,7 +11,7 @@ export interface LineProps {
 /**
  * Class representing a Line
  */
-export default class Line implements Indexable, LineProps {
+export class Line implements Indexable, LineProps {
 
     x1: number;
     y1: number;
@@ -52,47 +52,47 @@ export default class Line implements Indexable, LineProps {
 
         //test all nodes for line intersections
         for(let i=0; i<nodes.length; i++) {
-            if(aabbContainsSegment(this.x1, this.y1, this.x2, this.y2, nodes[i][0], nodes[i][1], nodes[i][0] + w2, nodes[i][1] + h2)) {
+            if(Line.containsSegment(this.x1, this.y1, this.x2, this.y2, nodes[i][0], nodes[i][1], nodes[i][0] + w2, nodes[i][1] + h2)) {
                 indexes.push(i);
             }
         }
      
         return indexes;
     };
-}
 
-/**
- * returns true if a line segment (the first 4 parameters) intersects an axis aligned rectangle (the last 4 parameters)
- * @see https://stackoverflow.com/a/18292964/860205
- * @param {number} x1 line start X
- * @param {number} y1 line start Y
- * @param {number} x2 line end X
- * @param {number} y2 line end Y
- * @param {number} minX rectangle start X
- * @param {number} minY rectangle start Y
- * @param {number} maxX rectangle end X
- * @param {number} maxY rectangle end Y
- * @returns {boolean}
- */
-export function aabbContainsSegment(x1:number, y1:number, x2:number, y2:number, minX:number, minY:number, maxX:number, maxY:number) { 
-
-    // Completely outside.
-    if ((x1 <= minX && x2 <= minX) || (y1 <= minY && y2 <= minY) || (x1 >= maxX && x2 >= maxX) || (y1 >= maxY && y2 >= maxY))
+    /**
+     * returns true if a line segment (the first 4 parameters) intersects an axis aligned rectangle (the last 4 parameters)
+     * @see https://stackoverflow.com/a/18292964/860205
+     * @param {number} x1 line start X
+     * @param {number} y1 line start Y
+     * @param {number} x2 line end X
+     * @param {number} y2 line end Y
+     * @param {number} minX rectangle start X
+     * @param {number} minY rectangle start Y
+     * @param {number} maxX rectangle end X
+     * @param {number} maxY rectangle end Y
+     * @returns {boolean}
+     */
+    static containsSegment(x1:number, y1:number, x2:number, y2:number, minX:number, minY:number, maxX:number, maxY:number) { 
+    
+        // Completely outside.
+        if ((x1 <= minX && x2 <= minX) || (y1 <= minY && y2 <= minY) || (x1 >= maxX && x2 >= maxX) || (y1 >= maxY && y2 >= maxY))
+            return false;
+    
+        const m = (y2 - y1) / (x2 - x1);
+    
+        let y = m * (minX - x1) + y1;
+        if (y > minY && y < maxY) return true;
+    
+        y = m * (maxX - x1) + y1;
+        if (y > minY && y < maxY) return true;
+    
+        let x = (minY - y1) / m + x1;
+        if (x > minX && x < maxX) return true;
+    
+        x = (maxY - y1) / m + x1;
+        if (x > minX && x < maxX) return true;
+    
         return false;
-
-    const m = (y2 - y1) / (x2 - x1);
-
-    let y = m * (minX - x1) + y1;
-    if (y > minY && y < maxY) return true;
-
-    y = m * (maxX - x1) + y1;
-    if (y > minY && y < maxY) return true;
-
-    let x = (minY - y1) / m + x1;
-    if (x > minX && x < maxX) return true;
-
-    x = (maxY - y1) / m + x1;
-    if (x > minX && x < maxX) return true;
-
-    return false;
+    }
 }

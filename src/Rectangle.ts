@@ -11,7 +11,7 @@ export interface RectProps {
 /**
  * Class representing a Rectangle
  */
- export default class Rectangle implements Indexable, RectProps {
+ export class Rectangle implements Indexable, RectProps {
 
     x: number;
     y: number;

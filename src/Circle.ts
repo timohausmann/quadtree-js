@@ -10,7 +10,7 @@ export interface CircleProps {
 /**
  * Class representing a Circle
  */
- export default class Circle implements Indexable, CircleProps {
+ export class Circle implements Indexable, CircleProps {
 
     x: number;
     y: number;
@@ -49,30 +49,30 @@ export interface CircleProps {
 
         //test all nodes for circle intersections
         for(let i=0; i<nodes.length; i++) {
-            if(circleRectIntersect(this.x, this.y, this.r, nodes[i][0], nodes[i][1], nodes[i][0] + w2, nodes[i][1] + h2)) {
+            if(Circle.intersectRect(this.x, this.y, this.r, nodes[i][0], nodes[i][1], nodes[i][0] + w2, nodes[i][1] + h2)) {
                 indexes.push(i);
             }
         }
      
         return indexes;
     };
-}
 
 
-/**
- * returns true if a circle intersects an axis aligned rectangle
- * @see https://yal.cc/rectangle-circle-intersection-test/
- * @param {number} x circle center X
- * @param {number} y circle center Y
- * @param {number} r circle radius
- * @param {number} minX rectangle start X
- * @param {number} minY rectangle start Y
- * @param {number} maxX rectangle end X
- * @param {number} maxY rectangle end Y
- * @returns {boolean}
- */
-export function circleRectIntersect(x:number, y:number, r:number, minX:number, minY:number, maxX:number, maxY:number) {
-    const deltaX = x - Math.max(minX, Math.min(x, maxX));
-    const deltaY = y - Math.max(minY, Math.min(y, maxY));
-    return (deltaX * deltaX + deltaY * deltaY) < (r * r);
+    /**
+     * returns true if a circle intersects an axis aligned rectangle
+     * @see https://yal.cc/rectangle-circle-intersection-test/
+     * @param {number} x circle center X
+     * @param {number} y circle center Y
+     * @param {number} r circle radius
+     * @param {number} minX rectangle start X
+     * @param {number} minY rectangle start Y
+     * @param {number} maxX rectangle end X
+     * @param {number} maxY rectangle end Y
+     * @returns {boolean}
+     */
+    static intersectRect(x:number, y:number, r:number, minX:number, minY:number, maxX:number, maxY:number) {
+        const deltaX = x - Math.max(minX, Math.min(x, maxX));
+        const deltaY = y - Math.max(minY, Math.min(y, maxY));
+        return (deltaX * deltaX + deltaY * deltaY) < (r * r);
+    }
 }
