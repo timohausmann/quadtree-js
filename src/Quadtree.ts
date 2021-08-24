@@ -1,5 +1,12 @@
-import type { NodeGeometry, Primitive } from "../quadtree";
+import type { NodeGeometry, TypedGeometry, Primitive } from "../quadtree";
 import { Rectangle } from './Rectangle';
+
+interface QuadtreeProps {
+    x?: number
+    y?: number
+    width: number
+    height: number
+}
 
 /**
  * Class representing a Quadtree node
@@ -11,27 +18,27 @@ export class Quadtree {
      * @var {number} max_levels defines the deepest level subnode
      * @var {number} level the level of the node
      * @var {NodeGeometry} bounds the numeric boundaries of the node
-     * @var {number} objects objects in the node
+     * @var {(Primitive|TypedGeometry)[]} objects array of objects in the node
      * @var {Quadtree[]} nodes subnodes of the node
      */
     max_objects: number;
     max_levels: number;
     level: number;
     bounds: NodeGeometry;
-    objects: Primitive[];
+    objects: (Primitive|TypedGeometry)[];
     nodes: Quadtree[];
 
     /**
      * Quadtree Constructor
      * @class Quadtree
-     * @param {NodeGeometry} bounds        bounds of the node ({ x, y, width, height })
+     * @param {QuadtreeProps} bounds       bounds of the node ({ x, y, width, height })
      * @param {number} [max_objects=10]    (optional) max objects a node can hold before splitting into 4 subnodes (default: 10)
      * @param {number} [max_levels=4]      (optional) total max levels inside root Quadtree (default: 4) 
      * @param {number} [level=0]           (optional) depth level, required for subnodes (default: 0)
      */
-    constructor(bounds:NodeGeometry, max_objects=10, max_levels=4, level=0) {
+    constructor(bounds:QuadtreeProps, max_objects=10, max_levels=4, level=0) {
         
-        this.bounds      = bounds;
+        this.bounds      = Object.assign({x: 0, y: 0}, bounds);
         this.max_objects = max_objects;
         this.max_levels  = max_levels;
         this.level       = level;
@@ -42,15 +49,14 @@ export class Quadtree {
     
     /**
      * Get the subnode indexes an object belongs to
-     * @param {Primitive} obj    object to be checked
-     * @return {number[]}        array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
+     * @param {Primitive|TypedGeometry} obj    object to be checked
+     * @return {number[]}                      array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
-    getIndex(obj:Primitive) {
+    getIndex(obj:Primitive|TypedGeometry) {
 
-        //support user set getIndex || Primitive instance static getIndex || fallback to Rectangle.getIndex
-        //@ts-ignore
-        const getIndex = obj.getIndex || obj.constructor?.getIndex || Rectangle.getIndex;
-        return getIndex(obj, this.bounds);
+        //getIndex via qtShape or fallback to Rectangle.getIndex
+        const getIndex = obj.qtShape?.prototype.getIndex || Rectangle.prototype.getIndex;
+        return getIndex.call(obj, this.bounds);
     };
 
     /**
@@ -64,10 +70,6 @@ export class Quadtree {
               x      = this.bounds.x,
               y      = this.bounds.y;
 
-        //0: top right node
-        //1: top left node
-        //2: bottom left node
-        //3: bottom right node
         const coords = [
             { x: x + width, y: y },
             { x: x,         y: y },
@@ -75,7 +77,7 @@ export class Quadtree {
             { x: x + width, y: y + height },
         ];
 
-        for(var i=0; i < 4; i++) {
+        for(let i=0; i < 4; i++) {
             this.nodes[i] = new Quadtree({
                 x: coords[i].x, 
                 y: coords[i].y, 
@@ -90,18 +92,15 @@ export class Quadtree {
      * Insert an object into the node. If the node
      * exceeds the capacity, it will split and add all
      * objects to their corresponding subnodes.
-     * @param {Primitive} rect    object to be added
+     * @param {Primitive|TypedGeometry} obj    object to be added
      */
-    insert(obj:Primitive) {
-        
-        var i = 0,
-            indexes;
+    insert(obj:Primitive|TypedGeometry) {
         
         //if we have subnodes, call insert on matching subnodes
         if(this.nodes.length) {
-            indexes = this.getIndex(obj);
+            const indexes = this.getIndex(obj);
     
-            for(i=0; i<indexes.length; i++) {
+            for(let i=0; i<indexes.length; i++) {
                 this.nodes[indexes[i]].insert(obj);
             }
             return;
@@ -119,9 +118,9 @@ export class Quadtree {
             }
             
             //add all objects to their corresponding subnode
-            for(i=0; i<this.objects.length; i++) {
-                indexes = this.getIndex(this.objects[i]);
-                for(var k=0; k<indexes.length; k++) {
+            for(let i=0; i<this.objects.length; i++) {
+                const indexes = this.getIndex(this.objects[i]);
+                for(let k=0; k<indexes.length; k++) {
                     this.nodes[indexes[k]].insert(this.objects[i]);
                 }
             }
@@ -134,17 +133,17 @@ export class Quadtree {
     
     /**
      * Return all objects that could collide with the given object
-     * @param {Primitive} obj    object to be checked
-     * @return {Primitive[]}     array with all detected objects
+     * @param {Primitive|TypedGeometry} obj    object to be checked
+     * @return {(Primitive|TypedGeometry)[]}   array with all detected objects
      */
-    retrieve(obj:Primitive) {
+    retrieve(obj:Primitive|TypedGeometry) {
         
-        var indexes = this.getIndex(obj),
-            returnObjects = this.objects;
+        const indexes = this.getIndex(obj);
+        let returnObjects = this.objects;
             
         //if we have subnodes, retrieve their objects
         if(this.nodes.length) {
-            for(var i=0; i<indexes.length; i++) {
+            for(let i=0; i<indexes.length; i++) {
                 returnObjects = returnObjects.concat(this.nodes[indexes[i]].retrieve(obj));
             }
         }
@@ -160,13 +159,12 @@ export class Quadtree {
 
     /**
      * Clear the quadtree
-     * @memberof Quadtree
      */
     clear() {
         
         this.objects = [];
     
-        for(var i=0; i < this.nodes.length; i++) {
+        for(let i=0; i < this.nodes.length; i++) {
             if(this.nodes.length) {
                 this.nodes[i].clear();
             }

@@ -7,6 +7,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
  */
 class Rectangle {
     constructor(props) {
+        this.qtShape = Rectangle;
         this.x = props.x;
         this.y = props.y;
         this.width = props.width;
@@ -18,9 +19,9 @@ class Rectangle {
      * @param {NodeGeometry} node   Quadtree node bounds to be checked ({ x, y, width, height })
      * @return {number[]}           array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
-    static getIndex(obj, node) {
+    getIndex(node) {
         const indexes = [], boundsCenterX = node.x + (node.width / 2), boundsCenterY = node.y + (node.height / 2);
-        const startIsNorth = obj.y < boundsCenterY, startIsWest = obj.x < boundsCenterX, endIsEast = obj.x + obj.width > boundsCenterX, endIsSouth = obj.y + obj.height > boundsCenterY;
+        const startIsNorth = this.y < boundsCenterY, startIsWest = this.x < boundsCenterX, endIsEast = this.x + this.width > boundsCenterX, endIsSouth = this.y + this.height > boundsCenterY;
         //top-right quad
         if (startIsNorth && endIsEast) {
             indexes.push(0);
@@ -49,13 +50,13 @@ class Quadtree {
     /**
      * Quadtree Constructor
      * @class Quadtree
-     * @param {NodeGeometry} bounds        bounds of the node ({ x, y, width, height })
+     * @param {QuadtreeProps} bounds       bounds of the node ({ x, y, width, height })
      * @param {number} [max_objects=10]    (optional) max objects a node can hold before splitting into 4 subnodes (default: 10)
      * @param {number} [max_levels=4]      (optional) total max levels inside root Quadtree (default: 4)
      * @param {number} [level=0]           (optional) depth level, required for subnodes (default: 0)
      */
     constructor(bounds, max_objects = 10, max_levels = 4, level = 0) {
-        this.bounds = bounds;
+        this.bounds = Object.assign({ x: 0, y: 0 }, bounds);
         this.max_objects = max_objects;
         this.max_levels = max_levels;
         this.level = level;
@@ -64,15 +65,14 @@ class Quadtree {
     }
     /**
      * Get the subnode indexes an object belongs to
-     * @param {Primitive} obj    object to be checked
-     * @return {number[]}        array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
+     * @param {Primitive|TypedGeometry} obj    object to be checked
+     * @return {number[]}                      array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
     getIndex(obj) {
         var _a;
-        //support user set getIndex || Primitive instance static getIndex || fallback to Rectangle.getIndex
-        //@ts-ignore
-        const getIndex = obj.getIndex || ((_a = obj.constructor) === null || _a === void 0 ? void 0 : _a.getIndex) || Rectangle.getIndex;
-        return getIndex(obj, this.bounds);
+        //getIndex via qtShape or fallback to Rectangle.getIndex
+        const getIndex = ((_a = obj.qtShape) === null || _a === void 0 ? void 0 : _a.prototype.getIndex) || Rectangle.prototype.getIndex;
+        return getIndex.call(obj, this.bounds);
     }
     ;
     /**
@@ -80,17 +80,13 @@ class Quadtree {
      */
     split() {
         const level = this.level + 1, width = this.bounds.width / 2, height = this.bounds.height / 2, x = this.bounds.x, y = this.bounds.y;
-        //0: top right node
-        //1: top left node
-        //2: bottom left node
-        //3: bottom right node
         const coords = [
             { x: x + width, y: y },
             { x: x, y: y },
             { x: x, y: y + height },
             { x: x + width, y: y + height },
         ];
-        for (var i = 0; i < 4; i++) {
+        for (let i = 0; i < 4; i++) {
             this.nodes[i] = new Quadtree({
                 x: coords[i].x,
                 y: coords[i].y,
@@ -104,14 +100,13 @@ class Quadtree {
      * Insert an object into the node. If the node
      * exceeds the capacity, it will split and add all
      * objects to their corresponding subnodes.
-     * @param {Primitive} rect    object to be added
+     * @param {Primitive|TypedGeometry} obj    object to be added
      */
     insert(obj) {
-        var i = 0, indexes;
         //if we have subnodes, call insert on matching subnodes
         if (this.nodes.length) {
-            indexes = this.getIndex(obj);
-            for (i = 0; i < indexes.length; i++) {
+            const indexes = this.getIndex(obj);
+            for (let i = 0; i < indexes.length; i++) {
                 this.nodes[indexes[i]].insert(obj);
             }
             return;
@@ -125,9 +120,9 @@ class Quadtree {
                 this.split();
             }
             //add all objects to their corresponding subnode
-            for (i = 0; i < this.objects.length; i++) {
-                indexes = this.getIndex(this.objects[i]);
-                for (var k = 0; k < indexes.length; k++) {
+            for (let i = 0; i < this.objects.length; i++) {
+                const indexes = this.getIndex(this.objects[i]);
+                for (let k = 0; k < indexes.length; k++) {
                     this.nodes[indexes[k]].insert(this.objects[i]);
                 }
             }
@@ -138,14 +133,15 @@ class Quadtree {
     ;
     /**
      * Return all objects that could collide with the given object
-     * @param {Primitive} obj    object to be checked
-     * @return {Primitive[]}     array with all detected objects
+     * @param {Primitive|TypedGeometry} obj    object to be checked
+     * @return {(Primitive|TypedGeometry)[]}   array with all detected objects
      */
     retrieve(obj) {
-        var indexes = this.getIndex(obj), returnObjects = this.objects;
+        const indexes = this.getIndex(obj);
+        let returnObjects = this.objects;
         //if we have subnodes, retrieve their objects
         if (this.nodes.length) {
-            for (var i = 0; i < indexes.length; i++) {
+            for (let i = 0; i < indexes.length; i++) {
                 returnObjects = returnObjects.concat(this.nodes[indexes[i]].retrieve(obj));
             }
         }
@@ -158,11 +154,10 @@ class Quadtree {
     ;
     /**
      * Clear the quadtree
-     * @memberof Quadtree
      */
     clear() {
         this.objects = [];
-        for (var i = 0; i < this.nodes.length; i++) {
+        for (let i = 0; i < this.nodes.length; i++) {
             if (this.nodes.length) {
                 this.nodes[i].clear();
             }
@@ -177,6 +172,7 @@ class Quadtree {
  */
 class Circle {
     constructor(props) {
+        this.qtShape = Circle;
         this.x = props.x;
         this.y = props.y;
         this.r = props.r;
@@ -187,7 +183,7 @@ class Circle {
      * @param {NodeGeometry} node   Quadtree node bounds to be checked ({ x, y, width, height })
      * @return {number[]}           array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
-    static getIndex(obj, node) {
+    getIndex(node) {
         const indexes = [], w2 = node.width / 2, h2 = node.height / 2, x2 = node.x + w2, y2 = node.y + h2;
         //an array of node origins where the array index equals the node index
         const nodes = [
@@ -198,7 +194,7 @@ class Circle {
         ];
         //test all nodes for circle intersections
         for (let i = 0; i < nodes.length; i++) {
-            if (Circle.intersectRect(obj.x, obj.y, obj.r, nodes[i][0], nodes[i][1], nodes[i][0] + w2, nodes[i][1] + h2)) {
+            if (Circle.intersectRect(this.x, this.y, this.r, nodes[i][0], nodes[i][1], nodes[i][0] + w2, nodes[i][1] + h2)) {
                 indexes.push(i);
             }
         }
@@ -229,6 +225,7 @@ class Circle {
  */
 class Line {
     constructor(props) {
+        this.qtShape = Line;
         this.x1 = props.x1;
         this.y1 = props.y1;
         this.x2 = props.x2;
@@ -240,7 +237,7 @@ class Line {
      * @param {NodeGeometry} node   Quadtree node bounds to be checked ({ x, y, width, height })
      * @return {number[]}           array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
-    static getIndex(obj, node) {
+    getIndex(node) {
         const indexes = [], w2 = node.width / 2, h2 = node.height / 2, x2 = node.x + w2, y2 = node.y + h2;
         //an array of node origins where the array index equals the node index
         const nodes = [
@@ -251,7 +248,7 @@ class Line {
         ];
         //test all nodes for line intersections
         for (let i = 0; i < nodes.length; i++) {
-            if (Line.containsSegment(obj.x1, obj.y1, obj.x2, obj.y2, nodes[i][0], nodes[i][1], nodes[i][0] + w2, nodes[i][1] + h2)) {
+            if (Line.containsSegment(this.x1, this.y1, this.x2, this.y2, nodes[i][0], nodes[i][1], nodes[i][0] + w2, nodes[i][1] + h2)) {
                 indexes.push(i);
             }
         }

@@ -6,7 +6,7 @@
   "license": "MIT",
   "main": "dist/quadtree.cjs.js",
   "module": "dist/quadtree.esm.js",
-  "browser": "dist/quadtree.umd.all.js",
+  "browser": "dist/quadtree.umd.full.js",
   "types": "quadtree.d.ts",
   "scripts": {
     "build": "rollup -c",

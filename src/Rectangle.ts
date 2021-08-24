@@ -1,26 +1,35 @@
-import type { NodeGeometry } from "../quadtree";
+import type { NodeGeometry, Indexable } from "../quadtree";
 
-export interface RectProps {
+export interface RectangleGeometry {
     x: number
     y: number
     width: number
     height: number
+}
+
+export interface TypedRectangleGeometry extends RectangleGeometry {
+    qtShape: typeof Rectangle
+}
+
+export interface RectangleProps extends RectangleGeometry {
     data?: any
 }
 
 /**
  * Class representing a Rectangle
  */
- export class Rectangle implements RectProps {
+ export class Rectangle implements Indexable, RectangleProps, TypedRectangleGeometry {
 
+    qtShape: typeof Rectangle;
     x: number;
     y: number;
     width: number;
     height: number;
-    data: any;
+    data?: any;
 
-    constructor(props:RectProps) {
+    constructor(props:RectangleProps) {
         
+        this.qtShape = Rectangle;
         this.x = props.x;
         this.y = props.y;
         this.width = props.width;
@@ -33,16 +42,16 @@ export interface RectProps {
      * @param {NodeGeometry} node   Quadtree node bounds to be checked ({ x, y, width, height })
      * @return {number[]}           array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
-    static getIndex(obj:Rectangle, node:NodeGeometry) {
+    getIndex(node:NodeGeometry) {
         
         const indexes:number[] = [],
               boundsCenterX    = node.x + (node.width/2),
               boundsCenterY    = node.y + (node.height/2);
 
-        const startIsNorth = obj.y < boundsCenterY,
-              startIsWest  = obj.x < boundsCenterX,
-              endIsEast    = obj.x + obj.width > boundsCenterX,
-              endIsSouth   = obj.y + obj.height > boundsCenterY;
+        const startIsNorth = this.y < boundsCenterY,
+              startIsWest  = this.x < boundsCenterX,
+              endIsEast    = this.x + this.width > boundsCenterX,
+              endIsSouth   = this.y + this.height > boundsCenterY;
 
         //top-right quad
         if(startIsNorth && endIsEast) {

@@ -37,12 +37,12 @@ function drawObjects(objects, ctx, outlineOnly) {
 
         if(outlineOnly) ctx.fillStyle = 'transparent';
 
-        if(obj instanceof Quadtree.Line || obj.getIndex === Quadtree.Line.getIndex) {
+        if(obj instanceof Quadtree.Line || obj.qtShape === Quadtree.Line) {
             ctx.beginPath();
             ctx.moveTo(obj.x1, obj.y1);
             ctx.lineTo(obj.x2, obj.y2);
             ctx.stroke();
-        } else if(obj instanceof Quadtree.Circle || obj.getIndex === Quadtree.Circle.getIndex) {
+        } else if(obj instanceof Quadtree.Circle || obj.qtShape === Quadtree.Circle) {
             ctx.beginPath();
             ctx.arc(obj.x, obj.y, obj.r, 0, 2 * Math.PI);
             ctx.fill();

@@ -1,6 +1,6 @@
-import type { NodeGeometry } from "../quadtree";
+import type { NodeGeometry, Indexable } from "../quadtree";
 
-export interface LineProps {
+export interface LineGeometry {
     x1: number
     y1: number
     x2: number
@@ -8,19 +8,29 @@ export interface LineProps {
     data?: any
 }
 
+export interface TypedLineGeometry extends LineGeometry {
+    qtShape: typeof Line
+}
+
+export interface LineProps extends LineGeometry {
+    data?: any
+}
+
 /**
  * Class representing a Line
  */
-export class Line implements LineProps {
+export class Line implements Indexable, LineProps, TypedLineGeometry {
 
+    qtShape: typeof Line;
     x1: number;
     y1: number;
     x2: number;
     y2: number;
-    data: any;
+    data?: any;
 
     constructor(props:LineProps) {
 
+        this.qtShape = Line;
         this.x1 = props.x1;
         this.y1 = props.y1;
         this.x2 = props.x2;
@@ -33,7 +43,7 @@ export class Line implements LineProps {
      * @param {NodeGeometry} node   Quadtree node bounds to be checked ({ x, y, width, height })
      * @return {number[]}           array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
-    static getIndex(obj:Line, node:NodeGeometry) {
+    getIndex(node:NodeGeometry) {
 
         const indexes:number[] = [],
               w2 = node.width/2,
@@ -51,7 +61,7 @@ export class Line implements LineProps {
 
         //test all nodes for line intersections
         for(let i=0; i<nodes.length; i++) {
-            if(Line.containsSegment(obj.x1, obj.y1, obj.x2, obj.y2, nodes[i][0], nodes[i][1], nodes[i][0] + w2, nodes[i][1] + h2)) {
+            if(Line.containsSegment(this.x1, this.y1, this.x2, this.y2, nodes[i][0], nodes[i][1], nodes[i][0] + w2, nodes[i][1] + h2)) {
                 indexes.push(i);
             }
         }

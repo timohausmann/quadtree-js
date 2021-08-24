@@ -24,7 +24,7 @@ export default [
 		input: 'src/index.umd.basic.ts',
 		output: {
 			name: 'Quadtree',
-			file: pkg.browser.replace('.umd.all.', '.umd.basic.'),
+			file: pkg.browser.replace('.umd.full.', '.umd.basic.'),
 			format: 'umd',
             exports: 'default'
 		},

@@ -61,7 +61,7 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/prism.min.js" integrity="sha512-WkVkkoB31AoI9DAk6SEEEyacH9etQXKUov4JRRuM1Y681VsTq7jYgrRw06cbP6Io7kPsKx+tLFpH/HXZSZ2YEQ==" crossorigin="anonymous"></script>
 
         <!-- quadtree lib -->
-		<script src="../dist/quadtree.umd.all.js"></script>
+		<script src="../dist/quadtree.umd.full.js"></script>
         
         <!-- example helpers -->
 		<script src="./example.js"></script>
@@ -135,7 +135,7 @@
                             vx: randMinMax(-0.5,0.5),
                             vy: randMinMax(-0.5,0.5),
                             check: false,
-                            getIndex: Quadtree.Rectangle.getIndex
+                            qtShape: Quadtree.Rectangle
                         });
                     } else if(rand > 0.33) {
                         myObjects.push({
@@ -145,7 +145,7 @@
                             vx: randMinMax(-0.5,0.5),
                             vy: randMinMax(-0.5,0.5),
                             check: false,
-                            getIndex: Quadtree.Circle.getIndex
+                            qtShape: Quadtree.Circle
                         });
                     } else {
 
@@ -163,13 +163,12 @@
                             vx: randMinMax(-0.5,0.5),
                             vy: randMinMax(-0.5,0.5),
                             check: false,
-                            getIndex: Quadtree.Line.getIndex
+                            qtShape: Quadtree.Line
                         };
 
                         myObjects.push(line);
 
                         updateLineXY(line);
-
                     }
 				}
 
@@ -202,7 +201,7 @@
 					myObjects[i].y += myObjects[i].vy;
 					myObjects[i].check = false;
 
-                    if(myObjects[i].getIndex === Quadtree.Line.getIndex) {
+                    if(myObjects[i].qtType === Quadtree.Line) {
                         updateLineXY(myObjects[i]);
                     }
 					
