@@ -1,4 +1,4 @@
-import type { NodeGeometry, Indexable } from "../quadtree";
+import type { NodeGeometry, Indexable } from '../quadtree';
 
 export interface CircleGeometry {
     x: number
@@ -10,28 +10,28 @@ export interface TypedCircleGeometry extends CircleGeometry {
     qtShape: typeof Circle
 }
 
-export interface CircleProps extends CircleGeometry {
-    data?: any
+export interface CircleProps<T> extends CircleGeometry {
+    data?: T
 }
 
 /**
  * Class representing a Circle
  */
- export class Circle implements Indexable, CircleProps, TypedCircleGeometry {
+export class Circle<T> implements Indexable, CircleProps<T>, TypedCircleGeometry {
 
     qtShape: typeof Circle;
     x: number;
     y: number;
     r: number;
-    data?: any;
+    data?: T;
 
-    constructor(props:CircleProps) {
+    constructor(props:CircleProps<T>) {
 
         this.qtShape = Circle;
         this.x = props.x;
         this.y = props.y;
         this.r = props.r;
-        this.data = props.data || {};
+        this.data = props.data;
     }
     
     /**
@@ -39,13 +39,13 @@ export interface CircleProps extends CircleGeometry {
      * @param {NodeGeometry} node   Quadtree node bounds to be checked ({ x, y, width, height })
      * @return {number[]}           array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
-    getIndex(node:NodeGeometry) {
+    getIndex(node:NodeGeometry): number[] {
 
         const indexes:number[] = [],
-              w2 = node.width/2,
-              h2 = node.height/2,
-              x2 = node.x + w2,
-              y2 = node.y + h2;
+            w2 = node.width/2,
+            h2 = node.height/2,
+            x2 = node.x + w2,
+            y2 = node.y + h2;
 
         //an array of node origins where the array index equals the node index
         const nodes = [
@@ -63,7 +63,7 @@ export interface CircleProps extends CircleGeometry {
         }
      
         return indexes;
-    };
+    }
 
 
     /**
@@ -78,7 +78,7 @@ export interface CircleProps extends CircleGeometry {
      * @param {number} maxY rectangle end Y
      * @returns {boolean}
      */
-    static intersectRect(x:number, y:number, r:number, minX:number, minY:number, maxX:number, maxY:number) {
+    static intersectRect(x:number, y:number, r:number, minX:number, minY:number, maxX:number, maxY:number): boolean {
         const deltaX = x - Math.max(minX, Math.min(x, maxX));
         const deltaY = y - Math.max(minY, Math.min(y, maxY));
         return (deltaX * deltaX + deltaY * deltaY) < (r * r);

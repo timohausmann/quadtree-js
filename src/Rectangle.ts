@@ -1,4 +1,4 @@
-import type { NodeGeometry, Indexable } from "../quadtree";
+import type { NodeGeometry, Indexable } from '../quadtree';
 
 export interface RectangleGeometry {
     x: number
@@ -11,30 +11,30 @@ export interface TypedRectangleGeometry extends RectangleGeometry {
     qtShape: typeof Rectangle
 }
 
-export interface RectangleProps extends RectangleGeometry {
-    data?: any
+export interface RectangleProps<T> extends RectangleGeometry {
+    data?: T
 }
 
 /**
  * Class representing a Rectangle
  */
- export class Rectangle implements Indexable, RectangleProps, TypedRectangleGeometry {
+export class Rectangle<T> implements Indexable, RectangleProps<T>, TypedRectangleGeometry {
 
     qtShape: typeof Rectangle;
     x: number;
     y: number;
     width: number;
     height: number;
-    data?: any;
+    data?: T;
 
-    constructor(props:RectangleProps) {
+    constructor(props:RectangleProps<T>) {
         
         this.qtShape = Rectangle;
         this.x = props.x;
         this.y = props.y;
         this.width = props.width;
         this.height = props.height;
-        this.data = props.data || {};
+        this.data = props.data;
     }
     
     /**
@@ -42,16 +42,16 @@ export interface RectangleProps extends RectangleGeometry {
      * @param {NodeGeometry} node   Quadtree node bounds to be checked ({ x, y, width, height })
      * @return {number[]}           array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
-    getIndex(node:NodeGeometry) {
+    getIndex(node:NodeGeometry): number[] {
         
         const indexes:number[] = [],
-              boundsCenterX    = node.x + (node.width/2),
-              boundsCenterY    = node.y + (node.height/2);
+            boundsCenterX    = node.x + (node.width/2),
+            boundsCenterY    = node.y + (node.height/2);
 
         const startIsNorth = this.y < boundsCenterY,
-              startIsWest  = this.x < boundsCenterX,
-              endIsEast    = this.x + this.width > boundsCenterX,
-              endIsSouth   = this.y + this.height > boundsCenterY;
+            startIsWest  = this.x < boundsCenterX,
+            endIsEast    = this.x + this.width > boundsCenterX,
+            endIsSouth   = this.y + this.height > boundsCenterY;
 
         //top-right quad
         if(startIsNorth && endIsEast) {
@@ -74,5 +74,5 @@ export interface RectangleProps extends RectangleGeometry {
         }
      
         return indexes;
-    };
+    }
 }

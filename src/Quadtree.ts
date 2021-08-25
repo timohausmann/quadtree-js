@@ -1,4 +1,4 @@
-import type { NodeGeometry, TypedGeometry, Primitive } from "../quadtree";
+import type { NodeGeometry, TypedGeometry, Primitive } from '../quadtree';
 import { Rectangle } from './Rectangle';
 
 interface QuadtreeProps {
@@ -52,23 +52,23 @@ export class Quadtree {
      * @param {Primitive|TypedGeometry} obj    object to be checked
      * @return {number[]}                      array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
-    getIndex(obj:Primitive|TypedGeometry) {
+    getIndex(obj:Primitive|TypedGeometry): number[] {
 
         //getIndex via qtShape or fallback to Rectangle.getIndex
         const getIndex = obj.qtShape?.prototype.getIndex || Rectangle.prototype.getIndex;
         return getIndex.call(obj, this.bounds);
-    };
+    }
 
     /**
      * Split the node into 4 subnodes
      */
-    split() {
+    split(): void {
         
         const level  = this.level + 1,
-              width  = this.bounds.width/2,
-              height = this.bounds.height/2,
-              x      = this.bounds.x,
-              y      = this.bounds.y;
+            width  = this.bounds.width/2,
+            height = this.bounds.height/2,
+            x      = this.bounds.x,
+            y      = this.bounds.y;
 
         const coords = [
             { x: x + width, y: y },
@@ -85,7 +85,7 @@ export class Quadtree {
                 height,
             }, this.max_objects, this.max_levels, level);
         }        
-    };
+    }
 
 
     /**
@@ -94,7 +94,7 @@ export class Quadtree {
      * objects to their corresponding subnodes.
      * @param {Primitive|TypedGeometry} obj    object to be added
      */
-    insert(obj:Primitive|TypedGeometry) {
+    insert(obj:Primitive|TypedGeometry): void {
         
         //if we have subnodes, call insert on matching subnodes
         if(this.nodes.length) {
@@ -128,7 +128,7 @@ export class Quadtree {
             //clean up this node
             this.objects = [];
         }
-    };
+    }
     
     
     /**
@@ -136,7 +136,7 @@ export class Quadtree {
      * @param {Primitive|TypedGeometry} obj    object to be checked
      * @return {(Primitive|TypedGeometry)[]}   array with all detected objects
      */
-    retrieve(obj:Primitive|TypedGeometry) {
+    retrieve(obj:Primitive|TypedGeometry): (Primitive|TypedGeometry)[] {
         
         const indexes = this.getIndex(obj);
         let returnObjects = this.objects;
@@ -154,13 +154,13 @@ export class Quadtree {
         });
     
         return returnObjects;
-    };
+    }
 
 
     /**
      * Clear the quadtree
      */
-    clear() {
+    clear(): void {
         
         this.objects = [];
     
@@ -171,5 +171,5 @@ export class Quadtree {
         }
 
         this.nodes = [];
-    };
+    }
 }
