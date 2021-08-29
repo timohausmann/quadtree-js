@@ -8,16 +8,15 @@
 * Update and publish jsdoc/tsdoc
 * Add explanations to primitives example
 * Publish to npm
-* Add unit tests
-* publish `withNodes`, `withPersistence` plugins
 
-This is a JavaScript Quadtree implementation based on the Java Methods described on [gamedevelopment.tutsplus.com by Steven Lambert](https://gamedevelopment.tutsplus.com/tutorials/quick-tip-use-quadtrees-to-detect-likely-collisions-in-2d-space--gamedev-374):
+This Javascript Quadtree Library can store and retrieve Rectangles, Circles and Lines in a recursive 2D Quadtree. Every Quadtree node can hold a maximum number of objects before it splits into four subnodes. Objects are only stored on leaf nodes (the lowest level). If an object overlaps into multiple leaf nodes, a reference to the object is stored in each node. 
+
+*Only XXX Bytes! (Compressed + Gzipped)*
+
+The code was initially based on the Java Methods described on [gamedevelopment.tutsplus.com by Steven Lambert](https://gamedevelopment.tutsplus.com/tutorials/quick-tip-use-quadtrees-to-detect-likely-collisions-in-2d-space--gamedev-374) and underwent some revisions since.
 
 > Many games require the use of collision detection algorithms to determine when two objects have collided, but these algorithms are often expensive operations and can greatly slow down a game. One way to speed things up is to reduce the number of checks that have to be made. Two objects that are at opposite ends of the screen can not possibly collide, so there is no need to check for a collision between them. This is where a quadtree comes into play.
 
-This implementation can store and retrieve rectangles in a recursive 2D Quadtree. Every Quadtree node can hold a maximum number of objects before it splits into four subnodes. Objects are only stored on leaf nodes (the lowest level). If an object overlaps into multiple leaf nodes, a reference to the object is stored in each node. 
-
-*Only 639 Bytes! (Compressed + Gzipped)*
 
 ## Demos
 
@@ -36,57 +35,54 @@ npm i -D @timohausmann/quadtree-js
 ```
 
 ```javascript
-import Quadtree from '@timohausmann/quadtree-js';
+// ES6
+import { Quadtree } from '@timohausmann/quadtree-js';
+// CommonJS
+const { Quadtree } = require('@timohausmann/quadtree-js');
 ```
 
-```javascript
-const Quadtree = require('@timohausmann/quadtree-js');
-```
-
-Alternatively, [download the source](https://github.com/timohausmann/quadtree-js/archive/master.zip) and include it the old-fashioned way:
+Alternatively, [download the source](https://github.com/timohausmann/quadtree-js/archive/master.zip) and include it the old-fashioned way, or use an awesome CDN like [jsdelivr](https://www.jsdelivr.com/package/npm/@timohausmann/quadtree-js) or [unpkg](https://unpkg.com/browse/@timohausmann/quadtree-js@latest/):
 
 ```html
-<script src="quadtree.min.js"></script>
-```
-
-Or use an awesome CDN like [jsdelivr](https://www.jsdelivr.com/package/npm/@timohausmann/quadtree-js) or [unpkg](https://unpkg.com/browse/@timohausmann/quadtree-js@latest/):
-
-```html
-<script src="https://cdn.jsdelivr.net/npm/@timohausmann/quadtree-js/quadtree.min.js"></script>
-```
-
-```html
-<script src="https://unpkg.com/@timohausmann/quadtree-js/quadtree.min.js"></script>
+<!-- self-hosted -->
+<script src="quadtree.umd.full.js"></script>
+<!-- CDN jsdelivr -->
+<script src="https://cdn.jsdelivr.net/npm/@timohausmann/quadtree-js/dist/quadtree.umd.full.js"></script>
+<!-- CDN unpkg -->
+<script src="https://unpkg.com/@timohausmann/quadtree-js/dist/quadtree.umd.full.js"></script>
 ```
 
 
 ## How to use
 
-Create a new Quadtree (with default values for `max_objects` (10) and `max_levels` (4)).
+Create a new Quadtree:
 
 ```javascript
-var myTree = new Quadtree({
-    x: 0,
-    y: 0,
-    width: 400,
-    height: 300
+const myTree = new Quadtree({
+    width: 800,
+    height: 600
 });
 ```
 
-> MAX_OBJECTS defines how many objects a node can hold before it splits and MAX_LEVELS defines the deepest level subnode.
+Optional properties: 
+* `maxObjects` – defines how many objects a node can hold before it splits 
+* `maxLevels` – defines the deepest level subnode
+* `x` and `y` – coordinate offset
 
-If you want to specify `max_objects` and `max_levels` on your own, you can pass them as a 2nd and 3rd argument. I recommend using low values for `max_levels` because each level will quadruple the possible amount of nodes. Using lower values for `max_levels` increases performance but may return more candidates. Finetuning these values depends on your 2D space, the amount and size of the objects and your retrieving areas. 
+I recommend using low values for `maxLevels` because each level will quadruple the possible amount of nodes. Using lower values for `maxLevels` increases performance but may return more candidates. Finetuning these values depends on your 2D space, the amount and size of the objects and your retrieving areas. 
 
 ```javascript
-var myTree = new Quadtree({
-    x: 0,
-    y: 0,
-    width: 800,
-    height: 600
-}, 15, 6);
+const myTree = new Quadtree({
+    width: 600,
+    height: 400,
+    x: 100,         // default:  0
+    y: 100,         // default:  0
+    maxObjects: 15, // default: 10
+    maxLevels: 3    // default:  4
+});
 ``` 
 
-Insert an element in the Quadtree
+Insert an element in the Quadtree (default: Rectangle)
 ```javascript
 myTree.insert({
     x: 100,
@@ -98,7 +94,7 @@ myTree.insert({
 
 Retrieve elements from nodes that intersect with the given bounds
 ```javascript
-var elements = myTree.retrieve({
+const elements = myTree.retrieve({
     x: 150,
     y: 150,
     width: 100,
@@ -111,61 +107,157 @@ Clear the Quadtree
 myTree.clear();
 ```
 
+### Shapes
+
+You can use any object directly with the Quadtree. There are a few primitive shapes available. Just specify what shape they are with `qtShape` (default: `Rectangle`). Each shape has required properties specific to their geometry.
+
+| Shape     | Required Properties |
+|-----------|---------------------|
+| Rectangle | x, y, width, height |
+| Circle    | x, y, r             |
+| Line      | x1, y1, x2, y2      |
+
+```javascript
+import { Rectangle, Circle, Line } from '@timohausmann/quadtree-js';
+
+const player = {
+    qtShape: Rectangle,
+    name: 'Giana',
+    x: 100,
+    y: 0,
+    width: 24,
+    height: 48,
+};
+const explosion = {
+    qtShape: Circle,
+    damage: 100,
+    x: 50,
+    y: 50,
+    r: 100,
+};
+const Laser = {
+    qtShape: Line,
+    color: 'green',
+    x1: 50,
+    y1: 50,
+    x2: 100,
+    y2: 100,
+};
+```
+
+These shapes are actually classes! You can also use them directly or extend them. Store custom data on the `data` property.
+
+```javascript
+import { Rectangle, Circle, Line } from '@timohausmann/quadtree-js';
+
+// Class usage
+const rectangle = new Rectangle({ x: 67, y: 67, width: 100, height: 100 });
+const circle    = new Circle({ x: 128, y: 128, r: 50, data: 'custom data here' });
+const line      = new Line({ x1: 67, y1: 67, x2: 128, y2: 128, data: { foo: bar } });
+
+myTree.insert(rectangle);
+myTree.insert(circle);
+myTree.insert(line);
+
+const area = new Rectangle({ x: 50, y: 50, width: 50, height: 50 });
+const elements = myTree.retrieve(area);
+
+// Class extend
+class Laser extends Line {
+    constructor(props) {
+        super(props);
+        this.color = 'green';
+    }
+    draw(ctx) {
+        ctx.beginPath();
+        ctx.moveTo(this.x1, this.y1);
+        ctx.lineTo(this.x2, this.y2);
+        ctx.strokeStyle = this.color;
+        ctx.stroke();
+    }
+}
+
+const laser = new Laser({x1: 100, y1: 0, x2: 100, y2: 100});
+myTree.insert(laser);
+```
+
+If you are using the **UMD bundles**, the classes are available as `Quadtree.Rectangle`, `Quadtree.Circle` and `Quadtree.Line`.
+
 Check out the examples for more information.
+
 
 ## Typescript
 
-Type definitions are included. Inserted objects need to conform to the `Quadtree.Rect` interface. 
+When using classes, you can easily tell TS the shape of your custom data with `<T>`:
 
-```javascript
-import Quadtree, { Rect } from '@timohausmann/quadtree-js';
-
-interface Player extends Rect {
-    name: string;
-    health: number;
+```typescript
+interface GameEntity {
+    name: string
+    health: number
 }
-
-const hero:Player = {
-    name: 'Shiffman',
-    health: 100,
+const hero = new Rectangle<GameEntity>({
     x: 100,
     y: 100,
-    width: 32,
-    height: 32
-}
-
-myTree.insert(hero);
+    width: 24,
+    height: 48,
+    data: {
+        name: 'Shiffman',
+        health: 100,
+    }
+})
 ```
 
 ## Browser Support
 
-This library is supported in all modern browsers including IE9 and above. 
+As of 2.0.0 the UMD bundles use ES6 features (e.g. classes) that are not supported by IE11 and below. 
+For legacy browser support, please download a [1.x version](https://github.com/timohausmann/quadtree-js/releases) of this library or bundle and polyfill it on your own.
+
 
 ## Development scripts
 
-* `npm run build` to minify the source
+* `npm run dev` to watch and build the source
+* `npm run build` to build the source
+* `npm run test` to run the test suit
+* `npm run lint` to run eslint
+* `npm run lint:fix` to run eslint with --fix
+
+
+## Migration Guide to 2.0.0
+
+* Named exports only: 👉 Change `import Quadtree ...` to `import { Quadtree } ...`
+* Quadtree constructor: `maxObjects` and `maxLevels` are now named properties. Also, `x` and `y` are now optional. 👉 Change `new Quadtree({x: 0, y: 0, width: 100, height: 100}, 5, 2);` to `new Quadtree({width: 100, height: 100, maxObjects: 5, maxLevels: 2});`
+* Bundle filename has changed. 👉 Update your script tag from `quadtree.min.js` to `quadtree.umd.basic.js`
+* Typescript: no more `Rect` interface. 👉 use `Rectangle` instead
+
 
 ## Changelog
 
+### 2.0.0
+
+* Refactored Codebase to ES6 and Typescript
+* Added modular classes for Rectangle, Circle, Line
+* Added dedicated bundle files for CJS, EMS and UMD
+* Added Unit Tests with Jest
+* Added ESLint
+
 ### 1.2.4
 
-Added definition files for Typescript support
-
-JSDoc Fixes
+* Added definition files for Typescript support
+* JSDoc Fixes
 
 ### 1.2.3
 
-Using github.io for examples (docs), CDN URLs
+* Using github.io for examples (docs)
+* CDN URLs
 
 ### 1.2.2
 
-Removed `grunt` dev dependency, now using `uglify-js` to minifiy
+* Removed `grunt` dev dependency, now using `uglify-js` to minifiy
 
 ### 1.2.1
 
-Allow float boundaries for Quads
-
-Simplified getIndex function
+* Allow float boundaries for Quads
+* Simplified getIndex function
 
 ### 1.2.0
 
@@ -173,7 +265,7 @@ This implementation now stores objects exclusively on leaf nodes and thus differ
 
 ### 1.1.3
 
-Support for npm and `module.exports`
+* Support for npm and `module.exports`
 
 ## Update single objects
 

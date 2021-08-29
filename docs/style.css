@@ -33,9 +33,9 @@ nav strong {
 }
 
 #canvasContainer canvas {
-	display: inline-block;
+	display: block;
 	background: #000;
-	border: 2px solid #a80000;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
 	max-width: 100%;
 }
 .ctrl {

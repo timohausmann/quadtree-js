@@ -12,7 +12,7 @@ class Rectangle {
         this.y = props.y;
         this.width = props.width;
         this.height = props.height;
-        this.data = props.data || {};
+        this.data = props.data;
     }
     /**
      * Determine which quadrant the object belongs to.
@@ -40,7 +40,6 @@ class Rectangle {
         }
         return indexes;
     }
-    ;
 }
 
 /**
@@ -74,7 +73,6 @@ class Quadtree {
         const getIndex = ((_a = obj.qtShape) === null || _a === void 0 ? void 0 : _a.prototype.getIndex) || Rectangle.prototype.getIndex;
         return getIndex.call(obj, this.bounds);
     }
-    ;
     /**
      * Split the node into 4 subnodes
      */
@@ -95,7 +93,6 @@ class Quadtree {
             }, this.max_objects, this.max_levels, level);
         }
     }
-    ;
     /**
      * Insert an object into the node. If the node
      * exceeds the capacity, it will split and add all
@@ -130,7 +127,6 @@ class Quadtree {
             this.objects = [];
         }
     }
-    ;
     /**
      * Return all objects that could collide with the given object
      * @param {Primitive|TypedGeometry} obj    object to be checked
@@ -151,7 +147,6 @@ class Quadtree {
         });
         return returnObjects;
     }
-    ;
     /**
      * Clear the quadtree
      */
@@ -164,7 +159,6 @@ class Quadtree {
         }
         this.nodes = [];
     }
-    ;
 }
 
 /**
@@ -176,7 +170,7 @@ class Circle {
         this.x = props.x;
         this.y = props.y;
         this.r = props.r;
-        this.data = props.data || {};
+        this.data = props.data;
     }
     /**
      * Determine which quadrant the object belongs to.
@@ -200,7 +194,6 @@ class Circle {
         }
         return indexes;
     }
-    ;
     /**
      * returns true if a circle intersects an axis aligned rectangle
      * @see https://yal.cc/rectangle-circle-intersection-test/
@@ -230,7 +223,7 @@ class Line {
         this.y1 = props.y1;
         this.x2 = props.x2;
         this.y2 = props.y2;
-        this.data = props.data || {};
+        this.data = props.data;
     }
     /**
      * Determine which quadrant the object belongs to.
@@ -248,15 +241,15 @@ class Line {
         ];
         //test all nodes for line intersections
         for (let i = 0; i < nodes.length; i++) {
-            if (Line.containsSegment(this.x1, this.y1, this.x2, this.y2, nodes[i][0], nodes[i][1], nodes[i][0] + w2, nodes[i][1] + h2)) {
+            if (Line.intersectRect(this.x1, this.y1, this.x2, this.y2, nodes[i][0], nodes[i][1], nodes[i][0] + w2, nodes[i][1] + h2)) {
                 indexes.push(i);
             }
         }
         return indexes;
     }
-    ;
     /**
      * returns true if a line segment (the first 4 parameters) intersects an axis aligned rectangle (the last 4 parameters)
+     * @todo this is a very naive implementation, it should be improved – fails on corner intersections
      * @see https://stackoverflow.com/a/18292964/860205
      * @param {number} x1 line start X
      * @param {number} y1 line start Y
@@ -268,10 +261,13 @@ class Line {
      * @param {number} maxY rectangle end Y
      * @returns {boolean}
      */
-    static containsSegment(x1, y1, x2, y2, minX, minY, maxX, maxY) {
-        // Completely outside.
+    static intersectRect(x1, y1, x2, y2, minX, minY, maxX, maxY) {
+        // Completely outside
         if ((x1 <= minX && x2 <= minX) || (y1 <= minY && y2 <= minY) || (x1 >= maxX && x2 >= maxX) || (y1 >= maxY && y2 >= maxY))
             return false;
+        // Single point inside
+        if ((x1 >= minX && x1 <= maxX && y1 >= minY && y1 <= maxY) || (x2 >= minX && x2 <= maxX && y2 >= minY && y2 <= maxY))
+            return true;
         const m = (y2 - y1) / (x2 - x1);
         let y = m * (minX - x1) + y1;
         if (y > minY && y < maxY)

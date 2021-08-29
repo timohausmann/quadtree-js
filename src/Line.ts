@@ -60,7 +60,7 @@ export class Line<T> implements Indexable, LineProps<T>, TypedLineGeometry {
 
         //test all nodes for line intersections
         for(let i=0; i<nodes.length; i++) {
-            if(Line.containsSegment(this.x1, this.y1, this.x2, this.y2, nodes[i][0], nodes[i][1], nodes[i][0] + w2, nodes[i][1] + h2)) {
+            if(Line.intersectRect(this.x1, this.y1, this.x2, this.y2, nodes[i][0], nodes[i][1], nodes[i][0] + w2, nodes[i][1] + h2)) {
                 indexes.push(i);
             }
         }
@@ -70,6 +70,7 @@ export class Line<T> implements Indexable, LineProps<T>, TypedLineGeometry {
 
     /**
      * returns true if a line segment (the first 4 parameters) intersects an axis aligned rectangle (the last 4 parameters)
+     * @todo this is a very naive implementation, it should be improved – fails on corner intersections
      * @see https://stackoverflow.com/a/18292964/860205
      * @param {number} x1 line start X
      * @param {number} y1 line start Y
@@ -81,11 +82,15 @@ export class Line<T> implements Indexable, LineProps<T>, TypedLineGeometry {
      * @param {number} maxY rectangle end Y
      * @returns {boolean}
      */
-    static containsSegment(x1:number, y1:number, x2:number, y2:number, minX:number, minY:number, maxX:number, maxY:number): boolean {
+    static intersectRect(x1:number, y1:number, x2:number, y2:number, minX:number, minY:number, maxX:number, maxY:number): boolean {
     
-        // Completely outside.
+        // Completely outside
         if ((x1 <= minX && x2 <= minX) || (y1 <= minY && y2 <= minY) || (x1 >= maxX && x2 >= maxX) || (y1 >= maxY && y2 >= maxY))
             return false;
+
+        // Single point inside
+        if ((x1 >= minX && x1 <= maxX && y1 >= minY && y1 <= maxY) || (x2 >= minX && x2 <= maxX && y2 >= minY && y2 <= maxY))
+            return true;
     
         const m = (y2 - y1) / (x2 - x1);
     
