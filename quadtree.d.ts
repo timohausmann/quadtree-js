@@ -20,13 +20,13 @@ declare class Quadtree {
     max_levels: number;
     level: number;
     bounds: Quadtree.Rect;
-    objects: [Quadtree.Rect];
-    nodes: [Quadtree];
+    objects: Quadtree.Rect[];
+    nodes: Quadtree[];
 
     split(): void
-    getIndex(pRect: Quadtree.Rect): [number]
+    getIndex(pRect: Quadtree.Rect): number[]
     insert(pRect: Quadtree.Rect): void
-    retrieve(pRect: Quadtree.Rect): [Quadtree.Rect]
+    retrieve<T extends Quadtree.Rect>(pRect: Quadtree.Rect): T[]
     clear(): void
 }
 
