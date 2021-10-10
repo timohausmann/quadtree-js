@@ -1,4 +1,4 @@
-// Type definitions for @timohausmann/quadtree-js v1.2.4
+// Type definitions for @timohausmann/quadtree-js v1.2.5
 // https://github.com/timohausmann/quadtree-js
 // Definitions by: Timo Hausmann <https://timohausmann.de/>
 // Template: https://www.typescriptlang.org/docs/handbook/declaration-files/templates/module-class-d-ts.html
