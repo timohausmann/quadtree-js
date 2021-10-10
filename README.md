@@ -136,6 +136,10 @@ This library is supported in all modern browsers including IE9 and above.
 
 ## Changelog
 
+### 1.2.5
+
+Typescript Definition File Bugfix (thanks to [pietrovismara](https://github.com/timohausmann/quadtree-js/pull/18))
+
 ### 1.2.4
 
 Added definition files for Typescript support
