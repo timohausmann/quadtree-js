@@ -40,11 +40,11 @@ describe('Quadtree.split', () => {
     });
 
     test('subnodes inherit max levels and objects', () => {
-        const tree = new Quadtree({ width: 100, height: 100 }, 5, 3);
+        const tree = new Quadtree({ width: 100, height: 100, maxObjects: 5, maxLevels: 3 });
         tree.split();         
         for(let i=0; i < 4; i++) {
-            expect(tree.nodes[i].max_objects).toBe(5);
-            expect(tree.nodes[i].max_levels).toBe(3);
+            expect(tree.nodes[i].maxObjects).toBe(5);
+            expect(tree.nodes[i].maxLevels).toBe(3);
         }
     });
 

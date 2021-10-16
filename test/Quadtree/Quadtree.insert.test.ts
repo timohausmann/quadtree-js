@@ -48,19 +48,19 @@ describe('Quadtree.insert', () => {
         expect(tree.nodes[3].insert).toHaveBeenCalledTimes(1);
     });
 
-    test('calls split when max_objects has been reached', () => {
+    test('calls split when maxObjects has been reached', () => {
         const tree = new Quadtree({ width: 100, height: 100 });
         jest.spyOn(tree, 'split');
-        for(let i = 0; i <= tree.max_objects; i++) {
+        for(let i = 0; i <= tree.maxObjects; i++) {
             tree.insert({x: 0, y: 0, width: 100, height: 100});
         }
         expect(tree.split).toHaveBeenCalledTimes(1);
     });
 
-    test('does not call split when max_levels has been reached', () => {
-        const tree = new Quadtree({ width: 100, height: 100 }, 10, 0);
+    test('does not call split when maxLevels has been reached', () => {
+        const tree = new Quadtree({ width: 100, height: 100, maxObjects: 10, maxLevels: 0 });
         jest.spyOn(tree, 'split');
-        for(let i = 0; i <= tree.max_objects * tree.max_levels; i++) {
+        for(let i = 0; i <= tree.maxObjects; i++) {
             tree.insert({x: 0, y: 0, width: 100, height: 100});
         }
         expect(tree.split).toHaveBeenCalledTimes(0);

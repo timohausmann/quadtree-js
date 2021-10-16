@@ -6,6 +6,8 @@ interface QuadtreeProps {
     y?: number
     width: number
     height: number
+    maxObjects?: number
+    maxLevels?: number
 }
 
 /**
@@ -14,15 +16,15 @@ interface QuadtreeProps {
 export class Quadtree {
 
     /**
-     * @var {number} max_objects how many objects a node can hold before it splits
-     * @var {number} max_levels defines the deepest level subnode
+     * @var {number} maxObjects how many objects a node can hold before it splits
+     * @var {number} maxLevels defines the deepest level subnode
      * @var {number} level the level of the node
      * @var {NodeGeometry} bounds the numeric boundaries of the node
      * @var {(Primitive|TypedGeometry)[]} objects array of objects in the node
      * @var {Quadtree[]} nodes subnodes of the node
      */
-    max_objects: number;
-    max_levels: number;
+    maxObjects: number;
+    maxLevels: number;
     level: number;
     bounds: NodeGeometry;
     objects: (Primitive|TypedGeometry)[];
@@ -32,16 +34,21 @@ export class Quadtree {
      * Quadtree Constructor
      * @class Quadtree
      * @param {QuadtreeProps} bounds       bounds of the node ({ x, y, width, height })
-     * @param {number} [max_objects=10]    (optional) max objects a node can hold before splitting into 4 subnodes (default: 10)
-     * @param {number} [max_levels=4]      (optional) total max levels inside root Quadtree (default: 4) 
+     * @param {number} [maxObjects=10]    (optional) max objects a node can hold before splitting into 4 subnodes (default: 10)
+     * @param {number} [maxLevels=4]      (optional) total max levels inside root Quadtree (default: 4) 
      * @param {number} [level=0]           (optional) depth level, required for subnodes (default: 0)
      */
-    constructor(bounds:QuadtreeProps, max_objects=10, max_levels=4, level=0) {
+    constructor(props:QuadtreeProps, level=0) {
         
-        this.bounds      = Object.assign({x: 0, y: 0}, bounds);
-        this.max_objects = max_objects;
-        this.max_levels  = max_levels;
-        this.level       = level;
+        this.bounds = { 
+            x: props.x || 0, 
+            y: props.y || 0, 
+            width: props.width, 
+            height: props.height
+        };
+        this.maxObjects = (typeof props.maxObjects === 'number') ? props.maxObjects : 10;
+        this.maxLevels  = (typeof props.maxLevels === 'number') ? props.maxLevels : 4;
+        this.level      = level;
         
         this.objects = [];
         this.nodes   = [];
@@ -83,7 +90,9 @@ export class Quadtree {
                 y: coords[i].y, 
                 width,
                 height,
-            }, this.max_objects, this.max_levels, level);
+                maxObjects: this.maxObjects,
+                maxLevels: this.maxLevels,
+            }, level);
         }        
     }
 
@@ -109,8 +118,8 @@ export class Quadtree {
         //otherwise, store object here
         this.objects.push(obj);
 
-        //max_objects reached
-        if(this.objects.length > this.max_objects && this.level < this.max_levels) {
+        //maxObjects reached
+        if(this.objects.length > this.maxObjects && this.level < this.maxLevels) {
 
             //split if we don't already have subnodes
             if(!this.nodes.length) {
