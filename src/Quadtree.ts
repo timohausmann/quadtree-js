@@ -1,4 +1,4 @@
-import type { NodeGeometry, TypedGeometry, Shape } from '../quadtree';
+import type { NodeGeometry, TypedGeometry, Shape } from './types';
 import { RectangleGeometry, Rectangle } from './Rectangle';
 
 /**

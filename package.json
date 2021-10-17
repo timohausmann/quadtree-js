@@ -7,14 +7,16 @@
   "main": "dist/quadtree.cjs.js",
   "module": "dist/quadtree.esm.js",
   "browser": "dist/quadtree.umd.full.js",
-  "types": "quadtree.d.ts",
+  "types": "types/index.esm.d.ts",
   "scripts": {
-    "build": "rollup -c",
+    "build": "npm run rollup && npm run docs && npm run dts",
+    "rollup": "rollup -c",
     "dev": "rollup -c -w",
     "lint": "eslint --ext .ts src/",
     "lint:fix": "eslint --fix --ext .ts src/",
     "test": "jest --verbose",
-    "docs": "typedoc --out docs/documentation --readme none src/index.esm.ts"
+    "docs": "typedoc --out docs/documentation --readme none src/index.esm.ts",
+    "dts": "tsc src/index.esm.ts --declaration --emitDeclarationOnly --outDir ./types/"
   },
   "repository": {
     "type": "git",

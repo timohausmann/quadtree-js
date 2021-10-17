@@ -220,10 +220,12 @@ For legacy browser support, please download a [1.x version](https://github.com/t
 ## Development scripts
 
 * `npm run dev` to watch and build the source
-* `npm run build` to build the source
-* `npm run test` to run the test suit
+* `npm run build` execute rollup, docs, dts
+* `npm run rollup` to build the source only
+* `npm run test` to run the test suite
 * `npm run lint` to run eslint
-* `npm run lint:fix` to run eslint with --fix
+* `npm run docs` to create docs
+* `npm run dts` to create definition files
 
 
 ## Migration Guide to 2.0.0
@@ -243,6 +245,7 @@ For legacy browser support, please download a [1.x version](https://github.com/t
 * Added dedicated bundle files for CJS, EMS and UMD
 * Added Unit Tests with Jest
 * Added ESLint
+* Added API docs with Typedoc
 
 ### 1.2.5
 

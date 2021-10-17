@@ -14,7 +14,7 @@ export default [
             exports: 'default'
 		},
 		plugins: [
-			typescript(), // so Rollup can convert TypeScript to JavaScript
+			typescript({ tsconfig: './tsconfig.json' }), // so Rollup can convert TypeScript to JavaScript
             terser(), //minify,
             banner2(() => `/* ${pkg.repository.url} v${pkg.version} */\n`),
 		]
@@ -29,7 +29,7 @@ export default [
             exports: 'default'
 		},
 		plugins: [
-			typescript(), // so Rollup can convert TypeScript to JavaScript
+			typescript({ tsconfig: './tsconfig.json' }), // so Rollup can convert TypeScript to JavaScript
             terser(), //minify,
             banner2(() => `/* ${pkg.repository.url} v${pkg.version} */\n`),
 		]
@@ -39,7 +39,7 @@ export default [
 	{
 		input: 'src/index.esm.ts',
 		plugins: [
-			typescript(), // so Rollup can convert TypeScript to JavaScript
+			typescript({ tsconfig: './tsconfig.json' }), // so Rollup can convert TypeScript to JavaScript
 		],
 		output: [
 			{ file: pkg.main, format: 'cjs', preferConst: true },

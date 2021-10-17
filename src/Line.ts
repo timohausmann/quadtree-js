@@ -1,4 +1,4 @@
-import type { NodeGeometry, Indexable } from '../quadtree';
+import type { NodeGeometry, Indexable } from './types';
 
 export interface LineGeometry {
     x1: number
