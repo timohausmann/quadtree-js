@@ -7,27 +7,27 @@ export interface RectangleGeometry {
     height: number
 }
 
-export interface TypedRectangleGeometry extends RectangleGeometry {
+export interface TaggedRectangleGeometry extends RectangleGeometry {
     qtShape: typeof Rectangle
 }
 
-export interface RectangleProps<T> extends RectangleGeometry {
-    data?: T
+export interface RectangleProps<CustomDataType = void> extends RectangleGeometry {
+    data?: CustomDataType
 }
 
 /**
  * Class representing a Rectangle
  */
-export class Rectangle<T = void> implements Indexable, RectangleGeometry, TypedRectangleGeometry {
+export class Rectangle<CustomDataType = void> implements Indexable, RectangleGeometry, TaggedRectangleGeometry {
 
     qtShape: typeof Rectangle;
     x: number;
     y: number;
     width: number;
     height: number;
-    data?: T;
+    data?: CustomDataType;
 
-    constructor(props:RectangleProps<T>) {
+    constructor(props:RectangleProps<CustomDataType>) {
         
         this.qtShape = Rectangle;
         this.x = props.x;

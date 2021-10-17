@@ -7,27 +7,27 @@ export interface LineGeometry {
     y2: number
 }
 
-export interface TypedLineGeometry extends LineGeometry {
+export interface TaggedLineGeometry extends LineGeometry {
     qtShape: typeof Line
 }
 
-export interface LineProps<T> extends LineGeometry {
-    data?: T
+export interface LineProps<CustomDataType = void> extends LineGeometry {
+    data?: CustomDataType
 }
 
 /**
  * Class representing a Line
  */
-export class Line<T = void> implements Indexable, LineGeometry, TypedLineGeometry {
+export class Line<CustomDataType = void> implements Indexable, LineGeometry, TaggedLineGeometry {
 
     qtShape: typeof Line;
     x1: number;
     y1: number;
     x2: number;
     y2: number;
-    data?: T;
+    data?: CustomDataType;
 
-    constructor(props:LineProps<T>) {
+    constructor(props:LineProps<CustomDataType>) {
 
         this.qtShape = Line;
         this.x1 = props.x1;

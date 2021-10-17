@@ -1,4 +1,4 @@
-import type { NodeGeometry, TypedGeometry, Shape } from './types';
+import type { NodeGeometry, TaggedGeometry, Shape } from './types';
 import { RectangleGeometry, Rectangle } from './Rectangle';
 
 /**
@@ -43,23 +43,50 @@ export interface QuadtreeProps {
 
 /**
  * Class representing a Quadtree node.
+ * 
+ * @example
+ * ```typescript
+ * const tree = new Quadtree({
+ *   width: 100,
+ *   height: 100,
+ *   // optional properties:
+ *   x: 50,          // default:  0
+ *   y: 50,          // default:  0
+ *   maxObjects: 20, // default: 10
+ *   maxLevels: 3,   // default:  4
+ * });
+ * ```
+ * 
+ * @example Typescript: If you like to be explicit, you optionally can pass in a generic type for objects to be stored in the Quadtree:
+ * ```typescript
+ * class GameEntity extends Rectangle {
+ *   ...
+ * }
+ * const tree = new Quadtree<GameEntity>({
+ *   width: 100,
+ *   height: 100,
+ * });
+ * ```
  */
-export class Quadtree<ObjectsType extends Shape|TypedGeometry|RectangleGeometry> {
+export class Quadtree<ObjectsType extends Shape|TaggedGeometry|RectangleGeometry> {
 
     /**
      * The numeric boundaries of this node.
+     * @readonly
      */
     bounds: NodeGeometry;
 
     /**
      * Max objects this node can hold before it splits.
      * @defaultValue `10`
+     * @readonly
      */
     maxObjects: number;
     
     /**
      * Total max nesting levels of the root Quadtree node.
      * @defaultValue `4`
+     * @readonly
      */
     maxLevels: number;
 
@@ -73,19 +100,21 @@ export class Quadtree<ObjectsType extends Shape|TypedGeometry|RectangleGeometry>
     /**
      * Array of objects in this node.
      * @defaultValue `[]`
+     * @readonly
      */
     objects: ObjectsType[];
 
     /**
      * Subnodes of this node
      * @defaultValue `[]`
+     * @readonly
      */
     nodes: Quadtree<ObjectsType>[];
 
     /**
      * Quadtree Constructor
      * @param props - bounds and properties of the node
-     * @param level - depth level, required for subnodes
+     * @param level - depth level (internal use only, required for subnodes)
      */
     constructor(props:QuadtreeProps, level=0) {
         
@@ -104,12 +133,19 @@ export class Quadtree<ObjectsType extends Shape|TypedGeometry|RectangleGeometry>
     }
     
     /**
-     * Get the subnode indexes an object belongs to.
+     * Get the quadrant (subnode indexes) an object belongs to.
+     * 
+     * @example Mostly for internal use but you can call it like so:
+     * ```typescript
+     * const tree = new Quadtree({ width: 100, height: 100 });
+     * const indexes = tree.getIndex({ x: 25, y: 25, width: 10, height: 10 });
+     * console.log(indexes); // [1]
+     * ```
      * 
      * @remarks
      * Objects that are no Shape instance and have no `qtShape` property are assumed to be a `RectangleGeometry`.
      * This is a) for ease of use and b) backwards compability with quadtree-js v1.
-     * Removing this check and support for 'anonymous' rectangle objects could be a performance improvement though. 
+     * Dropping support for 'anonymous' rectangle objects could be a future performance improvement. 
      * This could be done by overriding `Quadtree.getIndex` with a higher order class or helper function.
      * 
      * @param obj - object to be checked
@@ -124,6 +160,14 @@ export class Quadtree<ObjectsType extends Shape|TypedGeometry|RectangleGeometry>
 
     /**
      * Split the node into 4 subnodes.
+     * @internal
+     * 
+     * @example Mostly for internal use! You should only call this yourself if you know what you are doing:
+     * ```typescript
+     * const tree = new Quadtree({ width: 100, height: 100 });
+     * tree.split();
+     * console.log(tree); // now tree has four subnodes
+     * ```
      */
     split(): void {
         
@@ -157,6 +201,21 @@ export class Quadtree<ObjectsType extends Shape|TypedGeometry|RectangleGeometry>
      * Insert an object into the node. If the node
      * exceeds the capacity, it will split and add all
      * objects to their corresponding subnodes.
+     * 
+     * @example
+     * ```typescript
+     * const tree = new Quadtree({ width: 100, height: 100 });
+     * // 'anonymous' objects without qtShape are assumed to be RectangleGeometry
+     * tree.insert({x: 25, y: 25, width: 10, height: 10, custom: 'data'});
+     * tree.insert({qtShape: Rectangle, x: 25, y: 25, width: 10, height: 10, custom: 'data'});
+     * tree.insert({qtShape: Circle, x: 25, y: 25, r: 10, custom: 'data'});
+     * tree.insert({qtShape: Line, x1: 25, y1: 25, x2: 60, y2: 40, custom: 'data'});
+     * // Shape instances
+     * tree.insert(new Rectangle{x: 25, y: 25, width: 10, height: 10, data: 'data'});
+     * tree.insert(new Circle{x: 25, y: 25, r: 10, data: 512});
+     * tree.insert(new Circle{x1: 25, y1: 25, x2: 60, y2: 40, data: { custom: 'property'}});
+     * ```
+     * 
      * @param obj - Object to be added.
      */
     insert(obj:ObjectsType): void {
@@ -198,6 +257,20 @@ export class Quadtree<ObjectsType extends Shape|TypedGeometry|RectangleGeometry>
     
     /**
      * Return all objects that could collide with the given geometry.
+     * 
+     * @example Just like insert, you can use any geometry object or Shape instance:
+     * ```typescript 
+     * // 'Anonymous' objects without qtShape are assumed to be RectangleGeometry
+     * tree.retrieve({x: 25, y: 25, width: 10, height: 10});
+     * tree.retrieve({qtShape: Rectangle, x: 25, y: 25, width: 10, height: 10});
+     * tree.retrieve({qtShape: Circle, x: 25, y: 25, r: 10, custom: 'data'});
+     * tree.retrieve({qtShape: Line, x1: 25, y1: 25, x2: 60, y2: 40, custom: 'data'});
+     * // Shape instances
+     * tree.retrieve(new Rectangle{x: 25, y: 25, width: 10, height: 10, data: 'data'});
+     * tree.retrieve(new Circle{x: 25, y: 25, r: 10, data: 512});
+     * tree.retrieve(new Circle{x1: 25, y1: 25, x2: 60, y2: 40, data: { custom: 'property'}});
+     * ```
+     * 
      * @param obj - geometry to be checked
      * @returns Array containing all detected objects.
      */
@@ -224,6 +297,14 @@ export class Quadtree<ObjectsType extends Shape|TypedGeometry|RectangleGeometry>
 
     /**
      * Clear the Quadtree.
+     * 
+     * @example
+     * ```typescript
+     * const tree = new Quadtree({ width: 100, height: 100 });
+     * tree.insert(new Circle{x: 25, y: 25, r: 10});
+     * tree.clear();
+     * console.log(tree); // tree.objects and tree.nodes are empty
+     * ```
      */
     clear(): void {
         

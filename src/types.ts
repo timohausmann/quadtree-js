@@ -1,6 +1,6 @@
-import type { Rectangle, TypedRectangleGeometry } from './Rectangle';
-import type { Circle, TypedCircleGeometry } from './Circle';
-import type { Line, TypedLineGeometry } from './Line';
+import type { Rectangle, TaggedRectangleGeometry } from './Rectangle';
+import type { Circle, TaggedCircleGeometry } from './Circle';
+import type { Line, TaggedLineGeometry } from './Line';
 
 /**
  * All shape classes must implement this interface.
@@ -41,13 +41,13 @@ export interface NodeGeometry {
 }
 
 /**
- * Union type of any object with a valid `qtShape` property.
+ * Union type of geometry objects tagged with a valid `qtShape` property.
  * @beta
  */
-export type TypedGeometry =
-    | TypedRectangleGeometry
-    | TypedCircleGeometry
-    | TypedLineGeometry;
+export type TaggedGeometry =
+    | TaggedRectangleGeometry
+    | TaggedCircleGeometry
+    | TaggedLineGeometry;
 
 /**
 * Union type of all shape classes.

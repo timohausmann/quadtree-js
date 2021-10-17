@@ -33,7 +33,7 @@ export interface CircleGeometry {
  * @remarks
  * This interface represents a circle geometry ment to be inserted to or retrieved from a Quadtree.
  */
-export interface TypedCircleGeometry extends CircleGeometry {
+export interface TaggedCircleGeometry extends CircleGeometry {
 
     /**
      * Shape identifier
@@ -86,18 +86,29 @@ export interface CircleProps<CustomDataType = void> extends CircleGeometry {
  *   name: string
  *   health: number
  * }
- * const circle = new Circle<GameEntity>({ 
+ * const entity: GameEntity = {
+ *   name: 'Jane',
+ *   health: 100,
+ * };
+ * 
+ * // Typescript will infer the type of the data property
+ * const circle1 = new Circle({ 
  *   x: 100, 
  *   y: 100, 
  *   r: 32, 
- *   data: { 
- *     name: 'Jane', 
- *     health: 100,
- *   },
+ *   data: entity,
  * });
+ * 
+ * // You can also pass in a generic type for the data property
+ * const circle2 = new Circle<GameEntity>({ 
+ *   x: 100, 
+ *   y: 100, 
+ *   r: 32,
+ * });
+ * circle2.data = entity;
  * ```
  */
-export class Circle<CustomDataType = void> implements Indexable, CircleGeometry, TypedCircleGeometry {
+export class Circle<CustomDataType = void> implements Indexable, CircleGeometry, TaggedCircleGeometry {
 
     /**
      * Shape identifier.
