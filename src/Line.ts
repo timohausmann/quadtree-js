@@ -18,7 +18,7 @@ export interface LineProps<T> extends LineGeometry {
 /**
  * Class representing a Line
  */
-export class Line<T> implements Indexable, LineProps<T>, TypedLineGeometry {
+export class Line<T = void> implements Indexable, LineGeometry, TypedLineGeometry {
 
     qtShape: typeof Line;
     x1: number;
@@ -39,8 +39,8 @@ export class Line<T> implements Indexable, LineProps<T>, TypedLineGeometry {
     
     /**
      * Determine which quadrant the object belongs to.
-     * @param {NodeGeometry} node   Quadtree node bounds to be checked ({ x, y, width, height })
-     * @return {number[]}           array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
+     * @param node - Quadtree node to be checked
+     * @returns Array containing indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
     getIndex(node:NodeGeometry): number[] {
 
@@ -69,18 +69,21 @@ export class Line<T> implements Indexable, LineProps<T>, TypedLineGeometry {
     }
 
     /**
-     * returns true if a line segment (the first 4 parameters) intersects an axis aligned rectangle (the last 4 parameters)
-     * @todo this is a very naive implementation, it should be improved – fails on corner intersections
-     * @see https://stackoverflow.com/a/18292964/860205
-     * @param {number} x1 line start X
-     * @param {number} y1 line start Y
-     * @param {number} x2 line end X
-     * @param {number} y2 line end Y
-     * @param {number} minX rectangle start X
-     * @param {number} minY rectangle start Y
-     * @param {number} maxX rectangle end X
-     * @param {number} maxY rectangle end Y
-     * @returns {boolean}
+     * check if a line segment (the first 4 parameters) intersects an axis aligned rectangle (the last 4 parameters)
+     * 
+     * @remarks 
+     * There is a bug where detection fails on corner intersections
+     * {@link https://stackoverflow.com/a/18292964/860205}
+     * 
+     * @param x1 - line start X
+     * @param y1 - line start Y
+     * @param x2 - line end X
+     * @param y2 - line end Y
+     * @param minX - rectangle start X
+     * @param minY - rectangle start Y
+     * @param maxX - rectangle end X
+     * @param maxY - rectangle end Y
+     * @returns true if the line segment intersects the axis aligned rectangle
      */
     static intersectRect(x1:number, y1:number, x2:number, y2:number, minX:number, minY:number, maxX:number, maxY:number): boolean {
     

@@ -14,7 +14,8 @@
         "sourceType": "module"
     },
     "plugins": [
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "eslint-plugin-tsdoc"
     ],
     "rules": {
         "indent": [
@@ -33,6 +34,7 @@
             "error",
             "always"
         ],
-        "no-console": "error"
+        "no-console": "error",
+        "tsdoc/syntax": "warn"
     }
 }

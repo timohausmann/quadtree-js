@@ -16,8 +16,8 @@ class Rectangle {
     }
     /**
      * Determine which quadrant the object belongs to.
-     * @param {NodeGeometry} node   Quadtree node bounds to be checked ({ x, y, width, height })
-     * @return {number[]}           array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
+     * @param node - Quadtree node to be checked
+     * @returns Array containing indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
     getIndex(node) {
         const indexes = [], boundsCenterX = node.x + (node.width / 2), boundsCenterY = node.y + (node.height / 2);
@@ -43,38 +43,46 @@ class Rectangle {
 }
 
 /**
- * Class representing a Quadtree node
+ * Class representing a Quadtree node.
  */
 class Quadtree {
     /**
      * Quadtree Constructor
-     * @class Quadtree
-     * @param {QuadtreeProps} bounds       bounds of the node ({ x, y, width, height })
-     * @param {number} [max_objects=10]    (optional) max objects a node can hold before splitting into 4 subnodes (default: 10)
-     * @param {number} [max_levels=4]      (optional) total max levels inside root Quadtree (default: 4)
-     * @param {number} [level=0]           (optional) depth level, required for subnodes (default: 0)
+     * @param props - bounds and properties of the node
+     * @param level - depth level, required for subnodes
      */
-    constructor(bounds, max_objects = 10, max_levels = 4, level = 0) {
-        this.bounds = Object.assign({ x: 0, y: 0 }, bounds);
-        this.max_objects = max_objects;
-        this.max_levels = max_levels;
+    constructor(props, level = 0) {
+        this.bounds = {
+            x: props.x || 0,
+            y: props.y || 0,
+            width: props.width,
+            height: props.height,
+        };
+        this.maxObjects = (typeof props.maxObjects === 'number') ? props.maxObjects : 10;
+        this.maxLevels = (typeof props.maxLevels === 'number') ? props.maxLevels : 4;
         this.level = level;
         this.objects = [];
         this.nodes = [];
     }
     /**
-     * Get the subnode indexes an object belongs to
-     * @param {Primitive|TypedGeometry} obj    object to be checked
-     * @return {number[]}                      array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
+     * Get the subnode indexes an object belongs to.
+     *
+     * @remarks
+     * Objects that are no Shape instance and have no `qtShape` property are assumed to be a `RectangleGeometry`.
+     * This is a) for ease of use and b) backwards compability with quadtree-js v1.
+     * Removing this check and support for 'anonymous' rectangle objects could be a performance improvement though.
+     * This could be done by overriding `Quadtree.getIndex` with a higher order class or helper function.
+     *
+     * @param obj - object to be checked
+     * @returns Array containing indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right).
      */
     getIndex(obj) {
-        var _a;
         //getIndex via qtShape or fallback to Rectangle.getIndex
-        const getIndex = ((_a = obj.qtShape) === null || _a === void 0 ? void 0 : _a.prototype.getIndex) || Rectangle.prototype.getIndex;
+        const getIndex = 'qtShape' in obj ? obj.qtShape.prototype.getIndex : Rectangle.prototype.getIndex;
         return getIndex.call(obj, this.bounds);
     }
     /**
-     * Split the node into 4 subnodes
+     * Split the node into 4 subnodes.
      */
     split() {
         const level = this.level + 1, width = this.bounds.width / 2, height = this.bounds.height / 2, x = this.bounds.x, y = this.bounds.y;
@@ -90,14 +98,16 @@ class Quadtree {
                 y: coords[i].y,
                 width,
                 height,
-            }, this.max_objects, this.max_levels, level);
+                maxObjects: this.maxObjects,
+                maxLevels: this.maxLevels,
+            }, level);
         }
     }
     /**
      * Insert an object into the node. If the node
      * exceeds the capacity, it will split and add all
      * objects to their corresponding subnodes.
-     * @param {Primitive|TypedGeometry} obj    object to be added
+     * @param obj - Object to be added.
      */
     insert(obj) {
         //if we have subnodes, call insert on matching subnodes
@@ -110,8 +120,8 @@ class Quadtree {
         }
         //otherwise, store object here
         this.objects.push(obj);
-        //max_objects reached
-        if (this.objects.length > this.max_objects && this.level < this.max_levels) {
+        //maxObjects reached
+        if (this.objects.length > this.maxObjects && this.level < this.maxLevels) {
             //split if we don't already have subnodes
             if (!this.nodes.length) {
                 this.split();
@@ -128,9 +138,9 @@ class Quadtree {
         }
     }
     /**
-     * Return all objects that could collide with the given object
-     * @param {Primitive|TypedGeometry} obj    object to be checked
-     * @return {(Primitive|TypedGeometry)[]}   array with all detected objects
+     * Return all objects that could collide with the given geometry.
+     * @param obj - geometry to be checked
+     * @returns Array containing all detected objects.
      */
     retrieve(obj) {
         const indexes = this.getIndex(obj);
@@ -148,7 +158,7 @@ class Quadtree {
         return returnObjects;
     }
     /**
-     * Clear the quadtree
+     * Clear the Quadtree.
      */
     clear() {
         this.objects = [];
@@ -162,9 +172,54 @@ class Quadtree {
 }
 
 /**
- * Class representing a Circle
+ * Class representing a Circle.
+ * @typeParam CustomDataType - Type of the custom data property (optional).
+ *
+ * @example Without custom data (JS/TS):
+ * ```typescript
+ * const circle = new Circle({
+ *   x: 100,
+ *   y: 100,
+ *   r: 32,
+ * });
+ * ```
+ *
+ * @example With custom data (JS):
+ * ```javascript
+ * const circle = new Circle({
+ *   x: 100,
+ *   y: 100,
+ *   r: 32,
+ *   data: {
+ *     name: 'Jane',
+ *     health: 100,
+ *   },
+ * });
+ * ```
+ *
+ * @example With custom data (TS):
+ * ```typescript
+ * interface GameEntity {
+ *   name: string
+ *   health: number
+ * }
+ * const circle = new Circle<GameEntity>({
+ *   x: 100,
+ *   y: 100,
+ *   r: 32,
+ *   data: {
+ *     name: 'Jane',
+ *     health: 100,
+ *   },
+ * });
+ * ```
  */
 class Circle {
+    /**
+     * Circle Constructor
+     * @param props - Circle properties
+     * @typeParam CustomDataType - Type of the custom data property (optional, use with class constructor).
+     */
     constructor(props) {
         this.qtShape = Circle;
         this.x = props.x;
@@ -173,9 +228,9 @@ class Circle {
         this.data = props.data;
     }
     /**
-     * Determine which quadrant the object belongs to.
-     * @param {NodeGeometry} node   Quadtree node bounds to be checked ({ x, y, width, height })
-     * @return {number[]}           array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
+     * Determine which quadrant this circle belongs to.
+     * @param node - Quadtree node to be checked
+     * @returns Array containing indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
     getIndex(node) {
         const indexes = [], w2 = node.width / 2, h2 = node.height / 2, x2 = node.x + w2, y2 = node.y + h2;
@@ -195,16 +250,16 @@ class Circle {
         return indexes;
     }
     /**
-     * returns true if a circle intersects an axis aligned rectangle
+     * Check if a circle intersects an axis aligned rectangle.
      * @see https://yal.cc/rectangle-circle-intersection-test/
-     * @param {number} x circle center X
-     * @param {number} y circle center Y
-     * @param {number} r circle radius
-     * @param {number} minX rectangle start X
-     * @param {number} minY rectangle start Y
-     * @param {number} maxX rectangle end X
-     * @param {number} maxY rectangle end Y
-     * @returns {boolean}
+     * @param x - circle center X
+     * @param y - circle center Y
+     * @param r - circle radius
+     * @param minX - rectangle start X
+     * @param minY - rectangle start Y
+     * @param maxX - rectangle end X
+     * @param maxY - rectangle end Y
+     * @returns true if circle intersects rectangle
      */
     static intersectRect(x, y, r, minX, minY, maxX, maxY) {
         const deltaX = x - Math.max(minX, Math.min(x, maxX));
@@ -227,8 +282,8 @@ class Line {
     }
     /**
      * Determine which quadrant the object belongs to.
-     * @param {NodeGeometry} node   Quadtree node bounds to be checked ({ x, y, width, height })
-     * @return {number[]}           array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
+     * @param node - Quadtree node to be checked
+     * @returns Array containing indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
     getIndex(node) {
         const indexes = [], w2 = node.width / 2, h2 = node.height / 2, x2 = node.x + w2, y2 = node.y + h2;
@@ -248,18 +303,21 @@ class Line {
         return indexes;
     }
     /**
-     * returns true if a line segment (the first 4 parameters) intersects an axis aligned rectangle (the last 4 parameters)
-     * @todo this is a very naive implementation, it should be improved – fails on corner intersections
-     * @see https://stackoverflow.com/a/18292964/860205
-     * @param {number} x1 line start X
-     * @param {number} y1 line start Y
-     * @param {number} x2 line end X
-     * @param {number} y2 line end Y
-     * @param {number} minX rectangle start X
-     * @param {number} minY rectangle start Y
-     * @param {number} maxX rectangle end X
-     * @param {number} maxY rectangle end Y
-     * @returns {boolean}
+     * check if a line segment (the first 4 parameters) intersects an axis aligned rectangle (the last 4 parameters)
+     *
+     * @remarks
+     * There is a bug where detection fails on corner intersections
+     * {@link https://stackoverflow.com/a/18292964/860205}
+     *
+     * @param x1 - line start X
+     * @param y1 - line start Y
+     * @param x2 - line end X
+     * @param y2 - line end Y
+     * @param minX - rectangle start X
+     * @param minY - rectangle start Y
+     * @param maxX - rectangle end X
+     * @param maxY - rectangle end Y
+     * @returns true if the line segment intersects the axis aligned rectangle
      */
     static intersectRect(x1, y1, x2, y2, minX, minY, maxX, maxY) {
         // Completely outside

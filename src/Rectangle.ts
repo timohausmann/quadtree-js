@@ -18,7 +18,7 @@ export interface RectangleProps<T> extends RectangleGeometry {
 /**
  * Class representing a Rectangle
  */
-export class Rectangle<T> implements Indexable, RectangleProps<T>, TypedRectangleGeometry {
+export class Rectangle<T = void> implements Indexable, RectangleGeometry, TypedRectangleGeometry {
 
     qtShape: typeof Rectangle;
     x: number;
@@ -39,8 +39,8 @@ export class Rectangle<T> implements Indexable, RectangleProps<T>, TypedRectangl
     
     /**
      * Determine which quadrant the object belongs to.
-     * @param {NodeGeometry} node   Quadtree node bounds to be checked ({ x, y, width, height })
-     * @return {number[]}           array of indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
+     * @param node - Quadtree node to be checked
+     * @returns Array containing indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
     getIndex(node:NodeGeometry): number[] {
         

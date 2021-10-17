@@ -1,13 +1,17 @@
-# quadtree-js
+# quadtree-js 2.0.0-beta.1
 
-## Pre-Relase Branch
+## Please note: this is a beta release.
+
+**If you experience problems** please [raise an issue](https://github.com/timohausmann/quadtree-js/issues) and [use v1 in the meantime](https://github.com/timohausmann/quadtree-js/tree/064e56bfd9c3ef2c6ba9fa5f911a4e9cf61493a8).
 
 ### Todos
 
-* Update readme
+* Add integrity hash to script tags
 * Update and publish jsdoc/tsdoc
 * Add explanations to primitives example
 * Publish to npm
+* Add module to retrieve nodes and objects
+* Add module to update objects
 
 This Javascript Quadtree Library can store and retrieve Rectangles, Circles and Lines in a recursive 2D Quadtree. Every Quadtree node can hold a maximum number of objects before it splits into four subnodes. Objects are only stored on leaf nodes (the lowest level). If an object overlaps into multiple leaf nodes, a reference to the object is stored in each node. 
 
@@ -41,7 +45,7 @@ import { Quadtree } from '@timohausmann/quadtree-js';
 const { Quadtree } = require('@timohausmann/quadtree-js');
 ```
 
-Alternatively, [download the source](https://github.com/timohausmann/quadtree-js/archive/master.zip) and include it the old-fashioned way, or use an awesome CDN like [jsdelivr](https://www.jsdelivr.com/package/npm/@timohausmann/quadtree-js) or [unpkg](https://unpkg.com/browse/@timohausmann/quadtree-js@latest/):
+Alternatively, [download the source](https://github.com/timohausmann/quadtree-js/archive/master.zip) and include it the old-fashioned way, or use an awesome CDN like [jsdelivr](https://www.jsdelivr.com/package/npm/@timohausmann/quadtree-js) or [unpkg](https://unpkg.com/browse/@timohausmann/quadtree-js@latest/). (If you only need Rectangles and want to save some bytes, use `quadtree.umd.basic.js` instead):
 
 ```html
 <!-- self-hosted -->
@@ -239,6 +243,10 @@ For legacy browser support, please download a [1.x version](https://github.com/t
 * Added dedicated bundle files for CJS, EMS and UMD
 * Added Unit Tests with Jest
 * Added ESLint
+
+### 1.2.5
+
+* Typescript Definition File Bugfix (thanks to [pietrovismara](https://github.com/timohausmann/quadtree-js/pull/18))
 
 ### 1.2.4
 
