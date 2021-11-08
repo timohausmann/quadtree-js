@@ -6,7 +6,7 @@ export { Line } from './Line';
 
 //Typedoc
 export type { QuadtreeProps } from './Quadtree';
-export type { CircleProps, CircleGeometry, TaggedCircleGeometry } from './Circle';
-export type { LineProps, LineGeometry, TaggedLineGeometry } from './Line';
-export type { RectangleProps, RectangleGeometry, TaggedRectangleGeometry } from './Rectangle';
-export type { NodeGeometry, Indexable, TaggedGeometry, Shape } from './types';
+export type { CircleProps, CircleGeometry } from './Circle';
+export type { LineProps, LineGeometry } from './Line';
+export type { RectangleProps, RectangleGeometry } from './Rectangle';
+export type { NodeGeometry, Indexable } from './types';

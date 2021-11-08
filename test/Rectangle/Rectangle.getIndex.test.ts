@@ -1,60 +1,59 @@
 import { Rectangle } from '../../src/Rectangle';
 
-describe('Rectangle.getIndex', () => {
+describe('Rectangle.prototype.qtIndex', () => {
 
     test('is a function', () => {
-        const rect = new Rectangle({ x: 20, y: 40, width: 100, height: 100 });
-        expect(typeof rect.getIndex).toBe('function');
+        expect(typeof Rectangle.prototype.qtIndex).toBe('function');
     });
 
     test('returns an array', () => {
-        const rect = new Rectangle({ x: 20, y: 40, width: 100, height: 100 });
-        expect(Array.isArray(rect.getIndex({x: 0, y: 0, width: 0, height: 0}))).toBe(true);
+        const rect = new Rectangle({ x: 75, y: 0, width: 10, height: 10 });
+        expect(Array.isArray(rect.qtIndex({x: 0, y: 0, width: 0, height: 0}))).toBe(true);
     });
 
     test('identifies quadrant top right', () => {
         const rect = new Rectangle({ x: 75, y: 0, width: 10, height: 10 });
-        expect(rect.getIndex({x: 0, y: 0, width: 100, height: 100})).toEqual([0]);
+        expect(rect.qtIndex({x: 0, y: 0, width: 100, height: 100})).toEqual([0]);
     });
 
     test('identifies quadrant top left', () => {
         const rect = new Rectangle({ x: 25, y: 0, width: 10, height: 10 });
-        expect(rect.getIndex({x: 0, y: 0, width: 100, height: 100})).toEqual([1]);
+        expect(rect.qtIndex({x: 0, y: 0, width: 100, height: 100})).toEqual([1]);
     });
 
     test('identifies quadrant bottom left', () => {
         const rect = new Rectangle({ x: 25, y: 75, width: 10, height: 10 });
-        expect(rect.getIndex({x: 0, y: 0, width: 100, height: 100})).toEqual([2]);
+        expect(rect.qtIndex({x: 0, y: 0, width: 100, height: 100})).toEqual([2]);
     });
 
     test('identifies quadrant bottom right', () => {
         const rect = new Rectangle({ x: 75, y: 75, width: 10, height: 10 });
-        expect(rect.getIndex({x: 0, y: 0, width: 100, height: 100})).toEqual([3]);
+        expect(rect.qtIndex({x: 0, y: 0, width: 100, height: 100})).toEqual([3]);
     });
 
     test('identifies overlapping top', () => {
         const rect = new Rectangle({ x: 0, y: 0, width: 100, height: 10 });
-        expect(rect.getIndex({x: 0, y: 0, width: 100, height: 100})).toEqual([0, 1]);
+        expect(rect.qtIndex({x: 0, y: 0, width: 100, height: 100})).toEqual([0, 1]);
     });
 
     test('identifies overlapping bottom', () => {
         const rect = new Rectangle({ x: 0, y: 90, width: 100, height: 10 });
-        expect(rect.getIndex({x: 0, y: 0, width: 100, height: 100})).toEqual([2, 3]);
+        expect(rect.qtIndex({x: 0, y: 0, width: 100, height: 100})).toEqual([2, 3]);
     });
 
     test('identifies overlapping left', () => {
         const rect = new Rectangle({ x: 0, y: 0, width: 10, height: 100 });
-        expect(rect.getIndex({x: 0, y: 0, width: 100, height: 100})).toEqual([1, 2]);
+        expect(rect.qtIndex({x: 0, y: 0, width: 100, height: 100})).toEqual([1, 2]);
     });
 
     test('identifies overlapping right', () => {
         const rect = new Rectangle({ x: 90, y: 0, width: 10, height: 100 });
-        expect(rect.getIndex({x: 0, y: 0, width: 100, height: 100})).toEqual([0, 3]);
+        expect(rect.qtIndex({x: 0, y: 0, width: 100, height: 100})).toEqual([0, 3]);
     });
 
     test('identifies all', () => {
         const rect = new Rectangle({ x: 25, y: 25, width: 50, height: 50 });
-        expect(rect.getIndex({x: 0, y: 0, width: 100, height: 100})).toEqual([0, 1, 2, 3]);
+        expect(rect.qtIndex({x: 0, y: 0, width: 100, height: 100})).toEqual([0, 1, 2, 3]);
     });
 
     test('identifies edge', () => {
@@ -69,15 +68,15 @@ describe('Rectangle.getIndex', () => {
         // -----|-----
         //      |▮ <-- only in bottom right quadrant
         //      |
-        expect(topLeft.getIndex(node)).toEqual([1]);
-        expect(bottomRight.getIndex(node)).toEqual([3]);
+        expect(topLeft.qtIndex(node)).toEqual([1]);
+        expect(bottomRight.qtIndex(node)).toEqual([3]);
 
         const smallest = 0.0000000000001;
         topLeft.x += smallest;
         topLeft.y += smallest;
         bottomRight.x -= smallest;
         bottomRight.y -= smallest;
-        expect(topLeft.getIndex(node)).toEqual([0, 1, 2, 3]);
-        expect(bottomRight.getIndex(node)).toEqual([0, 1, 2, 3]);
+        expect(topLeft.qtIndex(node)).toEqual([0, 1, 2, 3]);
+        expect(bottomRight.qtIndex(node)).toEqual([0, 1, 2, 3]);
     });
 });

@@ -1,4 +1,5 @@
 import { Quadtree } from '../../src/Quadtree';
+import { Rectangle } from '../../src/Rectangle';
 
 describe('Quadtree.getIndex', () => {
 
@@ -9,10 +10,11 @@ describe('Quadtree.getIndex', () => {
 
     test('returns an array', () => {
         const tree = new Quadtree({ width: 100, height: 100 });
-        expect(Array.isArray(tree.getIndex({x: 0, y: 0, width: 0, height: 0}))).toBe(true);
+        const rect = new Rectangle({ x: 0, y: 0, width: 100, height: 100 });
+        expect(Array.isArray(tree.getIndex(rect))).toBe(true);
     });
 
-    test('can handle anonymous objects (falls back to Rectangle)', () => {
+    /*test('can handle anonymous objects (falls back to Rectangle)', () => {
         
         const tree = new Quadtree({ width: 100, height: 100 });
         const rect = { x: 75, y: 25, width: 10, height: 10 };
@@ -36,5 +38,5 @@ describe('Quadtree.getIndex', () => {
         rect.x = 45;
         rect.y = 45;
         expect(tree.getIndex(rect)).toEqual([0, 1, 2, 3]);
-    });
+    });*/
 });

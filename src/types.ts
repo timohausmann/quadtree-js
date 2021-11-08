@@ -1,7 +1,3 @@
-import type { Rectangle, TaggedRectangleGeometry } from './Rectangle';
-import type { Circle, TaggedCircleGeometry } from './Circle';
-import type { Line, TaggedLineGeometry } from './Line';
-
 /**
  * All shape classes must implement this interface.
  */
@@ -12,7 +8,7 @@ export interface Indexable {
      * @param node - Quadtree node to be checked
      * @returns Array containing indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
-    getIndex(node: NodeGeometry): number[]
+    qtIndex(node: NodeGeometry): number[]
 }
 
 /**
@@ -39,21 +35,3 @@ export interface NodeGeometry {
      */
     height: number
 }
-
-/**
- * Union type of geometry objects tagged with a valid `qtShape` property.
- * @beta
- */
-export type TaggedGeometry =
-    | TaggedRectangleGeometry
-    | TaggedCircleGeometry
-    | TaggedLineGeometry;
-
-/**
-* Union type of all shape classes.
-* @beta
-*/
-export type Shape =
-    | Rectangle
-    | Line
-    | Circle;

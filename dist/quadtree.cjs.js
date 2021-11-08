@@ -3,53 +3,36 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 /**
- * Class representing a Rectangle
- */
-class Rectangle {
-    constructor(props) {
-        this.qtShape = Rectangle;
-        this.x = props.x;
-        this.y = props.y;
-        this.width = props.width;
-        this.height = props.height;
-        this.data = props.data;
-    }
-    /**
-     * Determine which quadrant the object belongs to.
-     * @param node - Quadtree node to be checked
-     * @returns Array containing indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
-     */
-    getIndex(node) {
-        const indexes = [], boundsCenterX = node.x + (node.width / 2), boundsCenterY = node.y + (node.height / 2);
-        const startIsNorth = this.y < boundsCenterY, startIsWest = this.x < boundsCenterX, endIsEast = this.x + this.width > boundsCenterX, endIsSouth = this.y + this.height > boundsCenterY;
-        //top-right quad
-        if (startIsNorth && endIsEast) {
-            indexes.push(0);
-        }
-        //top-left quad
-        if (startIsWest && startIsNorth) {
-            indexes.push(1);
-        }
-        //bottom-left quad
-        if (startIsWest && endIsSouth) {
-            indexes.push(2);
-        }
-        //bottom-right quad
-        if (endIsEast && endIsSouth) {
-            indexes.push(3);
-        }
-        return indexes;
-    }
-}
-
-/**
  * Class representing a Quadtree node.
+ *
+ * @example
+ * ```typescript
+ * const tree = new Quadtree({
+ *   width: 100,
+ *   height: 100,
+ *   x: 0,           // optional, default:  0
+ *   y: 0,           // optional, default:  0
+ *   maxObjects: 10, // optional, default: 10
+ *   maxLevels: 4,   // optional, default:  4
+ * });
+ * ```
+ *
+ * @example Typescript: If you like to be explicit, you optionally can pass in a generic type for objects to be stored in the Quadtree:
+ * ```typescript
+ * class GameEntity extends Rectangle {
+ *   ...
+ * }
+ * const tree = new Quadtree<GameEntity>({
+ *   width: 100,
+ *   height: 100,
+ * });
+ * ```
  */
 class Quadtree {
     /**
      * Quadtree Constructor
      * @param props - bounds and properties of the node
-     * @param level - depth level, required for subnodes
+     * @param level - depth level (internal use only, required for subnodes)
      */
     constructor(props, level = 0) {
         this.bounds = {
@@ -65,24 +48,32 @@ class Quadtree {
         this.nodes = [];
     }
     /**
-     * Get the subnode indexes an object belongs to.
+     * Get the quadrant (subnode indexes) an object belongs to.
      *
-     * @remarks
-     * Objects that are no Shape instance and have no `qtShape` property are assumed to be a `RectangleGeometry`.
-     * This is a) for ease of use and b) backwards compability with quadtree-js v1.
-     * Removing this check and support for 'anonymous' rectangle objects could be a performance improvement though.
-     * This could be done by overriding `Quadtree.getIndex` with a higher order class or helper function.
+     * @example Mostly for internal use but you can call it like so:
+     * ```typescript
+     * const tree = new Quadtree({ width: 100, height: 100 });
+     * const rectangle = new Rectangle({ x: 25, y: 25, width: 10, height: 10 });
+     * const indexes = tree.getIndex(rectangle);
+     * console.log(indexes); // [1]
+     * ```
      *
      * @param obj - object to be checked
      * @returns Array containing indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right).
      */
     getIndex(obj) {
-        //getIndex via qtShape or fallback to Rectangle.getIndex
-        const getIndex = 'qtShape' in obj ? obj.qtShape.prototype.getIndex : Rectangle.prototype.getIndex;
-        return getIndex.call(obj, this.bounds);
+        return obj.qtIndex(this.bounds);
     }
     /**
      * Split the node into 4 subnodes.
+     * @internal
+     *
+     * @example Mostly for internal use! You should only call this yourself if you know what you are doing:
+     * ```typescript
+     * const tree = new Quadtree({ width: 100, height: 100 });
+     * tree.split();
+     * console.log(tree); // now tree has four subnodes
+     * ```
      */
     split() {
         const level = this.level + 1, width = this.bounds.width / 2, height = this.bounds.height / 2, x = this.bounds.x, y = this.bounds.y;
@@ -107,6 +98,15 @@ class Quadtree {
      * Insert an object into the node. If the node
      * exceeds the capacity, it will split and add all
      * objects to their corresponding subnodes.
+     *
+     * @example you can use any shape here (or object with a qtIndex method, see README):
+     * ```typescript
+     * const tree = new Quadtree({ width: 100, height: 100 });
+     * tree.insert(new Rectangle({ x: 25, y: 25, width: 10, height: 10, data: 'data' }));
+     * tree.insert(new Circle({ x: 25, y: 25, r: 10, data: 512 }));
+     * tree.insert(new Line({ x1: 25, y1: 25, x2: 60, y2: 40, data: { custom: 'property'} }));
+     * ```
+     *
      * @param obj - Object to be added.
      */
     insert(obj) {
@@ -139,6 +139,14 @@ class Quadtree {
     }
     /**
      * Return all objects that could collide with the given geometry.
+     *
+     * @example Just like insert, you can use any shape here (or object with a qtIndex method, see README):
+     * ```typescript
+     * tree.retrieve(new Rectangle({ x: 25, y: 25, width: 10, height: 10, data: 'data' }));
+     * tree.retrieve(new Circle({ x: 25, y: 25, r: 10, data: 512 }));
+     * tree.retrieve(new Line({ x1: 25, y1: 25, x2: 60, y2: 40, data: { custom: 'property'} }));
+     * ```
+     *
      * @param obj - geometry to be checked
      * @returns Array containing all detected objects.
      */
@@ -159,6 +167,14 @@ class Quadtree {
     }
     /**
      * Clear the Quadtree.
+     *
+     * @example
+     * ```typescript
+     * const tree = new Quadtree({ width: 100, height: 100 });
+     * tree.insert(new Circle({ x: 25, y: 25, r: 10 }));
+     * tree.clear();
+     * console.log(tree); // tree.objects and tree.nodes are empty
+     * ```
      */
     clear() {
         this.objects = [];
@@ -172,8 +188,183 @@ class Quadtree {
 }
 
 /**
+ * Class representing a Rectangle
+ * @typeParam CustomDataType - Type of the custom data property (optional, inferred automatically).
+ *
+ * @example Without custom data (JS/TS):
+ * ```typescript
+ * const rectangle = new Rectangle({
+ *   x: 10,
+ *   y: 20,
+ *   width: 30,
+ *   height: 40,
+ * });
+ * ```
+ *
+ * @example With custom data (JS/TS):
+ * ```javascript
+ * const rectangle = new Rectangle({
+ *   x: 10,
+ *   y: 20,
+ *   width: 30,
+ *   height: 40,
+ *   data: {
+ *     name: 'Jane',
+ *     health: 100,
+ *   },
+ * });
+ * ```
+ *
+ * @example With custom data (TS):
+ * ```typescript
+ * interface ObjectData {
+ *   name: string
+ *   health: number
+ * }
+ * const entity: ObjectData = {
+ *   name: 'Jane',
+ *   health: 100,
+ * };
+ *
+ * // Typescript will infer the type of the data property
+ * const rectangle1 = new Rectangle({
+ *   x: 10,
+ *   y: 20,
+ *   width: 30,
+ *   height: 40,
+ *   data: entity,
+ * });
+ *
+ * // You can also pass in a generic type for the data property
+ * const rectangle2 = new Rectangle<ObjectData>({
+ *   x: 10,
+ *   y: 20,
+ *   width: 30,
+ *   height: 40,
+ * });
+ * rectangle2.data = entity;
+ * ```
+ *
+ * @example With custom class extending Rectangle (implements {@link RectangleGeometry} (x, y, width, height)):
+ * ```javascript
+ * // extending inherits the qtIndex method
+ * class Box extends Rectangle {
+ *
+ *   constructor(props) {
+ *     // call super to set x, y, width, height (and data, if given)
+ *     super(props);
+ *     this.content = props.content;
+ *   }
+ * }
+ *
+ * const box = new Box({
+ *   content: 'Gravity Boots',
+ *   x: 10,
+ *   y: 20,
+ *   width: 30,
+ *   height: 40,
+ * });
+ * ```
+ *
+ * @example With custom class and mapping {@link RectangleGeometry}:
+ * ```javascript
+ * // no need to extend if you don't implement RectangleGeometry
+ * class Box {
+ *
+ *   constructor(content) {
+ *     this.content = content;
+ *     this.position = [10, 20];
+ *     this.size = [30, 40];
+ *   }
+ *
+ *   // add a qtIndex method to your class
+ *   qtIndex(node) {
+ *     // map your properties to RectangleGeometry
+ *     return Rectangle.prototype.qtIndex.call({
+ *       x: this.position[0],
+ *       y: this.position[1],
+ *       width: this.size[0],
+ *       height: this.size[1],
+ *     }, node);
+ *   }
+ * }
+ *
+ * const box = new Box('Gravity Boots');
+ * ```
+ *
+ * @example With custom object that implements {@link RectangleGeometry}:
+ * ```javascript
+ * const player = {
+ *   name: 'Jane',
+ *   health: 100,
+ *   x: 10,
+ *   y: 20,
+ *   width: 30,
+ *   height: 30,
+ *   qtIndex: Rectangle.prototype.qtIndex,
+ * });
+ * ```
+ *
+ * @example With custom object and mapping {@link RectangleGeometry}:
+ * ```javascript
+ * // Note: this is not recommended but possible.
+ * // Using this technique, each object would have it's own qtIndex method.
+ * // Rather add qtIndex to your prototype, e.g. by using classes like shown above.
+ * const player = {
+ *   name: 'Jane',
+ *   health: 100,
+ *   position: [10, 20],
+ *   size: [30, 40],
+ *   qtIndex: function(node) {
+ *     return Rectangle.prototype.qtIndex.call({
+ *       x: this.position[0],
+ *       y: this.position[1],
+ *       width: this.size[0],
+ *       height: this.size[1],
+ *     }, node);
+ *   },
+ * });
+ * ```
+ */
+class Rectangle {
+    constructor(props) {
+        this.x = props.x;
+        this.y = props.y;
+        this.width = props.width;
+        this.height = props.height;
+        this.data = props.data;
+    }
+    /**
+     * Determine which quadrant this rectangle belongs to.
+     * @param node - Quadtree node to be checked
+     * @returns Array containing indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
+     */
+    qtIndex(node) {
+        const indexes = [], boundsCenterX = node.x + (node.width / 2), boundsCenterY = node.y + (node.height / 2);
+        const startIsNorth = this.y < boundsCenterY, startIsWest = this.x < boundsCenterX, endIsEast = this.x + this.width > boundsCenterX, endIsSouth = this.y + this.height > boundsCenterY;
+        //top-right quad
+        if (startIsNorth && endIsEast) {
+            indexes.push(0);
+        }
+        //top-left quad
+        if (startIsWest && startIsNorth) {
+            indexes.push(1);
+        }
+        //bottom-left quad
+        if (startIsWest && endIsSouth) {
+            indexes.push(2);
+        }
+        //bottom-right quad
+        if (endIsEast && endIsSouth) {
+            indexes.push(3);
+        }
+        return indexes;
+    }
+}
+
+/**
  * Class representing a Circle.
- * @typeParam CustomDataType - Type of the custom data property (optional).
+ * @typeParam CustomDataType - Type of the custom data property (optional, inferred automatically).
  *
  * @example Without custom data (JS/TS):
  * ```typescript
@@ -184,7 +375,7 @@ class Quadtree {
  * });
  * ```
  *
- * @example With custom data (JS):
+ * @example With custom data (JS/TS):
  * ```javascript
  * const circle = new Circle({
  *   x: 100,
@@ -199,17 +390,105 @@ class Quadtree {
  *
  * @example With custom data (TS):
  * ```typescript
- * interface GameEntity {
+ * interface ObjectData {
  *   name: string
  *   health: number
  * }
- * const circle = new Circle<GameEntity>({
+ * const entity: ObjectData = {
+ *   name: 'Jane',
+ *   health: 100,
+ * };
+ *
+ * // Typescript will infer the type of the data property
+ * const circle1 = new Circle({
  *   x: 100,
  *   y: 100,
  *   r: 32,
- *   data: {
- *     name: 'Jane',
- *     health: 100,
+ *   data: entity,
+ * });
+ *
+ * // You can also pass in a generic type for the data property
+ * const circle2 = new Circle<ObjectData>({
+ *   x: 100,
+ *   y: 100,
+ *   r: 32,
+ * });
+ * circle2.data = entity;
+ * ```
+ *
+ * @example With custom class extending Circle (implements {@link CircleGeometry} (x, y, r)):
+ * ```javascript
+ * // extending inherits the qtIndex method
+ * class Bomb extends Circle {
+ *
+ *   constructor(props) {
+ *     // call super to set x, y, r (and data, if given)
+ *     super(props);
+ *     this.countdown = props.countdown;
+ *   }
+ * }
+ *
+ * const bomb = new Bomb({
+ *   countdown: 5,
+ *   x: 10,
+ *   y: 20,
+ *   r: 30,
+ * });
+ * ```
+ *
+ * @example With custom class and mapping {@link CircleGeometry}:
+ * ```javascript
+ * // no need to extend if you don't implement CircleGeometry
+ * class Bomb {
+ *
+ *   constructor(countdown) {
+ *     this.countdown = countdown;
+ *     this.position = [10, 20];
+ *     this.radius = 30;
+ *   }
+ *
+ *   // add a qtIndex method to your class
+ *   qtIndex(node) {
+ *     // map your properties to CircleGeometry
+ *     return Circle.prototype.qtIndex.call({
+ *       x: this.position[0],
+ *       y: this.position[1],
+ *       r: this.radius,
+ *     }, node);
+ *   }
+ * }
+ *
+ * const bomb = new Bomb(5);
+ * ```
+ *
+ * @example With custom object that implements {@link CircleGeometry}:
+ * ```javascript
+ * const player = {
+ *   name: 'Jane',
+ *   health: 100,
+ *   x: 10,
+ *   y: 20,
+ *   r: 30,
+ *   qtIndex: Circle.prototype.qtIndex,
+ * });
+ * ```
+ *
+ * @example With custom object and mapping {@link CircleGeometry}:
+ * ```javascript
+ * // Note: this is not recommended but possible.
+ * // Using this technique, each object would have it's own qtIndex method.
+ * // Rather add qtIndex to your prototype, e.g. by using classes like shown above.
+ * const player = {
+ *   name: 'Jane',
+ *   health: 100,
+ *   position: [10, 20],
+ *   radius: 30,
+ *   qtIndex: function(node) {
+ *     return Circle.prototype.qtIndex.call({
+ *       x: this.position[0],
+ *       y: this.position[1],
+ *       r: this.radius,
+ *     }, node);
  *   },
  * });
  * ```
@@ -218,10 +497,9 @@ class Circle {
     /**
      * Circle Constructor
      * @param props - Circle properties
-     * @typeParam CustomDataType - Type of the custom data property (optional, use with class constructor).
+     * @typeParam CustomDataType - Type of the custom data property (optional, inferred automatically).
      */
     constructor(props) {
-        this.qtShape = Circle;
         this.x = props.x;
         this.y = props.y;
         this.r = props.r;
@@ -229,10 +507,11 @@ class Circle {
     }
     /**
      * Determine which quadrant this circle belongs to.
+     * @beta this seems slow
      * @param node - Quadtree node to be checked
      * @returns Array containing indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
-    getIndex(node) {
+    qtIndex(node) {
         const indexes = [], w2 = node.width / 2, h2 = node.height / 2, x2 = node.x + w2, y2 = node.y + h2;
         //an array of node origins where the array index equals the node index
         const nodes = [
@@ -251,6 +530,7 @@ class Circle {
     }
     /**
      * Check if a circle intersects an axis aligned rectangle.
+     * @beta
      * @see https://yal.cc/rectangle-circle-intersection-test/
      * @param x - circle center X
      * @param y - circle center Y
@@ -260,6 +540,22 @@ class Circle {
      * @param maxX - rectangle end X
      * @param maxY - rectangle end Y
      * @returns true if circle intersects rectangle
+     *
+     * @example Check if a circle intersects a rectangle:
+     * ```javascript
+     * const circ = { x: 10, y: 20, r: 30 };
+     * const rect = { x: 40, y: 50, width: 60, height: 70 };
+     * const intersect = Circle.intersectRect(
+     *   circ.x,
+     *   circ.y,
+     *   circ.r,
+     *   rect.x,
+     *   rect.y,
+     *   rect.x + rect.width,
+     *   rect.y + rect.height,
+     * );
+     * console.log(circle, rect, 'intersect?', intersect);
+     * ```
      */
     static intersectRect(x, y, r, minX, minY, maxX, maxY) {
         const deltaX = x - Math.max(minX, Math.min(x, maxX));
@@ -270,10 +566,150 @@ class Circle {
 
 /**
  * Class representing a Line
+ * @typeParam CustomDataType - Type of the custom data property (optional, inferred automatically).
+ *
+ * @example Without custom data (JS/TS):
+ * ```typescript
+ * const line = new Line({
+ *   x1: 10,
+ *   y1: 20,
+ *   x2: 30,
+ *   y2: 40,
+ * });
+ * ```
+ *
+ * @example With custom data (JS/TS):
+ * ```javascript
+ * const line = new Line({
+ *   x1: 10,
+ *   y1: 20,
+ *   x2: 30,
+ *   y2: 40,
+ *   data: {
+ *     name: 'Jane',
+ *     health: 100,
+ *   },
+ * });
+ * ```
+ *
+ * @example With custom data (TS):
+ * ```typescript
+ * interface ObjectData {
+ *   name: string
+ *   health: number
+ * }
+ * const entity: ObjectData = {
+ *   name: 'Jane',
+ *   health: 100,
+ * };
+ *
+ * // Typescript will infer the type of the data property
+ * const line1 = new Line({
+ *   x1: 10,
+ *   y1: 20,
+ *   x2: 30,
+ *   y2: 40,
+ *   data: entity,
+ * });
+ *
+ * // You can also pass in a generic type for the data property
+ * const line2 = new Line<ObjectData>({
+ *   x1: 10,
+ *   y1: 20,
+ *   x2: 30,
+ *   y2: 40,
+ * });
+ * line2.data = entity;
+ * ```
+ *
+ * @example With custom class extending Line (implements {@link LineGeometry} (x1, y1, x2, y2)):
+ * ```javascript
+ * // extending inherits the qtIndex method
+ * class Laser extends Line {
+ *
+ *   constructor(props) {
+ *     // call super to set x1, y1, x2, y2 (and data, if given)
+ *     super(props);
+ *     this.color = props.color;
+ *   }
+ * }
+ *
+ * const laser = new Laser({
+ *   color: 'green',
+ *   x1: 10,
+ *   y1: 20,
+ *   x2: 30,
+ *   y2: 40,
+ * });
+ * ```
+ *
+ * @example With custom class and mapping {@link LineGeometry}:
+ * ```javascript
+ * // no need to extend if you don't implement LineGeometry
+ * class Laser {
+ *
+ *   constructor(color) {
+ *     this.color = color;
+ *     this.start = [10, 20];
+ *     this.end = [30, 40];
+ *   }
+ *
+ *   // add a qtIndex method to your class
+ *   qtIndex(node) {
+ *     // map your properties to LineGeometry
+ *     return Line.prototype.qtIndex.call({
+ *       x1: this.start[0],
+ *       y1: this.start[1],
+ *       x2: this.end[0],
+ *       y2: this.end[1],
+ *     }, node);
+ *   }
+ * }
+ *
+ * const laser = new Laser('green');
+ * ```
+ *
+ * @example With custom object that implements {@link LineGeometry}:
+ * ```javascript
+ * const player = {
+ *   name: 'Jane',
+ *   health: 100,
+ *   x1: 10,
+ *   y1: 20,
+ *   x2: 30,
+ *   y2: 40,
+ *   qtIndex: Line.prototype.qtIndex,
+ * });
+ * ```
+ *
+ * @example With custom object and mapping {@link LineGeometry}:
+ * ```javascript
+ * // Note: this is not recommended but possible.
+ * // Using this technique, each object would have it's own qtIndex method.
+ * // Rather add qtIndex to your prototype, e.g. by using classes like shown above.
+ * const player = {
+ *   name: 'Jane',
+ *   health: 100,
+ *   start: [10, 20],
+ *   end: [30, 40],
+ *   qtIndex: function(node) {
+ *     return Line.prototype.qtIndex.call({
+ *       x1: this.start[0],
+ *       y1: this.start[1],
+ *       x2: this.end[0],
+ *       y2: this.end[1],
+ *     }, node);
+ *   },
+ * });
+ * ```
  */
 class Line {
+    /**
+     * Line Constructor
+     * @param props - Line properties
+     * @typeParam CustomDataType - Type of the custom data property (optional, inferred automatically).
+     */
     constructor(props) {
-        this.qtShape = Line;
         this.x1 = props.x1;
         this.y1 = props.y1;
         this.x2 = props.x2;
@@ -281,11 +717,12 @@ class Line {
         this.data = props.data;
     }
     /**
-     * Determine which quadrant the object belongs to.
+     * Determine which quadrant this line belongs to.
+     * @beta
      * @param node - Quadtree node to be checked
      * @returns Array containing indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right)
      */
-    getIndex(node) {
+    qtIndex(node) {
         const indexes = [], w2 = node.width / 2, h2 = node.height / 2, x2 = node.x + w2, y2 = node.y + h2;
         //an array of node origins where the array index equals the node index
         const nodes = [
@@ -304,9 +741,11 @@ class Line {
     }
     /**
      * check if a line segment (the first 4 parameters) intersects an axis aligned rectangle (the last 4 parameters)
+     * @beta
      *
      * @remarks
      * There is a bug where detection fails on corner intersections
+     * when the line enters/exits the node exactly at corners (45°)
      * {@link https://stackoverflow.com/a/18292964/860205}
      *
      * @param x1 - line start X

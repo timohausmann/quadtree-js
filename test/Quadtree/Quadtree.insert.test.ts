@@ -1,4 +1,5 @@
 import { Quadtree } from '../../src/Quadtree';
+import { Rectangle } from '../../src/Rectangle';
 
 describe('Quadtree.insert', () => {
 
@@ -9,20 +10,20 @@ describe('Quadtree.insert', () => {
 
     test('returns undefined', () => {
         const tree = new Quadtree({ width: 100, height: 100 });
-        const rect = {x: 0, y: 0, width: 100, height: 100};
+        const rect = new Rectangle({ x: 0, y: 0, width: 100, height: 100 });
         expect(tree.insert(rect)).toBeUndefined();
     });
 
     test('adds objects to objects array', () => {
         const tree = new Quadtree({ width: 100, height: 100 });
-        const rect = {x: 0, y: 0, width: 100, height: 100};
+        const rect = new Rectangle({ x: 0, y: 0, width: 100, height: 100 });
         tree.insert(rect); 
         expect(tree.objects).toEqual([rect]);
     });
 
     test('adds objects to subnodes', () => {
         const tree = new Quadtree({ width: 100, height: 100 });
-        const rect = {x: 0, y: 0, width: 100, height: 100};
+        const rect = new Rectangle({ x: 0, y: 0, width: 100, height: 100 });
         tree.split();
         tree.insert(rect); 
         expect(tree.nodes[0].objects).toEqual([rect]);
@@ -33,7 +34,7 @@ describe('Quadtree.insert', () => {
 
     test('calls insert recursively', () => {
         const tree = new Quadtree({ width: 100, height: 100 });
-        const rect = {x: 0, y: 0, width: 100, height: 100};
+        const rect = new Rectangle({ x: 0, y: 0, width: 100, height: 100 });
         tree.split();
 
         jest.spyOn(tree.nodes[0], 'insert');
@@ -52,7 +53,8 @@ describe('Quadtree.insert', () => {
         const tree = new Quadtree({ width: 100, height: 100 });
         jest.spyOn(tree, 'split');
         for(let i = 0; i <= tree.maxObjects; i++) {
-            tree.insert({x: 0, y: 0, width: 100, height: 100});
+            const rect = new Rectangle({ x: 0, y: 0, width: 100, height: 100 });
+            tree.insert(rect);
         }
         expect(tree.split).toHaveBeenCalledTimes(1);
     });
@@ -61,7 +63,8 @@ describe('Quadtree.insert', () => {
         const tree = new Quadtree({ width: 100, height: 100, maxObjects: 10, maxLevels: 0 });
         jest.spyOn(tree, 'split');
         for(let i = 0; i <= tree.maxObjects; i++) {
-            tree.insert({x: 0, y: 0, width: 100, height: 100});
+            const rect = new Rectangle({ x: 0, y: 0, width: 100, height: 100 });
+            tree.insert(rect);
         }
         expect(tree.split).toHaveBeenCalledTimes(0);
     });

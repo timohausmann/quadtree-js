@@ -1,5 +1,7 @@
-import type { NodeGeometry, TaggedGeometry, Shape } from './types';
-import { RectangleGeometry, Rectangle } from './Rectangle';
+import type { NodeGeometry, Indexable } from './types';
+import type { Rectangle } from './Rectangle';
+import type { Circle } from './Circle';
+import type { Line } from './Line';
 
 /**
  * Quadtree Constructor Properties
@@ -49,11 +51,10 @@ export interface QuadtreeProps {
  * const tree = new Quadtree({
  *   width: 100,
  *   height: 100,
- *   // optional properties:
- *   x: 50,          // default:  0
- *   y: 50,          // default:  0
- *   maxObjects: 20, // default: 10
- *   maxLevels: 3,   // default:  4
+ *   x: 0,           // optional, default:  0
+ *   y: 0,           // optional, default:  0
+ *   maxObjects: 10, // optional, default: 10
+ *   maxLevels: 4,   // optional, default:  4
  * });
  * ```
  * 
@@ -68,7 +69,7 @@ export interface QuadtreeProps {
  * });
  * ```
  */
-export class Quadtree<ObjectsType extends Shape|TaggedGeometry|RectangleGeometry> {
+export class Quadtree<ObjectsType extends Rectangle|Circle|Line|Indexable> {
 
     /**
      * The numeric boundaries of this node.
@@ -138,24 +139,16 @@ export class Quadtree<ObjectsType extends Shape|TaggedGeometry|RectangleGeometry
      * @example Mostly for internal use but you can call it like so:
      * ```typescript
      * const tree = new Quadtree({ width: 100, height: 100 });
-     * const indexes = tree.getIndex({ x: 25, y: 25, width: 10, height: 10 });
+     * const rectangle = new Rectangle({ x: 25, y: 25, width: 10, height: 10 });
+     * const indexes = tree.getIndex(rectangle);
      * console.log(indexes); // [1]
      * ```
-     * 
-     * @remarks
-     * Objects that are no Shape instance and have no `qtShape` property are assumed to be a `RectangleGeometry`.
-     * This is a) for ease of use and b) backwards compability with quadtree-js v1.
-     * Dropping support for 'anonymous' rectangle objects could be a future performance improvement. 
-     * This could be done by overriding `Quadtree.getIndex` with a higher order class or helper function.
      * 
      * @param obj - object to be checked
      * @returns Array containing indexes of intersecting subnodes (0-3 = top-right, top-left, bottom-left, bottom-right).
      */
     getIndex(obj:ObjectsType): number[] {
-
-        //getIndex via qtShape or fallback to Rectangle.getIndex
-        const getIndex = 'qtShape' in obj ? obj.qtShape.prototype.getIndex : Rectangle.prototype.getIndex;
-        return getIndex.call(obj, this.bounds);
+        return obj.qtIndex(this.bounds);
     }
 
     /**
@@ -171,11 +164,11 @@ export class Quadtree<ObjectsType extends Shape|TaggedGeometry|RectangleGeometry
      */
     split(): void {
         
-        const level  = this.level + 1,
-            width  = this.bounds.width/2,
-            height = this.bounds.height/2,
-            x      = this.bounds.x,
-            y      = this.bounds.y;
+        const level = this.level + 1,
+            width   = this.bounds.width/2,
+            height  = this.bounds.height/2,
+            x       = this.bounds.x,
+            y       = this.bounds.y;
 
         const coords = [
             { x: x + width, y: y },
@@ -202,18 +195,12 @@ export class Quadtree<ObjectsType extends Shape|TaggedGeometry|RectangleGeometry
      * exceeds the capacity, it will split and add all
      * objects to their corresponding subnodes.
      * 
-     * @example
+     * @example you can use any shape here (or object with a qtIndex method, see README):
      * ```typescript
      * const tree = new Quadtree({ width: 100, height: 100 });
-     * // 'anonymous' objects without qtShape are assumed to be RectangleGeometry
-     * tree.insert({x: 25, y: 25, width: 10, height: 10, custom: 'data'});
-     * tree.insert({qtShape: Rectangle, x: 25, y: 25, width: 10, height: 10, custom: 'data'});
-     * tree.insert({qtShape: Circle, x: 25, y: 25, r: 10, custom: 'data'});
-     * tree.insert({qtShape: Line, x1: 25, y1: 25, x2: 60, y2: 40, custom: 'data'});
-     * // Shape instances
-     * tree.insert(new Rectangle{x: 25, y: 25, width: 10, height: 10, data: 'data'});
-     * tree.insert(new Circle{x: 25, y: 25, r: 10, data: 512});
-     * tree.insert(new Circle{x1: 25, y1: 25, x2: 60, y2: 40, data: { custom: 'property'}});
+     * tree.insert(new Rectangle({ x: 25, y: 25, width: 10, height: 10, data: 'data' }));
+     * tree.insert(new Circle({ x: 25, y: 25, r: 10, data: 512 }));
+     * tree.insert(new Line({ x1: 25, y1: 25, x2: 60, y2: 40, data: { custom: 'property'} }));
      * ```
      * 
      * @param obj - Object to be added.
@@ -258,17 +245,11 @@ export class Quadtree<ObjectsType extends Shape|TaggedGeometry|RectangleGeometry
     /**
      * Return all objects that could collide with the given geometry.
      * 
-     * @example Just like insert, you can use any geometry object or Shape instance:
+     * @example Just like insert, you can use any shape here (or object with a qtIndex method, see README):
      * ```typescript 
-     * // 'Anonymous' objects without qtShape are assumed to be RectangleGeometry
-     * tree.retrieve({x: 25, y: 25, width: 10, height: 10});
-     * tree.retrieve({qtShape: Rectangle, x: 25, y: 25, width: 10, height: 10});
-     * tree.retrieve({qtShape: Circle, x: 25, y: 25, r: 10, custom: 'data'});
-     * tree.retrieve({qtShape: Line, x1: 25, y1: 25, x2: 60, y2: 40, custom: 'data'});
-     * // Shape instances
-     * tree.retrieve(new Rectangle{x: 25, y: 25, width: 10, height: 10, data: 'data'});
-     * tree.retrieve(new Circle{x: 25, y: 25, r: 10, data: 512});
-     * tree.retrieve(new Circle{x1: 25, y1: 25, x2: 60, y2: 40, data: { custom: 'property'}});
+     * tree.retrieve(new Rectangle({ x: 25, y: 25, width: 10, height: 10, data: 'data' }));
+     * tree.retrieve(new Circle({ x: 25, y: 25, r: 10, data: 512 }));
+     * tree.retrieve(new Line({ x1: 25, y1: 25, x2: 60, y2: 40, data: { custom: 'property'} }));
      * ```
      * 
      * @param obj - geometry to be checked
@@ -301,7 +282,7 @@ export class Quadtree<ObjectsType extends Shape|TaggedGeometry|RectangleGeometry
      * @example
      * ```typescript
      * const tree = new Quadtree({ width: 100, height: 100 });
-     * tree.insert(new Circle{x: 25, y: 25, r: 10});
+     * tree.insert(new Circle({ x: 25, y: 25, r: 10 }));
      * tree.clear();
      * console.log(tree); // tree.objects and tree.nodes are empty
      * ```

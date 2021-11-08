@@ -1,4 +1,5 @@
 import { Quadtree } from '../../src/Quadtree';
+import { Rectangle } from '../../src/Rectangle';
 
 describe('Quadtree.retrieve', () => {
 
@@ -9,25 +10,29 @@ describe('Quadtree.retrieve', () => {
 
     test('returns array', () => {
         const tree = new Quadtree({ width: 100, height: 100 });
-        expect(Array.isArray(tree.retrieve({x: 0, y: 0, width: 0, height: 0}))).toBe(true);
+        const rect = new Rectangle({ x: 0, y: 0, width: 100, height: 100 });
+        const retrieve = new Rectangle({ x: 0, y: 0, width: 100, height: 100 });
+        expect(Array.isArray(tree.retrieve(retrieve))).toBe(true);
     });
 
     test('retrieves objects', () => {
         const tree = new Quadtree({ width: 100, height: 100 });
-        const rect = {x: 0, y: 0, width: 100, height: 100};
+        const rect = new Rectangle({ x: 0, y: 0, width: 100, height: 100 });
+        const retrieve = new Rectangle({ x: 0, y: 0, width: 100, height: 100 });
         tree.insert(rect);
-        expect(tree.retrieve({x: 0, y: 0, width: 100, height: 100})).toEqual([rect]);
+        expect(tree.retrieve(retrieve)).toEqual([rect]);
     });
 
     test('calls retrieve recursively', () => {
         const tree = new Quadtree({ width: 100, height: 100 });
+        const retrieve = new Rectangle({ x: 0, y: 0, width: 100, height: 100 });
         tree.split();
         jest.spyOn(tree.nodes[0], 'retrieve');
         jest.spyOn(tree.nodes[1], 'retrieve');
         jest.spyOn(tree.nodes[2], 'retrieve');
         jest.spyOn(tree.nodes[3], 'retrieve');
 
-        tree.retrieve({x: 0, y: 0, width: 100, height: 100});
+        tree.retrieve(retrieve);
         expect(tree.nodes[0].retrieve).toHaveBeenCalledTimes(1);
         expect(tree.nodes[1].retrieve).toHaveBeenCalledTimes(1);
         expect(tree.nodes[2].retrieve).toHaveBeenCalledTimes(1);
@@ -36,7 +41,7 @@ describe('Quadtree.retrieve', () => {
 
     test('retrieves without duplicates', () => {
         const tree = new Quadtree({ width: 100, height: 100 });
-        const rect = {x: 0, y: 0, width: 100, height: 100};
+        const rect = new Rectangle({ x: 0, y: 0, width: 100, height: 100 });
         tree.split();
         tree.insert(rect);
         const result = tree.retrieve(rect);
