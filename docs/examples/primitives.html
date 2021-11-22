@@ -3,7 +3,7 @@
 <html>
 	<head>
 		<title>quadtree-js Primitives Demo</title>
-		<link rel="stylesheet" type="text/css" href="style.css?v=2" />
+		<link rel="stylesheet" type="text/css" href="./assets/examples.css" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 		<!-- prism syntax highlighting (https://prismjs.com/) -->
@@ -82,50 +82,108 @@
 				y: 0,
 				width: 640,
 				height: 480
-			}, 1);
+			});
 			
 			//our objects will be stored here
 			const myObjects = [];
 						
 			//our "hero" (cursor)
-			const myCursor = new Quadtree.Rectangle({
+			const rectCursor = new Quadtree.Rectangle({
 				x: 0,
 				y: 0,
 				width: 40,
                 height: 40
 			});
+            
+            const circleCursor = new Quadtree.Circle({
+                x: 0, 
+                y: 0, 
+                r: 42
+            });
+
+            const lineCursor = new Quadtree.Line({
+                x1: 50, 
+                y1: 50, 
+                x2: 150,
+                y2: 150,
+                data: {
+                    x: 0,
+                    y: 0
+                }
+            });
+
+            let myCursor = lineCursor;
+
+            //change cursor on button click
+            document.querySelector('#btn_rect').addEventListener('click', () => myCursor = rectCursor);
+            document.querySelector('#btn_line').addEventListener('click', () => myCursor = lineCursor);
+            document.querySelector('#btn_circle').addEventListener('click', () => myCursor = circleCursor);
 			
 			
 			//create some objects and save them in myObjects
 			function createObjects() {
-/*
-                myObjects.push({
-                    x1: 160,
-                    y1: 120,
-                    x2: 480,
-                    y2: 360,
-                    check: false,
-                    qtShape: Quadtree.Line
-                });*/
-                myObjects.push({
-                    x1: 480,
-                    y1: 120,
-                    x2: 160,
-                    y2: 360,
-                    check: false,
-                    qtShape: Quadtree.Line
-                });
-                myObjects.push({
-                    x1: -160,
-                    y1: -120,
-                    x2: 640+160,
-                    y2: 480+120,
-                    check: false,
-                    qtShape: Quadtree.Line
-                });
+				for(var i=0;i<200;i=i+1) {
+
+                    let rand = Math.random();
+
+                    if(rand > 0.66) {
+                        myObjects.push({
+                            x: randMinMax(0, 640),
+                            y: randMinMax(0, 480),
+                            width: randMinMax(10, 20),
+                            height: randMinMax(10, 20),
+                            vx: randMinMax(-0.5,0.5),
+                            vy: randMinMax(-0.5,0.5),
+                            check: false,
+                            qtShape: Quadtree.Rectangle
+                        });
+                    } else if(rand > 0.33) {
+                        myObjects.push({
+                            x: randMinMax(0, 640),
+                            y: randMinMax(0, 480),
+                            r: randMinMax(5, 10),
+                            vx: randMinMax(-0.5,0.5),
+                            vy: randMinMax(-0.5,0.5),
+                            check: false,
+                            qtShape: Quadtree.Circle
+                        });
+                    } else {
+
+                        var x = randMinMax(0, 640);
+                        var y = randMinMax(0, 480);
+                        var rad = Math.PI * Math.random();
+                        var len = Math.random() * 30;
+
+                        //note: the required keys x1, y1, x2, y2 for Line are set later dynamically
+                        var line = {
+                            x: x,
+                            y: y,
+                            rad: rad,
+                            len: len,
+                            vx: randMinMax(-0.5,0.5),
+                            vy: randMinMax(-0.5,0.5),
+                            check: false,
+                            qtShape: Quadtree.Line
+                        };
+
+                        myObjects.push(line);
+
+                        updateLineXY(line);
+                    }
+				}
 
 				updateTotal();
 			};
+
+
+            function updateLineXY(line) {
+
+                line.x1 = line.x + Math.sin(line.rad) * line.len;
+                line.y1 = line.y + Math.cos(line.rad) * line.len;
+                line.x2 = line.x + Math.sin(line.rad) * -line.len;
+                line.y2 = line.y + Math.cos(line.rad) * -line.len;
+            }
+			
 			
 			//main loop
 			function loop() {
@@ -138,15 +196,48 @@
 				
 				//update myObjects and insert them into the tree again
 				for(var i=0;i<myObjects.length;i=i+1) {
+					
+					myObjects[i].x += myObjects[i].vx;
+					myObjects[i].y += myObjects[i].vy;
 					myObjects[i].check = false;
+
+                    if(myObjects[i].qtType === Quadtree.Line) {
+                        updateLineXY(myObjects[i]);
+                    }
+					
+					if(myObjects[i].x > 640) myObjects[i].x = 0;
+					if(myObjects[i].x < 0) myObjects[i].x = 640;
+					if(myObjects[i].y > 480) myObjects[i].y = 0;
+					if(myObjects[i].y < 0) myObjects[i].y = 480;
+					
+					
 					myTree.insert(myObjects[i]);
 				}
 				
+
 				if(isMouseover) {
 
                     ctx.fillStyle = 'rgba(255,255,255,0.5)';
                     ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-                    ctx.fillRect(myCursor.x, myCursor.y, myCursor.width, myCursor.height);
+
+                    if(myCursor === lineCursor) {
+                        const t = performance.now();
+                        myCursor.x1 = myCursor.data.x + Math.sin(t*0.001) * 200;
+                        myCursor.y1 = myCursor.data.y + Math.cos(t*0.001) * 200;
+                        myCursor.x2 = myCursor.data.x + Math.sin(t*0.001) * -200;
+                        myCursor.y2 = myCursor.data.y + Math.cos(t*0.001) * -200;
+
+                        ctx.beginPath();
+                        ctx.moveTo(myCursor.x1, myCursor.y1);
+                        ctx.lineTo(myCursor.x2, myCursor.y2);
+                        ctx.stroke();
+                    } else if(myCursor === circleCursor) {
+                        ctx.beginPath();
+                        ctx.arc(myCursor.x, myCursor.y, myCursor.r, 0, 2 * Math.PI);
+                        ctx.fill();
+                    } else {
+                        ctx.fillRect(myCursor.x, myCursor.y, myCursor.width, myCursor.height);
+                    }
 				
 					//retrieve all objects in the bounds of the hero 
 					candidates = myTree.retrieve(myCursor);
@@ -193,8 +284,16 @@
 					e.offsetY = e.layerY - e.target.offsetTop;
 				} 
 				
-                myCursor.x = e.offsetX - (myCursor.width/2);
-                myCursor.y = e.offsetY - (myCursor.height/2);
+				if(myCursor === lineCursor) {
+                    myCursor.data.x = e.offsetX;
+                    myCursor.data.y = e.offsetY;
+                } else if(myCursor === circleCursor) {
+                    myCursor.x = e.offsetX;
+				    myCursor.y = e.offsetY;
+                } else {			
+                    myCursor.x = e.offsetX - (myCursor.width/2);
+                    myCursor.y = e.offsetY - (myCursor.height/2);	
+                }
 			});
 
 			//hide hero on mouseout

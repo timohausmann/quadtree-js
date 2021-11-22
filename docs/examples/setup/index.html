@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+	<head>
+		<title>quadtree-js – simple example</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Fira+Sans&display=swap" rel="stylesheet">
+        
+        <!-- prism syntax highlighting (https://prismjs.com/) -->
+		<link 
+            rel="stylesheet" 
+            href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/themes/prism.min.css" 
+            integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" 
+            crossorigin="anonymous" />
+
+        <link rel="stylesheet" href="../assets/examples.css" />
+        
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+	</head>
+	<body>
+
+        <div class="panel">
+
+            <div>
+                <h2>quadtree-js</h2>
+                <h3 class="m1">2.0.0-beta.1</h3>
+                
+                <nav class="m4">
+                    <h4>Examples</h4>
+                    <ul class="links">
+                        <li><a class="link" href="../simple">Simple</a></li>
+                        <li><a class="link" href="../dynamic">primitives</a></li>
+                        <li><a class="link" href="../dynamic">Dynamic</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <footer>
+                <nav>
+                    <h4>Links</h4>
+                    <ul class="links">
+                        <li><a class="link" href="https://timohausmann.github.io/quadtree-js/">Home</a></li>
+                        <li><a class="link" href="https://github.com/timohausmann/quadtree-js#readme">Readme</a></li>
+                        <li><a class="link" href="/documentation">API Docs</a></li>
+                        <li><a href="https://github.com/timohausmann/quadtree-js" 
+                            title="quadtree-js at GitHub"
+                            class="link icon"
+                            target="_blank" rel="noopener noreferrer">
+                            <img src="/docs/examples/assets/logo-github.svg" alt="GitHub Logo" />
+                            GitHub
+                        </a></li>
+                        <li><a href="https://www.npmjs.com/package/@timohausmann/quadtree-js" 
+                            title="quadtree-js at npm"
+                            class="link icon"
+                            target="_blank" rel="noopener noreferrer">
+                            <img src="/docs/examples/assets/logo-npm.svg" alt="npm Logo" />
+                            npm
+                        </a></li>
+                        <li><a href="https://twitter.com/timohausmann" 
+                            title="quadtree-js author at Twitter"
+                            class="link icon"
+                            target="_blank" rel="noopener noreferrer">
+                            <img src="/docs/examples/assets/logo-twitter.svg" alt="Twitter Logo" />
+                            Twitter
+                        </a></li>
+                    </ul>
+                </nav>
+            </footer>
+        </div>
+
+        <main class="content">
+            <h1 class="m1">Setup Example</h1>
+            <p class="m1">
+				JS development is constantly evolving. This library ships three different versions to offer a high range of support.
+			</p>
+
+            <h3 class="m1">ES6 / Common JS</h3>
+
+            <section class="m2" style="max-width: 480px">
+                <div class="tabs tabs--dark">
+                    <button class="tab active">npm i --save</button>
+                    <button class="tab">npm i --save-dev</button>
+                    <button class="tab">yarn add</button>
+                </div>
+                <section class="tab-content active">
+                    <code class="tab-code">npm install --save @timohausmann/quadtree-js</code>
+                    <button class="copy"></button>
+                </section>
+                <section class="tab-content">
+                    <code class="tab-code">npm install --save-dev @timohausmann/quadtree-js</code>
+                    <button class="copy"></button>
+                </section>
+                <section class="tab-content">
+                    <code class="tab-code">yarn add @timohausmann/quadtree-js</code>
+                    <button class="copy"></button>
+                </section>
+            </section>
+
+            <p class="m2">
+                For ES6 modules and CommonJS, all classes are available as named exports.
+            </p>
+
+            <h4>ES6</h4>
+			<pre><code class="language-javascript">import { Quadtree, Rectangle, Circle, Line } from '@timohausmann/quadtree-js';</code></pre>
+
+            <h4>CommonJS</h4>
+            <pre><code class="language-javascript">const { Quadtree, Rectangle, Circle, Line } = require('@timohausmann/quadtree-js');</code></pre>
+
+            <h3 class="m05">Script Tag</h3>
+
+            <p>
+                If you simply want to load the library with a script tag, use the UMD version. 
+            </p>
+            <p class="m1">All primitive classes are available under the <code>Quadtree.</code> namespace.</p>
+            <p class="m2">To be beginner friendly, all examples use this UMD syntax. Just remove all <code>Quadtree.</code> if you use ES6 / CJS.</p>
+
+            <h4>UMD Full</h4>
+
+            <pre><code class="language-html">&lt;script src="quadtree.umd.full.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+    console.log(Quadtree, Quadtree.Rectangle, Quadtree.Circle, Quadtree.Line);
+&lt;/script&gt;</code></pre>
+
+<p class="m2">
+    If you are a minimalist, the basic version only includes the Quadtree and Rectangle class.
+</p>
+
+<h4>UMD Basic</h4>
+
+<pre><code class="language-html">&lt;script src="quadtree.umd.basic.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+    console.log(Quadtree, Quadtree.Rectangle);
+&lt;/script&gt;</code></pre>
+        </main>
+
+        <!-- prism syntax highlighting -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/prism.min.js" 
+            integrity="sha512-WkVkkoB31AoI9DAk6SEEEyacH9etQXKUov4JRRuM1Y681VsTq7jYgrRw06cbP6Io7kPsKx+tLFpH/HXZSZ2YEQ==" 
+            crossorigin="anonymous"></script>
+
+
+        <script src="../assets/tabs.js"></script>
+	</body>
+</html>

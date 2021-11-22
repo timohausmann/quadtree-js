@@ -1,0 +1,237 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Fira Code', monospace;
+    background: black;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    height: 100vh;
+}
+
+h1,
+h2 {
+    font-size: 1.5rem;
+    font-weight: normal;
+}
+h3 {
+    font-size: 1.25rem;
+    font-weight: normal;
+}
+h4 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+p {
+    font-family: 'Fira Sans', sans-serif;
+    line-height: 1.4;
+}
+hr {
+    margin: 0.5rem 0;
+    border: 0; 
+    border-top: 1px solid #eee;
+}
+
+code,
+button {
+    font-family: inherit;
+    font-size: 0.75rem;
+}
+
+code {
+    font-family: 'Fira Code', monospace;
+}
+
+pre {
+    font-size: 0.875rem !important;
+    margin-bottom: 2rem !important;
+}
+
+button {
+    cursor: pointer;
+}
+
+canvas {
+    background: black;
+}
+
+.m05 { margin-bottom: 0.5rem; }
+.m1 { margin-bottom: 1rem; }
+.m2 { margin-bottom: 2rem; }
+.m4 { margin-bottom: 4rem; }
+
+.panel {
+    flex: 1;
+    padding: 1rem;
+}
+.panel h3 {
+    font-size: 0.875rem;
+    color: rgba(255,255,255,0.5);
+}
+.panel h4 {
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.25);
+    margin-bottom: 0.5rem;
+}
+.content {
+    flex: 3;
+    background: white;
+    padding: 2rem;
+    color: black;
+    max-height: 100%;
+    overflow-y: auto;
+}
+
+.links {
+    list-style: none;
+}
+.links li {
+    margin-bottom: 1rem;
+}
+.link {
+    display: flex;
+    align-items: center;
+    color: aquamarine;
+    text-decoration: none;
+    padding: 0.25rem 0;
+}
+.link:hover,
+.link.active {
+    color: white;
+}
+.link:visited {
+    color: mediumaquamarine;
+}
+.link img {
+    height: 1.25rem;
+    margin-right: 0.5rem;
+}
+
+.info {
+    position: relative;
+    background: hsl(195deg 53% 90%);
+    border: 1px solid lightblue;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    padding-left: 3rem;
+}
+.info::before {
+    content: '';
+    width: 1.5rem;
+    height: 1.5rem;
+    background: url(./info.svg) no-repeat center center;
+    background-size: contain;
+    position: absolute;
+    left: 0.75rem;
+    top: 1rem;
+}
+
+.button {
+    display: inline-block;
+    border: none;
+    border-radius: 0.125rem;
+    background: rgba(32,32,32,0.2);
+    padding: 0.25rem 0.5rem;
+    transition: background-color 0.4s;
+    cursor: pointer;
+}
+.button:hover {
+    background-color: rgba(32,32,32,0.1);
+}
+.button:active {
+    color: black;
+    background-color: aquamarine;
+}
+
+/* TABS */
+
+
+
+.tabs {
+    display: flex;
+    justify-content: flex-start;
+}
+.tab {
+    margin-right: 0.25rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0 0.25rem 0 0;
+    background: rgba(255,255,255,0.6);
+    transition: background-color 0.4s;
+}
+.tab:hover {
+    background: rgba(255,255,255,0.8);
+}
+.tab.active {
+    color: black;
+    background: rgba(255,255,255,0.9);
+}
+.tabs--dark .tab {
+    background: rgba(32,32,32,0.1);
+}
+.tabs--dark .tab:hover {
+    background: rgba(32,32,32,0.2);
+}
+.tabs--dark .tab.active {
+    color: white;
+    background: rgba(32,32,32,0.8);
+}
+
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    color: black;
+    background: rgba(255,255,255,0.9);
+    font-size: 0.75rem;
+    border-radius: 0 0 0 0.25rem;
+}
+
+.tabs--dark ~ .tab-content.active {
+    color: white;
+    background: rgba(32,32,32,0.8);
+}
+
+.tab-code {
+    padding: 1rem;
+}
+
+.copy {
+    position: relative;
+    background: url(./copy.svg) no-repeat center aquamarine;
+    background-size: 1.5rem;
+    border: none;
+    width: 3rem;
+}
+.copied::after {
+    content: 'copied!';
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%) translateX(0.5rem);
+    background: rgba(255,255,255,0.9);
+    padding: 0.25rem 0.5rem;
+    animation: copied 2s forwards cubic-bezier(0.68, -0.6, 0.32, 1.6);
+}
+
+@keyframes copied {
+    0% {
+        opacity: 0;
+        transform: translateY(-50%) translateX(0.5rem) translateY(1rem) rotate(10deg);
+    }
+    30%, 70% {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0.5rem);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-50%) translateX(0.5rem) translateY(-1rem) rotate(-5deg);
+    }
+}

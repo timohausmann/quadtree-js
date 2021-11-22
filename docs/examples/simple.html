@@ -1,8 +1,8 @@
 <!doctype html>
 <html>
 	<head>
-		<title>quadtree-js Dynamic Demo</title>
-		<link rel="stylesheet" type="text/css" href="style.css?v=2" />
+		<title>quadtree-js Simple Demo</title>
+		<link rel="stylesheet" type="text/css" href="./assets/examples.css" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 		<!-- prism syntax highlighting (https://prismjs.com/) -->
@@ -12,12 +12,12 @@
 
 		<div class="outer">
 			
-			<h1><a href="https://github.com/timohausmann/quadtree-js">quadtree-js</a> <small>dynamic example</small></h1>
+			<h1><a href="https://github.com/timohausmann/quadtree-js">quadtree-js</a> <small>simple example</small></h1>
 
 			<nav>
 				<strong>Demos:</strong>
-				<a href="simple.html">simple</a>
-				<span>dynamic</span>
+				<span>simple</span>
+				<a href="dynamic.html">dynamic</a>
 				<a href="many.html">many to many</a>
 				<a href="test-10000-1.2.0.html">benchmark</a>
                 <a href="primitives.html">primitives</a>
@@ -28,67 +28,48 @@
 			</div>
 
 			<div class="ctrl">
-				<div class="ctrl-left">Total Objects: <span id="cnt_total">0</span></div>
+				<div class="ctrl-left">
+					<button id="btn_add">add small object</button>
+					<button id="btn_add_big">add big object</button>
+					<button id="btn_add_10">add 10 small objects</button>
+					<button id="btn_clear">clear tree</button>
+				</div>
+
 				<div class="ctrl-right">
+					Total Objects: <span id="cnt_total">0</span><br />
 					Candidates: <span id="cnt_cand">0</span> (<span id="cnt_perc">0</span>%)
 				</div>
 			</div>
-		
 
 			<p>
-				This example demonstrates the usage for a dynamic system. All objects are constantly moving. The quadtree is regenerated with each game loop.
+				This quadtree starts off empty. Click the buttons to add elements to the Quadtree.
 			</p>
 			<p>
-				We start off with an empty tree.
+				After adding five objects to the Quadtree it will split, because we initially set <code>max_objects</code> to 4.
 			</p>
 			<pre><code class="language-javascript">var myTree = new Quadtree({
 	x: 0,
 	y: 0,
 	width: 640,
 	height: 480
-});</code></pre>
+}, 4);</code></pre>
+
 			<p>
-				Next, lets create some objects. Objects that we plan to insert into the quadtree need <code>x</code>, <code>y</code>, <code>width</code> and <code>height</code> properties in order to work. 
+				Objects that you insert into the tree need to have <code>x</code>, <code>y</code>, <code>width</code> and <code>height</code> properties in order to work.
+				Of course you can extend these objects with your own data.
 			</p>
+			<pre><code class="language-javascript">var myObject = {
+	x: 200,
+	y: 100,
+	width: 35,
+	height: 70
+}
+
+myTree.insert(myObject);</code></pre>
+
+			
 			<p>
-				You can add as many other properties as you like. In this example, we use custom properties <code>vx</code>, <code>vy</code> and <code>check</code>.
-			</p>
-			<pre><code class="language-javascript">var myObjects = [];
-
-for(var i=0;i&lt;200;i=i+1) {
-	myObjects.push({
-		x: randMinMax(0, 640),
-		y: randMinMax(0, 480),
-		width: randMinMax(10, 20),
-		height: randMinMax(10, 20),
-		vx: randMinMax(-0.5,0.5),
-		vy: randMinMax(-0.5,0.5),
-		check: false
-	});
-}</code></pre>
-			<p>
-				We will clear and rewrite the quadtree with every game loop. This is neccessary to keep the tree clean and accurate (due to its recursive nature).
-			</p>
-			<pre><code class="language-javascript">function loop() {
-
-	//remove all objects and subnodes 
-	myTree.clear();
-
-	//update myObjects and insert them into the tree again
-	for(var i=0;i&lt;myObjects.length;i=i+1) {
-		
-		myObjects[i].x += myObjects[i].vx;
-		myObjects[i].y += myObjects[i].vy;
-		
-		myTree.insert(myObjects[i]);
-	}
-
-	//call next frame
-	requestAnimationFrame(loop);
-}</code></pre>
-
-			<p>
-				After filling the quadtree, we can now retrieve collision candidates for a certain area. In this example, we constantly retrieve collision candidates for the white area at your mouse cursor. The candidates are highlighted in green.
+				In this example, we constantly retrieve collision candidates for the white area at your mouse cursor. The candidates are highlighted in green.
 			</p>
 
 			<pre><code class="language-javascript">var myCursor = {
@@ -104,25 +85,25 @@ var candidates = myTree.retrieve(myCursor);</code></pre>
 			</p>
 			
 			<p>
-				What you get is an array of your collision candidates. In this example, we will only mark them with a <code>check</code>-property to paint them green. In a real world example, you may want to check them for collisions. 
+				What you get is an array of your collision candidates. In this example, we will only mark them with a <code>check</code>-property to paint them green. In a real world example, you may want to check them for collisions.
 			</p>
 
 			<pre><code class="language-javascript">for(var i=0;i&lt;candidates.length;i=i+1) {
 	candidates[i].check = true;
 }</code></pre>
-			
-			<!--p>
-				When you deal mostly with static objects, rewriting the whole tree each loop may seems like an overkill. 
-			</p>
+				
+
 			<p>
-				If you have the urge to update or remove single objects without affecting the whole quadtree, you may check out the <a href="https://github.com/timohausmann/quadtree-js/tree/hitman">quadtree-js hitman branch</a>.
-			</p-->
+				Run clear() to remove all objects from the quadtree and reset it.
+			</p>
+
+			<pre><code class="language-javascript">myTree.clear();</code></pre>
 
 			<p>
 				To see the full example code please check the page source or 
 				<a href="https://github.com/timohausmann/quadtree-js" target="_blank" rel="noopener noreferrer">visit github</a>.
 			</p>
-
+			
 		</div>
 
 		<!-- github corner (https://github.com/tholman/github-corners) -->
@@ -144,14 +125,14 @@ var candidates = myTree.retrieve(myCursor);</code></pre>
 
 		<!-- example script -->
 		<script>
-
+			
 			const ctx = document.getElementById('canvas').getContext('2d'),
 			cnt_total = document.querySelector('#cnt_total'),
 			cnt_cand = document.querySelector('#cnt_cand'),
 			cnt_perc = document.querySelector('#cnt_perc');
-
-            let isMouseover = false;
 			
+			let isMouseover = false;
+
 			//the main Quadtree
 			const myTree = new Quadtree({
 				x: 0,
@@ -161,67 +142,38 @@ var candidates = myTree.retrieve(myCursor);</code></pre>
 			});
 			
 			//our objects will be stored here
-			const myObjects = [];
-						
-			//our "hero"
-			const myCursor = {
-				x: 0,
-				y: 0,
-				width: 20,
-				height: 20
-			};
-			
-			//create some objects and save them in myObjects
-			function createObjects() {
-				for(let i=0;i<200;i=i+1) {
-					myObjects.push({
-						x: randMinMax(0, 640),
-						y: randMinMax(0, 480),
-						width: randMinMax(10, 20),
-						height: randMinMax(10, 20),
-						vx: randMinMax(-0.5,0.5),
-						vy: randMinMax(-0.5,0.5),
-						check: false
-					});
-				}
+			let myObjects = [];
 
-				updateTotal();
+			//our "hero", aka the mouse cursor.
+			//He is not in the quadtree, we only use this object to retrieve objects from a certain area
+			const myCursor = {
+				x : 0,
+				y : 0,
+				width : 28,
+				height : 28
 			};
-			
+
 			
 			//our main loop
 			function loop() {
 				
 				let candidates = [];
 				
-				//clear the tree
-				myTree.clear();
 				ctx.clearRect(0, 0, 640, 480);
 				
-				//update myObjects and insert them into the tree again
+				//reset myObjects check flag
 				for(let i=0;i<myObjects.length;i=i+1) {
-					
-					myObjects[i].x += myObjects[i].vx;
-					myObjects[i].y += myObjects[i].vy;
 					myObjects[i].check = false;
-					
-					if(myObjects[i].x > 640) myObjects[i].x = 0;
-					if(myObjects[i].x < 0) myObjects[i].x = 480;
-					if(myObjects[i].y > 480) myObjects[i].y = 0;
-					if(myObjects[i].y < 0) myObjects[i].y = 480;
-					
-					myTree.insert(myObjects[i]);
 				}
-				
 
 				if(isMouseover) {
 
 					ctx.fillStyle = 'rgba(255,255,255,0.5)';
 					ctx.fillRect(myCursor.x, myCursor.y, myCursor.width, myCursor.height);
-				
+					
 					//retrieve all objects in the bounds of the hero 
 					candidates = myTree.retrieve(myCursor);
-					
+
 					//flag retrieved objects
 					for(let i=0;i<candidates.length;i=i+1) {
 						candidates[i].check = true;
@@ -229,7 +181,6 @@ var candidates = myTree.retrieve(myCursor);</code></pre>
 				}
 
 				updateCandidatesInfo(candidates);
-				
 				
 				drawQuadtree(myTree, ctx);
 				drawObjects(myObjects, ctx);
@@ -239,7 +190,6 @@ var candidates = myTree.retrieve(myCursor);</code></pre>
 
 
 			function updateTotal() {
-
 				cnt_total.innerHTML = myObjects.length;
 			}
 
@@ -249,18 +199,33 @@ var candidates = myTree.retrieve(myCursor);</code></pre>
 				if(!myObjects.length) return;
 				cnt_perc.innerHTML = Math.round((candidates.length/myObjects.length)*100);
 			}
-			
-			//create objects
-			createObjects();
-			
+						
 			//init first loop
 			loop();
 			
 			//set eventListener for mousemove
 			document.getElementById('canvas').addEventListener('mousemove', handleMousemove);
 			document.getElementById('canvas').addEventListener('mouseout', handleMouseout);
+
+			//set eventListener for buttons
+			document.getElementById('btn_add').addEventListener('click', function() {
+				handleAdd();
+			});
+			document.getElementById('btn_add_big').addEventListener('click', function() {
+				handleAdd({
+					x : randMinMax(0, myTree.bounds.width/2),
+					y : randMinMax(0, myTree.bounds.height/2),
+					width : randMinMax(myTree.bounds.height/4, myTree.bounds.height/2, true),
+					height : randMinMax(myTree.bounds.height/4, myTree.bounds.height/2, true),
+					check : false
+				});
+			});
+			document.getElementById('btn_add_10').addEventListener('click', function() {
+				for(var i=0;i<10;i++) { handleAdd() };
+			});
+			document.getElementById('btn_clear').addEventListener('click', handleClear);
 			
-			
+
 			//position hero at mouse
 			function handleMousemove(e) {
 				
@@ -277,9 +242,45 @@ var candidates = myTree.retrieve(myCursor);</code></pre>
 
 
 			//hide hero
-			function handleMouseout(e) {
+			function handleMouseout(e) {	
 				isMouseover = false;
 			};
+			
+			//add a random object to our simulation
+			function handleAdd(rect) {
+
+				if(!rect) {
+					rect = {
+						x : randMinMax(0, myTree.bounds.width-32),
+						y : randMinMax(0, myTree.bounds.height-32),
+						width : randMinMax(4, 32, true),
+						height : randMinMax(4, 32, true),
+						check : false
+					};
+				}
+
+				//store object in our array
+				myObjects.push(rect);
+
+				//insert object in our quadtree
+				myTree.insert(rect);
+
+				//update total counter
+				updateTotal();
+			}
+			
+			//clear the tree
+			function handleClear() {
+
+				//empty our array
+				myObjects = [];
+
+				//empty our quadtree
+				myTree.clear();
+
+				//update total counter
+				updateTotal();				
+			}
 
 		</script>
 	</body>

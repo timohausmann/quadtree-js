@@ -1,6 +1,6 @@
 const colorNode = 'rgba(255,0,0,0.5)';
-const colorWhite = 'rgba(255,255,255,0.5)';
-const colorChecked = 'rgba(48,255,48,0.5)';
+const colorWhite = 'rgba(255,255,255,0.33)';
+const colorChecked = 'rgba(127,255,212,0.8)';
 
 /*
 * draw Quadtree nodes
@@ -10,7 +10,7 @@ function drawQuadtree(node, ctx) {
     //no subnodes? draw the current node
     if(node.nodes.length === 0) {
         ctx.strokeStyle = colorNode;
-        ctx.strokeRect(obj.x, obj.y, obj.width, obj.height);
+        ctx.strokeRect(node.bounds.x, node.bounds.y, node.bounds.width, node.bounds.height);
         
     //has subnodes? drawQuadtree them!
     } else {
@@ -25,27 +25,31 @@ function drawQuadtree(node, ctx) {
  */
 function drawObjects(objects, ctx) {
     for(let i=0;i<objects.length;i=i+1) {
-        draw.get(objects[i].qtShape)(ctx, objects[i]);
+        const t = objects[i].width ? 'Rectangle' : objects[i].r ? 'Circle' : 'Line';
+        drawMap.get(t)(ctx, objects[i]);
     }
 }
-const draw = new Map();
-draw.set(Quadtree.Rectangle, function(ctx, obj) {
-    ctx.strokeStyle = obj.check ? colorChecked : colorWhite;
-    ctx.strokeRect(obj.x, obj.y, obj.width, obj.height);
+const drawMap = new Map();
+drawMap.set('Rectangle', function(ctx, obj) {
+    ctx.fillStyle = obj.data.check ? colorChecked : colorWhite;
+    ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
 });
-draw.set(Quadtree.Circle, function(ctx, obj) {
-    ctx.strokeStyle = obj.check ? colorChecked : colorWhite;
+drawMap.set('Circle', function(ctx, obj) {
+    ctx.fillStyle = obj.data.check ? colorChecked : colorWhite;
     ctx.beginPath();
     ctx.arc(obj.x, obj.y, obj.r, 0, 2 * Math.PI);
+    ctx.closePath();
     ctx.fill();
-    ctx.stroke();
 });
-draw.set(Quadtree.Line, function(ctx, obj) {
-    ctx.strokeStyle = obj.check ? colorChecked : colorWhite;
+drawMap.set('Line', function(ctx, obj) {
+    ctx.save();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = obj.data.check ? colorChecked : colorWhite;
     ctx.beginPath();
     ctx.moveTo(obj.x1, obj.y1);
     ctx.lineTo(obj.x2, obj.y2);
     ctx.stroke();
+    ctx.restore();
 });
 
 

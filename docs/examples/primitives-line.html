@@ -3,7 +3,7 @@
 <html>
 	<head>
 		<title>quadtree-js Primitives Demo</title>
-		<link rel="stylesheet" type="text/css" href="style.css?v=2" />
+		<link rel="stylesheet" type="text/css" href="./assets/examples.css" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 		<!-- prism syntax highlighting (https://prismjs.com/) -->
@@ -29,6 +29,12 @@
 			</div>
 
 			<div class="ctrl">
+				<div class="ctrl-left">
+					<button id="btn_rect">Rect Cursor</button>
+					<button id="btn_circle">Circle Cursor</button>
+					<button id="btn_line">Line Cursor</button>
+				</div>
+
 				<div class="ctrl-right">
 					Total Objects: <span id="cnt_total">0</span><br />
 					Candidates: <span id="cnt_cand">0</span> (<span id="cnt_perc">0</span>%)
@@ -37,7 +43,7 @@
 		
 
 			<p>
-				This example demonstrates how objects behave near edges.
+				This example demonstrates Rects, Circles and Lines.
 			</p>
 
 
@@ -76,7 +82,7 @@
 				y: 0,
 				width: 640,
 				height: 480
-			}, tests.length-1);
+			}, 1);
 			
 			//our objects will be stored here
 			const myObjects = [];
@@ -89,32 +95,34 @@
                 height: 40
 			});
 			
-
-            // demo rectangle coordinates
-            const tests = [
-                {x: 0, y: 0},
-                {x: 320-100, y: 240-100},
-                {x: 0, y: 240},
-                {x: 320-100, y: 480-100},
-                {x: 320, y: 0},
-                {x: 640-100, y: 240-100},
-                {x: 320, y: 240},
-                {x: 640-100, y: 480-100},
-            ]
 			
 			//create some objects and save them in myObjects
 			function createObjects() {
-
-                for(let i = 0; i < tests.length; i++) {
-                    myObjects.push({
-                        x: tests[i].x,
-                        y: tests[i].y,
-                        width: 100,
-                        height: 100,
-                        check: false,
-                        qtShape: Quadtree.Rectangle
-                    });
-                }
+/*
+                myObjects.push({
+                    x1: 160,
+                    y1: 120,
+                    x2: 480,
+                    y2: 360,
+                    check: false,
+                    qtShape: Quadtree.Line
+                });*/
+                myObjects.push({
+                    x1: 480,
+                    y1: 120,
+                    x2: 160,
+                    y2: 360,
+                    check: false,
+                    qtShape: Quadtree.Line
+                });
+                myObjects.push({
+                    x1: -160,
+                    y1: -120,
+                    x2: 640+160,
+                    y2: 480+120,
+                    check: false,
+                    qtShape: Quadtree.Line
+                });
 
 				updateTotal();
 			};
@@ -152,7 +160,7 @@
 				updateCandidatesInfo(candidates);
 				
 				drawQuadtree(myTree, ctx);
-				drawObjectsPrecise(myObjects, ctx);
+				drawObjects(myObjects, ctx);
 				
 				window.requestAnimationFrame(loop);
 			};

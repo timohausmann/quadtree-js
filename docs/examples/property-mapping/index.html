@@ -1,0 +1,198 @@
+<!doctype html>
+<html>
+	<head>
+		<title>quadtree-js – property mapping example</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Fira+Sans&display=swap" rel="stylesheet">
+        
+        <!-- prism syntax highlighting (https://prismjs.com/) -->
+		<link 
+            rel="stylesheet" 
+            href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/themes/prism.min.css" 
+            integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" 
+            crossorigin="anonymous" />
+
+        <link rel="stylesheet" href="../assets/examples.css" />
+        
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+	</head>
+	<body>
+
+        <div class="panel">
+
+            <div>
+                <h2>quadtree-js</h2>
+                <h3 class="m1">2.0.0-beta.1</h3>
+                
+                <nav class="m4">
+                    <h4>Examples</h4>
+                    <ul class="links">
+                        <li><a class="link" href="../simple">Simple</a></li>
+                        <li><a class="link" href="../dynamic">Dynamic</a></li>
+                        <li><a class="link" href="../primitives">Primitives</a></li>
+                        <li><a class="link" href="../class-extension">Class Extension</a></li>
+                        <li><a class="link" href="../property-mapping">Property Mapping</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <footer>
+                <nav>
+                    <h4>Links</h4>
+                    <ul class="links">
+                        <li><a class="link" href="/">Home</a></li>
+                        <li><a class="link" href="https://github.com/timohausmann/quadtree-js#readme">Readme</a></li>
+                        <li><a class="link" href="/documentation">API Docs</a></li>
+                        <li><a href="https://github.com/timohausmann/quadtree-js" 
+                            title="quadtree-js at GitHub"
+                            class="link icon"
+                            target="_blank" rel="noopener noreferrer">
+                            <img src="/docs/examples/assets/logo-github.svg" alt="GitHub Logo" />
+                            GitHub
+                        </a></li>
+                        <li><a href="https://www.npmjs.com/package/@timohausmann/quadtree-js" 
+                            title="quadtree-js at npm"
+                            class="link icon"
+                            target="_blank" rel="noopener noreferrer">
+                            <img src="/docs/examples/assets/logo-npm.svg" alt="npm Logo" />
+                            npm
+                        </a></li>
+                        <li><a href="https://twitter.com/timohausmann" 
+                            title="quadtree-js author at Twitter"
+                            class="link icon"
+                            target="_blank" rel="noopener noreferrer">
+                            <img src="/docs/examples/assets/logo-twitter.svg" alt="Twitter Logo" />
+                            Twitter
+                        </a></li>
+                    </ul>
+                </nav>
+            </footer>
+        </div>
+
+        <main class="content">
+            <h1 class="m1">Property Mapping Example</h1>
+            <div class="canvas m2">
+                <canvas id="canvas" width="640" height="480"></canvas>
+            </div>
+
+            <p class="m1">
+                In case you use other property names than the primitives' defaults 
+                (e.g. <code>x, y, width, height</code>), 
+                you can map your properties.
+			</p>
+
+            <p class="m1 info">
+                The crucial part to make objects Quadtree-compatible is to implement the 
+                <a href="../../documentation/interfaces/Indexable.html">Indexable</a> interface –
+                that means to provide a <code>qtIndex()</code> method, that returns the quadrant of the object
+                for any given Quadtree node. All <em>Indexable</em> objects can be inserted or used for retrieval. 
+            </p>
+
+            <p class="m2">
+                The following code is reduced to the most important parts.
+                <a href="https://github.com/timohausmann/quadtree-js/docs/examples/property-mapping/" 
+                    target="_blank" rel="noopener noreferrer">View the full script.js of this example on GitHub</a>.
+            </p>
+
+            <h4>HTML</h4>
+            <pre><code class="language-html">&lt;canvas id="canvas" width="640" height="480"&gt;&lt;/canvas&gt;</code></pre>
+            
+            <h4>Box.JS</h4>
+			<pre><code class="language-javascript">// Custom Box class
+class Box {
+    
+    constructor(x, y, width, height) {
+
+        // This class describes rectangles with two vectors for position and size.
+        this.position = new Vector(x, y);
+        this.size = new Vector(width, height);
+    }
+
+    // In order to be a Quadtree compatible primitive
+    // your object has to implement the Indexable interface 
+    // in form of a qtIndex method:
+    qtIndex(node) {
+        // The Box should act like a Rectangle
+        // so we just call qtIndex on the Rectangle prototype 
+        // and map the position and size vectors to x, y, width and height
+        return Quadtree.Rectangle.prototype.qtIndex.call({
+            x: this.position.x,
+            y: this.position.y,
+            width: this.size.x,
+            height: this.size.y,
+        }, node);
+    }
+
+    draw(ctx) {
+        ctx.fillStyle = 'white';
+        ctx.fillRect(this.position.x, this.position.y, this.size.x, this.size.y);
+    }
+}
+</code></pre>
+
+<h4>Vector.JS</h4>
+			<pre><code class="language-javascript">// Just a dummy Vector class
+class Vector {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+</code></pre>
+
+            <h4>Script.JS</h4>
+			<pre><code class="language-javascript">// Create a new Quadtree
+const tree = new Quadtree({
+    width: 640,
+    height: 480,
+    maxObjects: 4,
+});
+
+// Store all objects in an array
+const myObjects = [];
+
+// Create a box every second
+const interval = window.setInterval(() => {
+
+    const box = new Box(
+        Math.random() * (canvas.width-32),
+        Math.random() * (canvas.height-32),
+        4 + Math.random() * 28,
+        4 + Math.random() * 28,
+    );
+
+    tree.insert(box);
+
+    myObjects.push(box);
+
+    draw();
+    
+    // Stop after 100 boxes
+    if(myObjects.length > 100) {
+        window.clearInterval(interval);
+    }
+
+}, 1000);
+</code></pre>
+
+			<p>
+				To see the full example code please check the page source or 
+				<a href="https://github.com/timohausmann/quadtree-js/docs/examples/property-mapping/" 
+                    target="_blank" rel="noopener noreferrer">visit this page on github</a>.
+			</p>
+        </main>
+
+        <!-- prism syntax highlighting -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/prism.min.js" 
+            integrity="sha512-WkVkkoB31AoI9DAk6SEEEyacH9etQXKUov4JRRuM1Y681VsTq7jYgrRw06cbP6Io7kPsKx+tLFpH/HXZSZ2YEQ==" 
+            crossorigin="anonymous"></script>
+
+        <script src="/dist/quadtree.umd.full.js"></script>
+        <script src="../assets/examples.js"></script>
+        <script src="./Vector.js"></script>
+        <script src="./Box.js"></script>
+        <script src="./script.js"></script>
+	</body>
+</html>

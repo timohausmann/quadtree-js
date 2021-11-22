@@ -1,0 +1,205 @@
+<!doctype html>
+<html>
+	<head>
+		<title>quadtree-js – simple example</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Fira+Sans&display=swap" rel="stylesheet">
+        
+        <!-- prism syntax highlighting (https://prismjs.com/) -->
+		<link 
+            rel="stylesheet" 
+            href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/themes/prism.min.css" 
+            integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" 
+            crossorigin="anonymous" />
+
+        <link rel="stylesheet" href="../assets/examples.css" />
+        
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+	</head>
+	<body>
+
+        <div class="panel">
+
+            <div>
+                <h2>quadtree-js</h2>
+                <h3 class="m1">2.0.0-beta.1</h3>
+                
+                <nav class="m4">
+                    <h4>Examples</h4>
+                    <ul class="links">
+                        <li><a class="link" href="../simple">Simple</a></li>
+                        <li><a class="link" href="../dynamic">Dynamic</a></li>
+                        <li><a class="link" href="../primitives">Primitives</a></li>
+                        <li><a class="link" href="../class-extension">Class Extension</a></li>
+                        <li><a class="link" href="../property-mapping">Property Mapping</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <footer>
+                <nav>
+                    <h4>Links</h4>
+                    <ul class="links">
+                        <li><a class="link" href="/">Home</a></li>
+                        <li><a class="link" href="https://github.com/timohausmann/quadtree-js#readme">Readme</a></li>
+                        <li><a class="link" href="/documentation">API Docs</a></li>
+                        <li><a href="https://github.com/timohausmann/quadtree-js" 
+                            title="quadtree-js at GitHub"
+                            class="link icon"
+                            target="_blank" rel="noopener noreferrer">
+                            <img src="/docs/examples/assets/logo-github.svg" alt="GitHub Logo" />
+                            GitHub
+                        </a></li>
+                        <li><a href="https://www.npmjs.com/package/@timohausmann/quadtree-js" 
+                            title="quadtree-js at npm"
+                            class="link icon"
+                            target="_blank" rel="noopener noreferrer">
+                            <img src="/docs/examples/assets/logo-npm.svg" alt="npm Logo" />
+                            npm
+                        </a></li>
+                        <li><a href="https://twitter.com/timohausmann" 
+                            title="quadtree-js author at Twitter"
+                            class="link icon"
+                            target="_blank" rel="noopener noreferrer">
+                            <img src="/docs/examples/assets/logo-twitter.svg" alt="Twitter Logo" />
+                            Twitter
+                        </a></li>
+                    </ul>
+                </nav>
+            </footer>
+        </div>
+
+        <main class="content">
+            <h1 class="m1">Simple Example</h1>
+            <div class="canvas m2">
+                <canvas id="canvas" width="640" height="480"></canvas>
+
+                <div>
+                    <button class="button" id="btnAdd">add small object</button>
+                    <button class="button" id="btnAddBig">add big object</button>
+                    <button class="button" id="btnAdd10">add 10 small objects</button>
+                    <button class="button" id="btnClear">clear tree</button>
+                </div>
+            </div>
+
+            <p>
+				Click the buttons to add elements to the Quadtree.
+                After adding five objects, the Quadtree it will split, 
+                because <code>maxObjects: 4</code> was set (default: 10).
+			</p>
+            <p class="m2">
+                The following code is reduced to the most important parts.
+                <a href="https://github.com/timohausmann/quadtree-js/docs/examples/simple/" 
+                    target="_blank" rel="noopener noreferrer">View the full script.js of this example on GitHub</a>.
+            </p>
+
+            <h4>HTML</h4>
+            <pre><code class="language-html">&lt;canvas id="canvas" width="640" height="480"&gt;&lt;/canvas&gt;
+&lt;button id="btnAdd"&gt;add small object&lt;/button&gt;</code></pre>
+
+            <h4>JS</h4>
+			<pre><code class="language-javascript">// Create a new Quadtree
+const tree = new Quadtree({
+	width: 640,
+	height: 480,
+    maxObjects: 4,
+});
+
+// Store all objects in an array
+const myObjects = [];
+
+// Canvas and context
+const canvas = document.querySelector('#canvas'),
+    ctx = canvas.getContext('2d');
+
+// Add event listener to a button to create new Rectangles
+document.querySelector('#btnAdd').addEventListener('click', () => {
+
+    // Each primitive requires geometry properties –
+    // For Rectangle x, y, width and height are required.
+    const rect = new Quadtree.Rectangle({
+        x: Math.random() * 640,
+        y: Math.random() * 480,
+        width: 4 + Math.random() * 28,
+        height: 4 + Math.random() * 28,
+
+        // We will use the optional `data` property to 
+        // keep track of the object's status
+        data: {
+            check: false
+        },
+    });
+
+    // Insert the rect in the Quadtree
+    tree.insert(rect);
+
+    // Store all objects for later use
+    myObjects.push(rect);
+
+    // Update the scene
+    draw();
+});
+
+// Create a "cursor" Rectangle to retrieve objects from the Quadtree
+const myCursor = new Quadtree.Rectangle({
+    x: 0,
+    y: 0,
+    width: 28,
+    height: 28
+});
+
+// Add event listener to mouse movement
+canvas.addEventListener('mousemove', (e) => {
+    myCursor.x = e.offsetX - (myCursor.width/2);
+    myCursor.y = e.offsetY - (myCursor.height/2);
+
+    // Reset check flag on each Rectangle
+    myObjects.forEach(rect => rect.data.check = false);
+
+    // Retrieve all objects that share nodes with the cursor 
+    const candidates = tree.retrieve(myCursor);
+
+    // Flag retrieved objects
+    candidates.forEach(rect => rect.data.check = true);
+
+    // Update the scene
+    draw();
+});
+
+function draw() {
+    
+    // Clear the canvas
+    ctx.clearRect(0, 0, 640, 480);
+    
+    // Draw the objects
+    for(let i=0;i&lt;myObjects.length;i=i+1) {
+        const obj = myObjects[i];
+        ctx.fillStyle = obj.data.check ? 'rgba(127,255,212,0.8)' : 'rgba(255,255,255,0.25)';
+        ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
+    }
+
+    // Draw the cursor
+    ctx.strokeStyle = 'rgba(127,255,212,1)';
+    ctx.strokeRect(myCursor.x, myCursor.y, myCursor.width, myCursor.height);
+};
+
+</code></pre>
+
+			<p>
+				To see the full example code please check the page source or 
+				<a href="https://github.com/timohausmann/quadtree-js/docs/examples/simple/" 
+                    target="_blank" rel="noopener noreferrer">visit this page on github</a>.
+			</p>
+        </main>
+
+        <!-- prism syntax highlighting -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/prism.min.js" 
+            integrity="sha512-WkVkkoB31AoI9DAk6SEEEyacH9etQXKUov4JRRuM1Y681VsTq7jYgrRw06cbP6Io7kPsKx+tLFpH/HXZSZ2YEQ==" 
+            crossorigin="anonymous"></script>
+
+        <script src="/dist/quadtree.umd.full.js"></script>
+        <script src="../assets/examples.js"></script>
+        <script src="./script.js"></script>
+	</body>
+</html>

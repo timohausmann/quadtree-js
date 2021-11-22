@@ -1,8 +1,8 @@
 <!doctype html>
 <html>
 	<head>
-		<title>quadtree-js 1.1.3 Performance Test</title>
-		<link rel="stylesheet" type="text/css" href="style.css?v=2" />
+		<title>quadtree-js 1.2.0 Performance Test</title>
+		<link rel="stylesheet" type="text/css" href="./assets/examples.css" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 		<!-- prism syntax highlighting (https://prismjs.com/) -->
@@ -17,13 +17,17 @@
 
 		<div class="outer">
 			
-			<h1><a href="https://github.com/timohausmann/quadtree-js">quadtree-js</a> 1.1.3 <small>performance test</small></h1>
+			<h1><a href="https://github.com/timohausmann/quadtree-js">quadtree-js</a> 1.2.0 <small>performance test</small></h1>
 
 			<nav>
 				<strong>Demos:</strong>
-				<a href="test-10000-1.2.0.html">benchmark 1.2</a>
-				<span>benchmark 1.1.3</span>
+				<a href="simple.html">simple</a>
+				<a href="dynamic.html">dynamic</a>
+				<a href="many.html">many to many</a>
+				<span>benchmark</span>
+                <a href="primitives.html">primitives</a>
 			</nav>
+
 
 			<div id="canvasContainer">
 				<canvas id="canvas" width="800" height="600"></canvas>
@@ -42,10 +46,10 @@
 			</div>
 
 			<p>
-				Quadtree 1.1.3 stored objects on parent nodes if they could not fully fit in a single subnode. This left alot of objects on high level nodes every time an object overlapped into two or more nodes. As a result, the retrieved candidates included alot of nodes that are actually far away. 
+				Quadtree 1.2 now stores objects exclusively on leaf nodes. Objects, that overlap into multiple subnodes are now referenced in each matching subnode instead of their parent node. This drastically reduces the collision candidates. Prior to 1.2, overlapping objects were stored in parent nodes (<a href="test-10000-1.1.3.html">1.1.3 Demo</a>). 
 			</p>
 			<p>
-				<a href="test-10000-1.2.0.html">Quadtree 1.2</a> fixes this by not storing objects on parent nodes, but only on leaf nodes (the lowest level).
+				Because objects may now be present in multiple nodes, nodes will split rather soon (depending on the max_objects value, default&nbsp;=&nbsp;10&nbsp;objects per node).
 			</p>
 
 			<p>Heart of the test code:</p>
@@ -72,9 +76,9 @@ var myTree = new Quadtree({
 }, 10, 4);
 
 for(var i=0; i&lt;amount;i++) {
-  myTree.insert(myObjects[i]);
+  myOldTree.insert(myObjects[i]);
 }
-var candidates = myTree.retrieve(myCursor);
+var candidates = myOldTree.retrieve(myCursor);
 
 //time measure ends here
 var end = window.performance.now();
@@ -97,21 +101,22 @@ var time = end - start;</code></pre>
 		<!-- prism syntax highlighting -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/prism.min.js" integrity="sha512-WkVkkoB31AoI9DAk6SEEEyacH9etQXKUov4JRRuM1Y681VsTq7jYgrRw06cbP6Io7kPsKx+tLFpH/HXZSZ2YEQ==" crossorigin="anonymous"></script>
 
-		<!-- quadtree lib and script -->
-		<script src="https://timohausmann.de/quadtree.js/releases/quadtree-1.1.3.js"></script>
+        <!-- quadtree lib -->
+		<script src="../dist/quadtree.umd.full.js"></script>
+        
+        <!-- example helpers -->
+		<script src="./example.js"></script>
+
+		<!-- example script -->
 		<script>
 
 			//---- SETUP
 			var amount = 10000;
+			var max_objects = 10;
+			var max_levels = 4;
 			var width = 800;
 			var height = 600;
 			var maxObjectSize = 64;
-
-			var randMinMax = function(min, max, round) {
-				var val = min + (Math.random() * (max - min));	
-				if(round) val = Math.round(val);	
-				return val;
-			};
 
 			var myCursor = {
 				x : randMinMax(120,width-120),
@@ -130,7 +135,7 @@ var time = end - start;</code></pre>
 				});
 			}
 
-			console.log('Quadtree 1.1.3 with', amount, 'objects on parent and leaf nodes');
+			console.log('Quadtree 1.2 with', amount, 'objects on leaf nodes only');
 
 
 			//---- TEST
@@ -141,7 +146,7 @@ var time = end - start;</code></pre>
 				y: 0,
 				width: width,
 			    height: height
-			});
+			}, max_objects, max_levels);
 
 			for(var i=0; i<amount;i++) {
 				myTree.insert(myObjects[i]);
@@ -170,50 +175,9 @@ var time = end - start;</code></pre>
 				candidates[ i ].check = true;
 			}
 
-			/*
-			 * draw Quadtree nodes
-			 */
-			var drawQuadtree = function(node) {
-
-				var bounds = node.bounds;
-			
-				//no subnodes? draw the current node
-				if(node.nodes.length === 0) {
-					ctx.strokeStyle = 'rgba(255,0,0,0.5)';
-					ctx.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
-					
-				//has subnodes? drawQuadtree them!
-				} else {
-					for(var i=0;i<node.nodes.length;i=i+1) {
-						drawQuadtree(node.nodes[ i ]);
-					}
-				}
-			};
-			
-			/*
-			 * draw all objects
-			 */
-			var drawObjects = function() {
-				
-				var obj;
-				
-				for(var i=0;i<myObjects.length;i=i+1) {
-					
-					obj = myObjects[ i ];
-					
-					if(obj.check) {
-						ctx.fillStyle = 'rgba(48,255,48,0.5)';
-						ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
-					} else {
-						ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-						ctx.strokeRect(obj.x, obj.y, obj.width, obj.height);
-					}
-				}
-			};
-
-			drawObjects();
-			drawQuadtree(myTree);
-
+            drawQuadtree(myTree, ctx);
+			drawObjects(myObjects, ctx);
+            
 			//draw retrieve area
 			ctx.strokeStyle = 'blue';
 			ctx.lineWidth = 2;

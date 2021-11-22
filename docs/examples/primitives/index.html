@@ -1,0 +1,240 @@
+<!doctype html>
+<html>
+	<head>
+		<title>quadtree-js – primitives example</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Fira+Sans&display=swap" rel="stylesheet">
+        
+        <!-- prism syntax highlighting (https://prismjs.com/) -->
+		<link 
+            rel="stylesheet" 
+            href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/themes/prism.min.css" 
+            integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" 
+            crossorigin="anonymous" />
+
+        <link rel="stylesheet" href="../assets/examples.css" />
+        
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+	</head>
+	<body>
+
+        <div class="panel">
+
+            <div>
+                <h2>quadtree-js</h2>
+                <h3 class="m1">2.0.0-beta.1</h3>
+                
+                <nav class="m4">
+                    <h4>Examples</h4>
+                    <ul class="links">
+                        <li><a class="link" href="../simple">Simple</a></li>
+                        <li><a class="link" href="../dynamic">Dynamic</a></li>
+                        <li><a class="link" href="../primitives">Primitives</a></li>
+                        <li><a class="link" href="../class-extension">Class Extension</a></li>
+                        <li><a class="link" href="../property-mapping">Property Mapping</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <footer>
+                <nav>
+                    <h4>Links</h4>
+                    <ul class="links">
+                        <li><a class="link" href="/">Home</a></li>
+                        <li><a class="link" href="https://github.com/timohausmann/quadtree-js#readme">Readme</a></li>
+                        <li><a class="link" href="/documentation">API Docs</a></li>
+                        <li><a href="https://github.com/timohausmann/quadtree-js" 
+                            title="quadtree-js at GitHub"
+                            class="link icon"
+                            target="_blank" rel="noopener noreferrer">
+                            <img src="/docs/examples/assets/logo-github.svg" alt="GitHub Logo" />
+                            GitHub
+                        </a></li>
+                        <li><a href="https://www.npmjs.com/package/@timohausmann/quadtree-js" 
+                            title="quadtree-js at npm"
+                            class="link icon"
+                            target="_blank" rel="noopener noreferrer">
+                            <img src="/docs/examples/assets/logo-npm.svg" alt="npm Logo" />
+                            npm
+                        </a></li>
+                        <li><a href="https://twitter.com/timohausmann" 
+                            title="quadtree-js author at Twitter"
+                            class="link icon"
+                            target="_blank" rel="noopener noreferrer">
+                            <img src="/docs/examples/assets/logo-twitter.svg" alt="Twitter Logo" />
+                            Twitter
+                        </a></li>
+                    </ul>
+                </nav>
+            </footer>
+        </div>
+
+        <main class="content">
+            <h1 class="m1">Primitives Example</h1>
+            <div class="canvas m2">
+                <canvas id="canvas" width="640" height="480"></canvas>
+
+                <div>
+                    <button class="button" id="addRectangle">add Rectangle</button>
+                    <button class="button" id="addCircle">add Circle</button>
+                    <button class="button" id="addLine">add Line</button>
+                    <button class="button" id="btnClear">clear tree</button>
+                    <hr />
+                    <button class="button" id="cursorRectangle">Cursor: Rectangle</button>
+                    <button class="button" id="cursorCircle">Cursor: Circle</button>
+                    <button class="button" id="cursorLine">Cursor: Line</button>
+                </div>
+            </div>
+
+            <p>
+				The main goal for quadtree-js v2 was to support multiple primitive shapes.
+			</p>
+            <p class="m1">
+				Right now there is built-in support for Rectangles, Circles and Lines.
+			</p>
+            <p class="m1">
+				All primitives can 1) be inserted into the tree and 2) be used to retrieve objects from the tree.
+			</p>
+            <p class="m1">
+				Rectangle is probably the fastest implementation (performance example will follow some day). 
+			</p>
+            <p class="m2">
+                The following code is reduced to the most important parts.
+                <a href="https://github.com/timohausmann/quadtree-js/docs/examples/primitives/" 
+                    target="_blank" rel="noopener noreferrer">View the full script.js of this example on GitHub</a>.
+            </p>
+
+            <h4>HTML</h4>
+            <pre><code class="language-html">&lt;canvas id="canvas" width="640" height="480"&gt;&lt;/canvas&gt;
+&lt;button id="addRectangle"&gt;add Rectangle&lt;/button&gt;
+&lt;button id="addCircle"&gt;add Circle&lt;/button&gt;
+&lt;button id="addLine"&gt;add Line&lt;/button&gt;</code></pre>
+
+            <h4>JS</h4>
+			<pre><code class="language-javascript">// Create a new Quadtree
+const tree = new Quadtree({
+	width: 640,
+	height: 480,
+});
+
+// Add Rectangles
+document.querySelector('#addRectangle').addEventListener('click', () => {
+
+    // Each primitive requires geometry properties –
+    // For Rectangle: x, y, width and height are required.
+    const rect = new Quadtree.Rectangle({
+        x: Math.random() * 640,
+        y: Math.random() * 480,
+        width: 4 + Math.random() * 28,
+        height: 4 + Math.random() * 28,
+    });
+
+    // Insert the Rectangle in the Quadtree
+    tree.insert(rect);
+});
+
+// Add Circle
+document.querySelector('#addCircle').addEventListener('click', () => {
+
+    // For Circle: x, y and r are required.
+    const circle = new Quadtree.Circle({
+        x: Math.random() * 640,
+        y: Math.random() * 480,
+        r: 4 + Math.random() * 16,
+    });
+
+    // Insert the Circle in the Quadtree
+    tree.insert(circle);
+});
+
+// Add Line
+document.querySelector('#addLine').addEventListener('click', () => {
+
+    // For Line: x1, y1, x2 and y2 are required.
+    const x1 = Math.random() * (640 - 128);
+    const y1 =  Math.random() * (480 - 128);
+    const line = new Quadtree.Line({
+        x1: x1,
+        y1: y1,
+        x2: x1 + Math.random() * 128,
+        y2: y1 + Math.random() * 128,
+    });
+
+    // Insert the Line in the Quadtree
+    tree.insert(line);
+});
+
+</code></pre>
+
+            <p class="m2">
+                All primitives can be used to retrieve objects from the Quadtree, too.
+            </p>
+            <h4>JS</h4>
+            <pre><code class="language-javascript">// Create some primitives we can use as cursors
+const cursorRectangle = new Quadtree.Rectangle({
+    x: 0,
+    y: 0,
+    width: 128,
+    height: 128,
+});
+const cursorCircle = new Quadtree.Circle({
+    x: 0, 
+    y: 0, 
+    r: 64,
+}),
+const cursorLine = new Quadtree.Line({
+    x1: 50, 
+    y1: 50, 
+    x2: 150,
+    y2: 150,
+});
+
+let myCursor = cursorRectangle;
+
+// Update cursor position
+canvas.addEventListener('mousemove', function(e) {
+    if(myCursor === cursorLine) {
+        myCursor.x1 = e.offsetX;
+        myCursor.y1 = e.offsetY;
+        myCursor.x2 = e.offsetX + 100;
+        myCursor.y2 = e.offsetY + 75;
+    } else {			
+        myCursor.x = e.offsetX;
+        myCursor.y = e.offsetY;	
+    }
+
+    // Retrieve objects
+    const candidates = tree.retrieve(myCursor);
+    console.log(candidates);
+});
+
+// Change the cursor
+document.querySelector('#cursorRectangle').addEventListener('click', () => {
+    myCursor = cursorRectangle;
+});
+document.querySelector('#cursorCircle').addEventListener('click', () => {
+    myCursor = cursorCircle;
+});
+document.querySelector('#cursorLine').addEventListener('click', () => {
+    myCursor = cursorLine;
+});
+</code></pre>
+
+			<p>
+				To see the full example code please check the page source or 
+				<a href="https://github.com/timohausmann/quadtree-js/docs/examples/primitives/" 
+                    target="_blank" rel="noopener noreferrer">visit this page on github</a>.
+			</p>
+        </main>
+
+        <!-- prism syntax highlighting -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/prism.min.js" 
+            integrity="sha512-WkVkkoB31AoI9DAk6SEEEyacH9etQXKUov4JRRuM1Y681VsTq7jYgrRw06cbP6Io7kPsKx+tLFpH/HXZSZ2YEQ==" 
+            crossorigin="anonymous"></script>
+
+        <script src="/dist/quadtree.umd.full.js"></script>
+        <script src="../assets/examples.js"></script>
+        <script src="./script.js"></script>
+	</body>
+</html>
