@@ -64,6 +64,14 @@ canvas {
 .m2 { margin-bottom: 2rem; }
 .m4 { margin-bottom: 4rem; }
 
+.canvas {
+    position: relative;
+    display: inline-block;
+}
+.canvas .stats {
+    position: absolute !important;
+}
+
 .panel {
     flex: 1;
     padding: 1rem;

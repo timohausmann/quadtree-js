@@ -64,7 +64,7 @@ function loop() {
         obj.data.check = false;
         
         if(obj.x > 640) obj.x = 0;
-        if(obj.x < 0) obj.x = 480;
+        if(obj.x < 0) obj.x = 640;
         if(obj.y > 480) obj.y = 0;
         if(obj.y < 0) obj.y = 480;
         
