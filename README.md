@@ -8,6 +8,13 @@ This implementation can store and retrieve rectangles in a recursive 2D Quadtree
 
 *Only 639 Bytes! (Compressed + Gzipped)*
 
+
+----
+
+### checkout "2.0": [quadtree-ts](https://github.com/timohausmann/quadtree-ts/) with multiple primitives, Typescript and more.
+
+----
+
 ## Demos
 
 * [Simple Demo](https://timohausmann.github.io/quadtree-js/simple.html) – add static objects and see the Quadtree split
