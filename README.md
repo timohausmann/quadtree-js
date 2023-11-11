@@ -160,7 +160,7 @@ This library is supported in all modern browsers and runtimes.
 
 ### 1.2.6
 
-* Retrieve performance boost (thanks to [xixileng](https://github.com/timohausmann/quadtree-ts/pull/8)) Pushing the retrieval on a tree with 1.000.000 objects from ~160ms to ~5ms (MacBook M1 Pro).
+* Performance improvement of `retrieve()` (was O(n^2), now O(n)) (thanks to [xixileng](https://github.com/timohausmann/quadtree-ts/pull/8)) Pushing the retrieval on a tree with 1.000.000 objects from ~160ms to ~5ms (MacBook M1 Pro).
 * New example: <a href="https://timohausmann.github.io/quadtree-js/test-retrieve.html" target="_blank">test-retrieve</a>
 * Local copy of `quadtree.min.js` for the docs folder so it's always up to date
 
