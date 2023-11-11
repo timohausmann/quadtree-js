@@ -135,13 +135,20 @@ myTree.insert(hero);
 
 ## Browser Support
 
-This library is supported in all modern browsers including IE9 and above. 
+This library is supported in all modern browsers and runtimes.
+2023 Update: now using ES6 (`new Set()`) which breaks IE9 compatibility. For IE9 support, use [1.2.5](https://github.com/timohausmann/quadtree-js/releases/tag/1.2.5).
 
 ## Development scripts
 
 * `npm run build` to minify the source
 
 ## Changelog
+
+### 1.2.6
+
+Retrieve performance boost (thanks to [xixileng](https://github.com/timohausmann/quadtree-ts/pull/8))
+Pushing the retrieval on a tree with 1.000.000 objects from ~160ms to ~5ms (MacBook M1 Pro).
+New example: <a href="https://timohausmann.github.io/quadtree-js/test-retrieve.html" target="_blank">test-retrieve</a>
 
 ### 1.2.5
 

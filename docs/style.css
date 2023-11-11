@@ -20,10 +20,15 @@ h1 {
 h1 a {
 	text-decoration: none;
 }
-nav {
+.nav {
 	display: flex;
 	justify-content: space-around;
 	margin-bottom: 2rem;
+}
+.nav + .nav {
+    margin-top: -1.25rem;
+    justify-content: center;
+    gap: 1rem;
 }
 nav a,
 nav span,
@@ -54,7 +59,7 @@ button {
 }
 p {
 	margin-bottom: 1em;
-	line-height: 1.3;
+	line-height: 1.6;
 }
 p code {
 	background: #f5f2f0;

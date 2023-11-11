@@ -1,14 +1,14 @@
 /**
  * quadtree-js
- * @version 1.2.5
+ * @version 1.2.6
  * @license MIT
  * @author Timo Hausmann
  */
 
-/* https://github.com/timohausmann/quadtree-js.git v1.2.4 */
+/* https://github.com/timohausmann/quadtree-js.git v1.2.6 */
  
 /*
-Copyright © 2012-2021 Timo Hausmann
+Copyright © 2012-2023 Timo Hausmann
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -216,9 +216,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         }
 
         //remove duplicates
-        returnObjects = returnObjects.filter(function(item, index) {
-            return returnObjects.indexOf(item) >= index;
-        });
+        if(this.level === 0) {
+            return Array.from(new Set(returnObjects));
+        }
      
         return returnObjects;
     };

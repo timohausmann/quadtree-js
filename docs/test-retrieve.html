@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 	<head>
-		<title>quadtree-js 1.2.0 Performance Test</title>
+		<title>quadtree-js 1.2.6 "Retrieve" Performance Test</title>
 		<link rel="stylesheet" type="text/css" href="style.css?v=2" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -17,7 +17,7 @@
 
 		<div class="outer">
 			
-			<h1><a href="https://github.com/timohausmann/quadtree-js">quadtree-js</a> 1.2.0 <small>performance test</small></h1>
+			<h1><a href="https://github.com/timohausmann/quadtree-js">quadtree-js</a> 1.2.6 <small>retrieve performance test</small></h1>
 
 			<nav>
                 <div class="nav">
@@ -25,11 +25,11 @@
                     <a href="simple.html">simple</a>
                     <a href="dynamic.html">dynamic</a>
                     <a href="many.html">many to many</a>
-                    <a href="test-retrieve.html">benchmark</a>
+                    <span>benchmark</span>
                 </div>
                 <div class="nav">
                     <strong>Old Benchmarks:</strong>
-                    <span>benchmark 1.2</span>
+                    <a href="test-10000-1.2.0.html">benchmark 1.2</a>
                     <a href="test-10000-1.1.3.html">benchmark 1.1.3</a>
                 </div>
 			</nav>
@@ -41,7 +41,7 @@
 
 			<div class="ctrl">
 				<div class="ctrl-left">
-					Time spend for insert of <span id="cnt_total2">0</span> objects and retrieve once:<br />
+					Time spend to retrieve <span id="cnt_total2">0</span> objects once:<br />
 					<strong><span id="cnt_time">0</span></strong>
 				</div>
 
@@ -52,15 +52,12 @@
 			</div>
 
 			<p>
-				Quadtree 1.2 now stores objects exclusively on leaf nodes. Objects, that overlap into multiple subnodes are now referenced in each matching subnode instead of their parent node. This drastically reduces the collision candidates. Prior to 1.2, overlapping objects were stored in parent nodes (<a href="test-10000-1.1.3.html">1.1.3 Demo</a>). 
-			</p>
-			<p>
-				Because objects may now be present in multiple nodes, nodes will split rather soon (depending on the max_objects value, default&nbsp;=&nbsp;10&nbsp;objects per node).
+				Quadtree 1.2.6 now uses the ES6 feature <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set" target="_blank">Set</a> to remove duplicates faster than ever (was O(n^2), now O(n)). 
 			</p>
 
 			<p>Heart of the test code:</p>
 
-			<pre><code class="language-javascript">var amount = 10000;
+			<pre><code class="language-javascript">var amount = 1000000;
 var myObjects = [];
 for(var i=0; i&lt;amount;i++) {
 	myObjects.push({
@@ -70,9 +67,6 @@ for(var i=0; i&lt;amount;i++) {
 	height: randMinMax(4, maxObjectSize)
 	});
 }
-
-//time measure starts here
-var start = window.performance.now();
 
 var myTree = new Quadtree({
 	x: 0,
@@ -84,6 +78,10 @@ var myTree = new Quadtree({
 for(var i=0; i&lt;amount;i++) {
   myOldTree.insert(myObjects[i]);
 }
+
+//time measure starts here
+var start = window.performance.now();
+
 var candidates = myOldTree.retrieve(myCursor);
 
 //time measure ends here
@@ -107,12 +105,14 @@ var time = end - start;</code></pre>
 		<!-- prism syntax highlighting -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/prism.min.js" integrity="sha512-WkVkkoB31AoI9DAk6SEEEyacH9etQXKUov4JRRuM1Y681VsTq7jYgrRw06cbP6Io7kPsKx+tLFpH/HXZSZ2YEQ==" crossorigin="anonymous"></script>
 
-		<!-- quadtree lib and script -->
+        <!-- quadtree lib and script -->
 		<script src="https://cdn.jsdelivr.net/npm/@timohausmann/quadtree-js/quadtree.min.js"></script>
+        <!-- compare with 1.1.3, 1.2.5 to see performance benefits: -->
+		<!-- <script src="https://cdn.jsdelivr.net/npm/@timohausmann/quadtree-js@1.2.5/quadtree.min.js"></script> -->
 		<script>
 
 			//---- SETUP
-			var amount = 10000;
+			var amount = 1000000;
 			var max_objects = 10;
 			var max_levels = 4;
 			var width = 800;
@@ -142,25 +142,25 @@ var time = end - start;</code></pre>
 				});
 			}
 
-			console.log('Quadtree 1.2 with', amount, 'objects on leaf nodes only');
+			console.log('Quadtree with', amount, 'objects on leaf nodes');
 
 
 			//---- TEST
-			var start = window.performance.now();
-
+            
 			var myTree = new Quadtree({
-				x: 0,
+                x: 0,
 				y: 0,
 				width: width,
 			    height: height
 			}, max_objects, max_levels);
-
+            
+            
 			for(var i=0; i<amount;i++) {
-				myTree.insert(myObjects[i]);
+                myTree.insert(myObjects[i]);
 			}
-
+            
+            var start = window.performance.now();
 			var candidates = myTree.retrieve(myCursor);
-
 			var end = window.performance.now();
 			var time = end - start;
 
