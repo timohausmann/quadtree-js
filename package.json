@@ -7,7 +7,7 @@
   "main": "quadtree.js",
   "types": "quadtree.d.ts",
   "scripts": {
-    "build": "uglifyjs quadtree.js -o quadtree.min.js --compress --mangle --comments /github/"
+    "build": "uglifyjs ./quadtree.js -o ./quadtree.min.js --compress --mangle --comments /github/ && cp quadtree.min.js ./docs/quadtree.min.js"
   },
   "repository": {
     "type": "git",
