@@ -20,8 +20,7 @@ This implementation can store and retrieve rectangles in a recursive 2D Quadtree
 * [Simple Demo](https://timohausmann.github.io/quadtree-js/simple.html) – add static objects and see the Quadtree split
 * [Dynamic Demo](https://timohausmann.github.io/quadtree-js/dynamic.html) – continuously track moving objects
 * [Many to many Demo](https://timohausmann.github.io/quadtree-js/many.html) – check all objects against each other
-* [Benchmark v1.2](https://timohausmann.github.io/quadtree-js/test-10000-1.2.0.html) - Performance test with 10.000 objects
-* [Benchmark v1.1.3](https://timohausmann.github.io/quadtree-js/test-10000-1.1.3.html) - Performance test with 10.000 objects (old implementation)
+* [Benchmark v1.2.6](https://timohausmann.github.io/quadtree-js/test-retrieve.html) - Performance test with 1.000.000 objects
 
 ## Install
 
@@ -116,6 +115,15 @@ Type definitions are included. Inserted objects need to conform to the `Quadtree
 ```javascript
 import Quadtree, { Rect } from '@timohausmann/quadtree-js';
 
+/*
+ * interface Rect {
+ *     x: number
+ *     y: number
+ *     width: number
+ *     height: number
+ * }
+ */
+
 interface Player extends Rect {
     name: string;
     health: number;
@@ -132,6 +140,12 @@ const hero:Player = {
 
 myTree.insert(hero);
 ```
+
+## Update single objects
+
+This was often requested and is now supported in [quadtree-ts](https://timohausmann.github.io/quadtree-ts/examples/update/). 
+This might be handy when most of the objects in your Quadtree are static.
+
 
 ## Browser Support
 
@@ -181,7 +195,3 @@ This implementation now stores objects exclusively on leaf nodes and thus differ
 ### 1.1.3
 
 Support for npm and `module.exports`
-
-## Update single objects
-
-There is a (currently deprecated) [quadtree-js hitman branch](https://github.com/timohausmann/quadtree-js/tree/hitman) available that allows you to update and remove single objects. This may be handy when most of the objects in your Quadtree are static. Please raise an issue if you want to see this feature maintained in future releases.
